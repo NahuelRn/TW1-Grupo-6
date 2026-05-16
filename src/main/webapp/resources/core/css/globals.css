@@ -1,0 +1,30 @@
+/* Definición de variables globales*/
+:root {
+    /* Fondos y Estructura */
+    --game-void: #1A1A1D;
+    --game-panel: #2A2A30;
+    --game-border: #404040;
+
+    /* Textos */
+    --game-text: #EAEAEA;
+    --game-muted: #A0A0A5;
+
+    /* Acentos y Acciones */
+    --game-blood: #8A0303;
+    --game-blood-hover: #aa0404;
+    --game-epic: #D4AF37;
+    --game-epic-hover: #f3c83b;
+
+    /* Métricas UI */
+    --border-radius-general: 6px; /* Estilo tallado, no circular [6] */
+    --hp-bar-height: 25px; /* Altura legible para barras de vida [6] */
+
+    /* Sombras Profundas */
+    --shadow-game: 0 8px 16px rgba(0, 0, 0, 0.8);
+}
+
+body {
+    background-color: var(--game-void);
+    color: var(--game-text);
+    font-family: 'Roboto', sans-serif; /* Según tipografías recomendadas [7] */
+}
