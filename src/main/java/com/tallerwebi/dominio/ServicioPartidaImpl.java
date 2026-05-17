@@ -22,20 +22,16 @@ public class ServicioPartidaImpl implements ServicioPartida {
     Partida nuevaPartida = new Partida();
     nuevaPartida.setUsuario(usuario);
 
-    // 1. Buscamos al enemigo y seteamos la vida
     Enemigo enemigo = repositorioEnemigo.obtenerEnemigoAleatorioPorZona(zona);
     nuevaPartida.setEnemigo(enemigo);
     nuevaPartida.setHpEnemigo(enemigo != null ? enemigo.getHpBase() : 100);
     nuevaPartida.setHpJugador(100);
 
-    // 2. Extraer cartas del Mazo
     List<Carta> mazoCompleto = new ArrayList<>();
     if (usuario.getMazoActivo() != null && usuario.getMazoActivo().getCartas() != null) {
       mazoCompleto.addAll(usuario.getMazoActivo().getCartas());
     }
 
-    // 3. Mezclar y repartir cartas
-    // 3. Mezclar y repartir cartas
     if (mazoCompleto.size() >= CARTAS_INICIALES) {
       Collections.shuffle(mazoCompleto);
       List<Carta> manoInicial = new ArrayList<>(mazoCompleto.subList(0, CARTAS_INICIALES));

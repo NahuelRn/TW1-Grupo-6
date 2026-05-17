@@ -1,0 +1,65 @@
+package com.tallerwebi.presentacion;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalToIgnoringCase;
+import static org.mockito.Mockito.*;
+
+import com.tallerwebi.dominio.Partida;
+import com.tallerwebi.dominio.ServicioPartida;
+import com.tallerwebi.dominio.Usuario;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.web.servlet.ModelAndView;
+
+public class ControladorPartidaTest {
+
+  private ControladorPartida controladorPartida;
+  private ServicioPartida servicioPartidaMock;
+  private HttpServletRequest requestMock;
+  private HttpSession sessionMock;
+
+  @BeforeEach
+  public void init() {
+    // Mockeamos (simulamos) las dependencias
+    servicioPartidaMock = mock(ServicioPartida.class);
+    requestMock = mock(HttpServletRequest.class);
+    sessionMock = mock(HttpSession.class);
+
+    // Le decimos al request falso que cuando le pidan la sesión, devuelva nuestra sesión falsa
+    when(requestMock.getSession()).thenReturn(sessionMock);
+
+    // Instanciamos nuestro controlador pasándole el servicio falso
+    controladorPartida = new ControladorPartida(servicioPartidaMock);
+  }
+
+  @Test
+  public void alIrASeleccionarZonaDebeLlevarALaVistaSeleccionZona() {
+    // Ejecución
+    ModelAndView mav = controladorPartida.irASeleccionDeZona();
+
+    // Validación: verificamos que el nombre de la vista sea el HTML correcto
+    assertThat(mav.getViewName(), equalToIgnoringCase("seleccion-zona"));
+  }
+
+  @Test
+  public void alIniciarCombateDebeRedirigirAlHomeYGuardarPartidaEnSesion() {
+    // Preparación: Simulamos que hay un usuario logueado en la sesión
+    Usuario usuarioMock = new Usuario();
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuarioMock);
+
+    // Simulamos que el servicio devuelve una partida válida
+    Partida partidaMock = new Partida();
+    when(servicioPartidaMock.iniciarPartida(any(Usuario.class), anyString()))
+      .thenReturn(partidaMock);
+
+    // Ejecución: Simulamos que el usuario eligió el Bosque Oscuro
+    ModelAndView mav = controladorPartida.iniciarCombate("Bosque Oscuro", requestMock);
+
+    // Validación: verificamos que nos redirija al home
+    assertThat(mav.getViewName(), equalToIgnoringCase("redirect:/home"));
+    // Verificamos que se haya guardado la partida en la sesión
+    verify(sessionMock, times(1)).setAttribute("PARTIDA_ACTUAL", partidaMock);
+  }
+}

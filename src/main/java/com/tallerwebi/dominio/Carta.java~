@@ -22,6 +22,7 @@ public class Carta {
   private String rareza;
   private String descripcion;
 
+  // --- GETTERS Y SETTERS OBLIGATORIOS ---
   public Long getId() {
     return id;
   }

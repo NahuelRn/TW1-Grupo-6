@@ -11,7 +11,7 @@ public class Mazo {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Transient // Le ponemos Transient por ahora para que no rompa la base de datos
+  @Transient
   private List<Carta> cartas = new ArrayList<>();
 
   public List<Carta> getCartas() {

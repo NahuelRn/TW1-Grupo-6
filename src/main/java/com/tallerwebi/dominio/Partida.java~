@@ -66,6 +66,8 @@ public class Partida {
     return this;
   }
 
+  // @Transient significa que esta lista no se va a guardar en una tabla de la BD.
+  // Es temporal, solo dura mientras la partida está en memoria.
   @Transient
   private List<Carta> manoJugador = new ArrayList<>();
 

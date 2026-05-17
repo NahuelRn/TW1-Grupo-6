@@ -18,7 +18,6 @@ public class RepositorioEnemigoImpl implements RepositorioEnemigo {
 
   @Override
   public Enemigo obtenerEnemigoAleatorioPorZona(String zona) {
-    // Buscamos un enemigo de esa zona en la base de datos
     return (Enemigo) sessionFactory
       .getCurrentSession()
       .createQuery("FROM Enemigo WHERE zona = :zona ORDER BY rand()")
