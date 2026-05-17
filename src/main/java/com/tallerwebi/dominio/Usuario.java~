@@ -14,16 +14,16 @@ public class Usuario {
   private String rol;
   private Boolean activo = false;
 
-  @ManyToOne
   @JoinColumn(name = "mazo_activo_id")
-  private Mazo mazoActivo;
+  @ManyToOne
+  public Mazo mazoActivo;
 
   public Mazo getMazoActivo() {
     return mazoActivo;
   }
-
-  public void setMazoActivo(Mazo mazoActivo) {
+  public Usuario setMazoActivo(Mazo mazoActivo) {
     this.mazoActivo = mazoActivo;
+    return this;
   }
 
   public Long getId() {

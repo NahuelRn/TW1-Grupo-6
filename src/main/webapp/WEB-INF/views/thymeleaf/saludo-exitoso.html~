@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Resultado</title>
+</head>
+<body>
+<!-- Mostramos la variable que mandamos desde el ModelMap -->
+<h1>${mensajeSaludo}</h1>
+
+<br>
+<a href="saludo">Volver a intentar</a>
+</body>
+</html>

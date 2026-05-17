@@ -1,0 +1,49 @@
+package com.tallerwebi.dominio;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import java.util.ArrayList;
+import java.util.List;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.Mockito.*;
+
+public class ServicioPartidaTest {
+
+    private ServicioPartida servicioPartida;
+    private RepositorioEnemigo repositorioEnemigoMock;
+    private Usuario usuarioMock;
+    private Mazo mazoActivo;
+
+    @BeforeEach
+    public void init() {
+        // Simulamos la base de datos de enemigos
+        repositorioEnemigoMock = mock(RepositorioEnemigo.class);
+        // Instanciamos el servicio pasándole el repositorio falso
+        servicioPartida = new ServicioPartidaImpl(repositorioEnemigoMock);
+
+        // Preparamos un usuario de prueba con un mazo de 10 cartas
+        usuarioMock = new Usuario();
+        mazoActivo = new Mazo();
+        List<Carta> cartasMazo = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            cartasMazo.add(new Carta()); // Cartas genéricas para el test
+        }
+        mazoActivo.setCartas(cartasMazo);
+        usuarioMock.setMazoActivo(mazoActivo);
+    }
+
+    @Test
+    public void alIniciarPartidaElJugadorDebeTenerExactamente5CartasEnLaMano() {
+        // Preparación: Le decimos al mock que cuando busque un enemigo, devuelva uno genérico
+        Enemigo enemigoGenerico = new Enemigo();
+        when(repositorioEnemigoMock.obtenerEnemigoAleatorioPorZona(anyString())).thenReturn(enemigoGenerico);
+
+        // Ejecución
+        Partida partida = servicioPartida.iniciarPartida(usuarioMock, "Bosque Oscuro");
+
+        // Validación
+        assertThat(partida, is(notNullValue()));
+        assertThat(partida.getManoJugador(), hasSize(5)); // Acá verificamos la regla de negocio
+    }
+}
