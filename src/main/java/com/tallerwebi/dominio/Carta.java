@@ -1,0 +1,104 @@
+package com.tallerwebi.dominio;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Entity
+public class Carta {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  private String nombre;
+  private String tipo;
+  private String subtipo;
+  private Integer valorOroBase;
+  private Integer nivelDesbloqueo;
+  private Double probabilidad;
+  private Integer duracion;
+  private String rareza;
+  private String descripcion;
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public String getNombre() {
+    return nombre;
+  }
+
+  public void setNombre(String nombre) {
+    this.nombre = nombre;
+  }
+
+  public String getTipo() {
+    return tipo;
+  }
+
+  public void setTipo(String tipo) {
+    this.tipo = tipo;
+  }
+
+  public String getSubtipo() {
+    return subtipo;
+  }
+
+  public void setSubtipo(String subtipo) {
+    this.subtipo = subtipo;
+  }
+
+  public Integer getValorOroBase() {
+    return valorOroBase;
+  }
+
+  public void setValorOroBase(Integer valorOroBase) {
+    this.valorOroBase = valorOroBase;
+  }
+
+  public Integer getNivelDesbloqueo() {
+    return nivelDesbloqueo;
+  }
+
+  public void setNivelDesbloqueo(Integer nivelDesbloqueo) {
+    this.nivelDesbloqueo = nivelDesbloqueo;
+  }
+
+  public Double getProbabilidad() {
+    return probabilidad;
+  }
+
+  public void setProbabilidad(Double probabilidad) {
+    this.probabilidad = probabilidad;
+  }
+
+  public Integer getDuracion() {
+    return duracion;
+  }
+
+  public void setDuracion(Integer duracion) {
+    this.duracion = duracion;
+  }
+
+  public String getRareza() {
+    return rareza;
+  }
+
+  public void setRareza(String rareza) {
+    this.rareza = rareza;
+  }
+
+  public String getDescripcion() {
+    return descripcion;
+  }
+
+  public void setDescripcion(String descripcion) {
+    this.descripcion = descripcion;
+  }
+}
