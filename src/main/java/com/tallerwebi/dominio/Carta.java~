@@ -22,13 +22,12 @@ public class Carta {
   private String rareza;
   private String descripcion;
 
-  // --- GETTERS Y SETTERS OBLIGATORIOS ---
   public Long getId() {
     return id;
   }
 
   public void setId(Long id) {
-    this.id = id;
+    this.id = id;git checkout -b feature-nombre-de-tu-rama
   }
 
   public String getNombre() {
