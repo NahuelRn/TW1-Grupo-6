@@ -18,7 +18,7 @@ public class ServicioPartidaTest {
 
   @BeforeEach
   public void init() {
-    // Simulamos la base de datos de enemigos
+    // Simula la base de datos de enemigos
     repositorioEnemigoMock = mock(RepositorioEnemigo.class);
     // Instanciamos el servicio pasándole el repositorio falso
     servicioPartida = new ServicioPartidaImpl(repositorioEnemigoMock);
@@ -27,7 +27,7 @@ public class ServicioPartidaTest {
     usuarioMock = new Usuario();
     mazoActivo = new Mazo();
     List<Carta> cartasMazo = new ArrayList<>();
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 15; i++) {
       cartasMazo.add(new Carta()); // Cartas genéricas para el test
     }
     mazoActivo.setCartas(cartasMazo);
@@ -38,7 +38,7 @@ public class ServicioPartidaTest {
   public void alIniciarPartidaElJugadorDebeTenerExactamente5CartasEnLaMano() {
     // Preparación: Le decimos al mock que cuando busque un enemigo, devuelva uno genérico
     Enemigo enemigoGenerico = new Enemigo();
-    enemigoGenerico.setHpBase(100); // <--- ¡ESTA ES LA LÍNEA MÁGICA QUE FALTABA!
+    enemigoGenerico.setHpBase(100);
 
     when(repositorioEnemigoMock.obtenerEnemigoAleatorioPorZona(anyString()))
       .thenReturn(enemigoGenerico);

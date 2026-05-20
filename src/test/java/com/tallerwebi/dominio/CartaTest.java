@@ -9,10 +9,9 @@ public class CartaTest {
 
   @Test
   public void queSePuedanAsignarYObtenerTodosLosAtributosDeUnaCarta() {
-    // Preparación (Given)
     Carta carta = new Carta();
 
-    // Ejecución (When) - Le damos valor a absolutamente TODO
+    // Ejecución
     carta.setId(1L);
     carta.setNombre("Espada Larga");
     carta.setTipo("Ataque");
@@ -24,7 +23,7 @@ public class CartaTest {
     carta.setRareza("Poco Común");
     carta.setDescripcion("Inflige daño físico");
 
-    // Validación (Then) - Verificamos que devuelva exactamente lo mismo
+    // Validación (Then)
     assertThat(carta.getId(), equalTo(1L));
     assertThat(carta.getNombre(), equalTo("Espada Larga"));
     assertThat(carta.getTipo(), equalTo("Ataque"));
