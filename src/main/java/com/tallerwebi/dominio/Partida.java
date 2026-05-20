@@ -4,77 +4,61 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.*;
 
-@Entity
 public class Partida {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+//  private Integer identificadorPartida;
+    private Integer hpJugador;
+    private Integer hpEnemigo;
 
-  public Long getId() {
-    return id;
-  }
+    private Integer turno;
 
-  public Partida setId(Long id) {
-    this.id = id;
-    return this;
-  }
+//  private Usuario usuario;
+//  private Enemigo enemigo;
 
-  private Integer hpJugador;
+    private String estado;
 
-  public Integer getHpJugador() {
-    return hpJugador;
-  }
+    private List<Integer> cartasEnManoJugador;
 
-  public Partida setHpJugador(Integer hpJugador) {
-    this.hpJugador = hpJugador;
-    return this;
-  }
+    public Partida(Integer hpJugador, Integer hpEnemigo, Integer turno) {
+        this.hpJugador = hpJugador;
+        this.hpEnemigo = hpEnemigo;
+        this.turno = turno;
+        this.cartasEnManoJugador = new ArrayList<>();
+    }
 
-  private Integer hpEnemigo;
+    public Integer getHpJugador() {
+        return this.hpJugador;
+    }
 
-  public Integer getHpEnemigo() {
-    return hpEnemigo;
-  }
+    public void setHpJugador(Integer hpJugador) {
+        this.hpJugador = hpJugador;
+    }
 
-  public Partida setHpEnemigo(Integer hpEnemigo) {
-    this.hpEnemigo = hpEnemigo;
-    return this;
-  }
+    public Integer getHpEnemigo() {
+        return this.hpEnemigo;
+    }
 
-  @ManyToOne
-  private Usuario usuario;
+    public void setHpEnemigo(Integer hpEnemigo) {
+        this.hpEnemigo = hpEnemigo;
+    }
 
-  public Usuario getUsuario() {
-    return usuario;
-  }
+    public Integer getTurno() {
+        return this.turno;
+    }
 
-  public Partida setUsuario(Usuario usuario) {
-    this.usuario = usuario;
-    return this;
-  }
+    public void setTurno(Integer turno) {
+        this.turno = turno;
+    }
 
-  @ManyToOne
-  private Enemigo enemigo;
+    public void setCartasEnManoJugador(List<Integer> cartasEnManoJugador) {
+        this.cartasEnManoJugador = cartasEnManoJugador;
+    }
 
-  public Enemigo getEnemigo() {
-    return enemigo;
-  }
+    public List<Integer> getCartasEnManoJugador() {
+        return cartasEnManoJugador;
+    }
 
-  public Partida setEnemigo(Enemigo enemigo) {
-    this.enemigo = enemigo;
-    return this;
-  }
-
-  @Transient
-  private List<Carta> manoJugador = new ArrayList<>();
-
-  public List<Carta> getManoJugador() {
-    return manoJugador;
-  }
-
-  public Partida setManoJugador(List<Carta> manoJugador) {
-    this.manoJugador = manoJugador;
-    return this;
-  }
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
 }

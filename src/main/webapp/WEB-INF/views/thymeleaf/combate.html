@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Combate</title>
+</head>
+
+<body>
+
+<form th:action="@{/jugar-carta}" method="POST">
+    <input type="number" name="identificadorCarta">
+    <input type="number" name="identificadorPartida">
+
+    <button type="submit">JUGAR CARTA</button>
+</form>
+
+</body>
+</html>
