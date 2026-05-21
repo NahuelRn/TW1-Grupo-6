@@ -6,7 +6,23 @@
     <title>Combate</title>
 </head>
 
+<style>
+    body {
+        margin: auto;
+        text-align: center;
+        max-width: 750px;
+    }
+</style>
+
 <body>
+
+<h2>COMBATE</h2>
+
+<p>Daño realizado: <span th:text="${danioCartaHaciaEnemigo}"></span></p>
+
+<p>HP enemigo: <span th:text="${hpEnemigo}"></span></p>
+
+<p>Turno actual: <span th:text="${turno}"></span></p>
 
 <form th:action="@{/jugar-carta}" method="POST">
     <input type="number" name="identificadorCarta">
