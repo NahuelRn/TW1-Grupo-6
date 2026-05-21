@@ -26,8 +26,12 @@ public class ControladorCombate {
   }
 
   @RequestMapping(path = "/jugar-carta", method = RequestMethod.POST)
-  public ModelAndView jugarCarta(@RequestParam Integer identificadorCarta, @RequestParam Integer identificadorPartida) {
-    Integer danioCartaHaciaEnemigo = this.servicioCombate.jugarCarta(identificadorCarta, identificadorPartida);
+  public ModelAndView jugarCarta(
+    @RequestParam Integer identificadorCarta,
+    @RequestParam Integer identificadorPartida
+  ) {
+    Integer danioCartaHaciaEnemigo =
+      this.servicioCombate.jugarCarta(identificadorCarta, identificadorPartida);
     Partida partida = servicioCombate.obtenerPartidaPorIdentificador(identificadorPartida);
 
     ModelMap modelo = new ModelMap();
