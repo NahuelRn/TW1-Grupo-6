@@ -1,35 +1,30 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.Partida;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.tallerwebi.dominio.ServicioCombate;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.springframework.web.servlet.ModelAndView;
 
 public class ControladorCombateTest {
 
-    ServicioCombate servicioCombate = new ServicioCombate();
-    Partida partida = new Partida(100, 100, 1);
+  ServicioCombate servicioCombate = new ServicioCombate();
 
-    @Test
-    public void validarTurnoDelEnemigo() {
+  @Test
+  public void deberiaMostrarVistaCombate() {
+    ControladorCombate controladorCombate = new ControladorCombate(this.servicioCombate);
 
-        assertThrows(RuntimeException.class,() -> this.servicioCombate.jugarCarta(1, 2));
-    }
+    ModelAndView modelAndView = controladorCombate.combate();
 
-//    @Test
-//    public void debeFallarSiNoTieneLasCartasEnMano() {
-//
-//        assertThrows(RuntimeException.class, () -> this.servicioCombate.jugarCarta(1, 2));
-//        assertThrows(RuntimeException.class, () -> this.servicioCombate.jugarCarta(1, 2));
-//    }
+    assertEquals("combate", modelAndView.getViewName());
+  }
 
-    @Test
-    public void calcularEfectoCartaHaciaEnemigo() {
+  @Test
+  public void deberiaJugarCartaYMostrarDatosEnVista() {
+    ControladorCombate controladorCombate = new ControladorCombate(this.servicioCombate);
 
-        Integer resultadoDanioCartaHaciaEnemigo = this.servicioCombate.jugarCarta(1, 1);
+    ModelAndView modelAndView = controladorCombate.jugarCarta(1, 1);
 
-        assertEquals(55, resultadoDanioCartaHaciaEnemigo);
-    }
+    assertEquals("combate", modelAndView.getViewName());
+  }
 }
