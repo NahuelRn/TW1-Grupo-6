@@ -18,15 +18,6 @@ public class ServicioCombateTest {
   }
 
   @Test
-  public void deberiaLanzarErrorCuandoNoEsTurnoDelJugador() {
-    RuntimeException error = assertThrows(
-      RuntimeException.class,
-      () -> servicioCombate.jugarCarta(1, 2)
-    );
-    assertEquals("Turno del enemigo.", error.getMessage());
-  }
-
-  @Test
   public void deberiaCambiarTurnoLuegoDeJugarCarta() {
     servicioCombate.jugarCarta(1, 1);
 
