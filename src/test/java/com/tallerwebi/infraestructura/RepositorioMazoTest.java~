@@ -17,7 +17,7 @@ public class RepositorioMazoTest {
   private Session sessionMock;
 
   @BeforeEach
-  public void init() throws Exception {
+  public void init() {
     sessionFactoryMock = mock(SessionFactory.class);
     sessionMock = mock(Session.class);
 

@@ -11,6 +11,39 @@ public class Partida {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @ManyToOne
+  private Usuario usuario;
+
+  @ManyToOne
+  private Enemigo enemigo;
+
+  // --- VARIABLES COMPARTIDAS ---
+  private Integer hpJugador;
+  private Integer hpEnemigo;
+
+  // --- LO DE MIKA (Combate) ---
+  private Integer turno;
+  private String estado;
+
+  @Transient
+  private List<Carta> manoJugador = new ArrayList<>();
+
+  @Transient
+  private List<Integer> cartasEnManoJugador = new ArrayList<>();
+
+  // --- CONSTRUCTORES ---
+  public Partida() {}
+
+  // 2. Constructor que armó Mika para su lógica
+  public Partida(Integer hpJugador, Integer hpEnemigo, Integer turno) {
+    this.hpJugador = hpJugador;
+    this.hpEnemigo = hpEnemigo;
+    this.turno = turno;
+    this.cartasEnManoJugador = new ArrayList<>();
+  }
+
+  // GETTERS Y SETTERS
+
   public Long getId() {
     return id;
   }
@@ -19,8 +52,6 @@ public class Partida {
     this.id = id;
     return this;
   }
-
-  private Integer hpJugador;
 
   public Integer getHpJugador() {
     return hpJugador;
@@ -31,8 +62,6 @@ public class Partida {
     return this;
   }
 
-  private Integer hpEnemigo;
-
   public Integer getHpEnemigo() {
     return hpEnemigo;
   }
@@ -42,8 +71,21 @@ public class Partida {
     return this;
   }
 
-  @ManyToOne
-  private Usuario usuario;
+  public Integer getTurno() {
+    return turno;
+  }
+
+  public void setTurno(Integer turno) {
+    this.turno = turno;
+  }
+
+  public String getEstado() {
+    return estado;
+  }
+
+  public void setEstado(String estado) {
+    this.estado = estado;
+  }
 
   public Usuario getUsuario() {
     return usuario;
@@ -54,9 +96,6 @@ public class Partida {
     return this;
   }
 
-  @ManyToOne
-  private Enemigo enemigo;
-
   public Enemigo getEnemigo() {
     return enemigo;
   }
@@ -66,9 +105,6 @@ public class Partida {
     return this;
   }
 
-  @Transient
-  private List<Carta> manoJugador = new ArrayList<>();
-
   public List<Carta> getManoJugador() {
     return manoJugador;
   }
@@ -76,5 +112,13 @@ public class Partida {
   public Partida setManoJugador(List<Carta> manoJugador) {
     this.manoJugador = manoJugador;
     return this;
+  }
+
+  public List<Integer> getCartasEnManoJugador() {
+    return cartasEnManoJugador;
+  }
+
+  public void setCartasEnManoJugador(List<Integer> cartasEnManoJugador) {
+    this.cartasEnManoJugador = cartasEnManoJugador;
   }
 }

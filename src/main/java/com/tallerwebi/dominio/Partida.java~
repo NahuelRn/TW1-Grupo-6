@@ -7,76 +7,126 @@ import javax.persistence.*;
 @Entity
 public class Partida {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    // --- LO TUYO (Base de datos e Identificadores) ---
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  public Long getId() {
-    return id;
-  }
+    @ManyToOne
+    private Usuario usuario;
 
-  public Partida setId(Long id) {
-    this.id = id;
-    return this;
-  }
+    @ManyToOne
+    private Enemigo enemigo;
 
-  private Integer hpJugador;
+    // --- VARIABLES COMPARTIDAS ---
+    private Integer hpJugador;
+    private Integer hpEnemigo;
 
-  public Integer getHpJugador() {
-    return hpJugador;
-  }
+    // --- LO DE MIKA (Combate) ---
+    private Integer turno;
+    private String estado;
 
-  public Partida setHpJugador(Integer hpJugador) {
-    this.hpJugador = hpJugador;
-    return this;
-  }
+    // --- LAS MANOS (Unificamos las dos para que nadie llore) ---
+    // Esta es tuya, la que necesitan tus tests y la lógica orientada a objetos
+    @Transient
+    private List<Carta> manoJugador = new ArrayList<>();
 
-  private Integer hpEnemigo;
+    // Esta es la de Mika, la marcamos como Transient para que Hibernate no intente guardarla mal en la BD
+    @Transient
+    private List<Integer> cartasEnManoJugador = new ArrayList<>();
 
-  public Integer getHpEnemigo() {
-    return hpEnemigo;
-  }
+    // --- CONSTRUCTORES ---
+    // 1. Constructor vacío OBLIGATORIO para que Hibernate no explote
+    public Partida() {
+    }
 
-  public Partida setHpEnemigo(Integer hpEnemigo) {
-    this.hpEnemigo = hpEnemigo;
-    return this;
-  }
+    // 2. Constructor que armó Mika para su lógica
+    public Partida(Integer hpJugador, Integer hpEnemigo, Integer turno) {
+        this.hpJugador = hpJugador;
+        this.hpEnemigo = hpEnemigo;
+        this.turno = turno;
+        this.cartasEnManoJugador = new ArrayList<>();
+    }
 
-  @ManyToOne
-  private Usuario usuario;
+    // --- GETTERS Y SETTERS UNIFICADOS ---
 
-  public Usuario getUsuario() {
-    return usuario;
-  }
+    public Long getId() {
+        return id;
+    }
 
-  public Partida setUsuario(Usuario usuario) {
-    this.usuario = usuario;
-    return this;
-  }
+    public Partida setId(Long id) {
+        this.id = id;
+        return this;
+    }
 
-  @ManyToOne
-  private Enemigo enemigo;
+    public Integer getHpJugador() {
+        return hpJugador;
+    }
 
-  public Enemigo getEnemigo() {
-    return enemigo;
-  }
+    public Partida setHpJugador(Integer hpJugador) {
+        this.hpJugador = hpJugador;
+        return this;
+    }
 
-  public Partida setEnemigo(Enemigo enemigo) {
-    this.enemigo = enemigo;
-    return this;
-  }
+    public Integer getHpEnemigo() {
+        return hpEnemigo;
+    }
 
-  // @Transient significa que esta lista no se va a guardar en una tabla de la BD.
-  // Es temporal, solo dura mientras la partida está en memoria.
-  @Transient
-  private List<Carta> manoJugador = new ArrayList<>();
+    public Partida setHpEnemigo(Integer hpEnemigo) {
+        this.hpEnemigo = hpEnemigo;
+        return this;
+    }
 
-  public List<Carta> getManoJugador() {
-    return manoJugador;
-  }
+    public Integer getTurno() {
+        return turno;
+    }
 
-  public Partida setManoJugador(List<Carta> manoJugador) {
-    this.manoJugador = manoJugador;
-    return this;
-  }
+    public void setTurno(Integer turno) {
+        this.turno = turno;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public Partida setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+        return this;
+    }
+
+    public Enemigo getEnemigo() {
+        return enemigo;
+    }
+
+    public Partida setEnemigo(Enemigo enemigo) {
+        this.enemigo = enemigo;
+        return this;
+    }
+
+    // Tu Getter/Setter para el Test
+    public List<Carta> getManoJugador() {
+        return manoJugador;
+    }
+
+    public Partida setManoJugador(List<Carta> manoJugador) {
+        this.manoJugador = manoJugador;
+        return this;
+    }
+
+    // El Getter/Setter de Mika
+    public List<Integer> getCartasEnManoJugador() {
+        return cartasEnManoJugador;
+    }
+
+    public void setCartasEnManoJugador(List<Integer> cartasEnManoJugador) {
+        this.cartasEnManoJugador = cartasEnManoJugador;
+    }
 }
