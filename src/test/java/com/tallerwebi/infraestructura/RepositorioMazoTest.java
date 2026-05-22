@@ -4,6 +4,7 @@ import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.Carta;
 import com.tallerwebi.dominio.Mazo;
+import com.tallerwebi.dominio.MazoCarta;
 import com.tallerwebi.dominio.RepositorioMazo;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -34,12 +35,21 @@ public class RepositorioMazoTest {
     Carta carta = new Carta();
     carta.setNombre("Hechizo de Fuego");
 
-    mazo.getCartas().add(carta);
+    // Creamos la entidad intermedia (el nexo)
+    MazoCarta nexo = new MazoCarta();
+
+    // Seteamos las relaciones en el nexo
+    nexo.setMazo(mazo);
+    nexo.setCarta(carta);
+
+    // Agregamos el nexo a la lista del mazo (en lugar de la carta directamente)
+    mazo.getMazoCartas().add(nexo);
 
     // When
     repositorioMazo.guardar(mazo);
 
     // Then
+    // Verificamos que se llame a saveOrUpdate con el objeto mazo
     verify(sessionMock, times(1)).saveOrUpdate(mazo);
   }
 }
