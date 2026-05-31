@@ -11,8 +11,17 @@ public class Mazo {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Transient // Le ponemos Transient por ahora para que no rompa la base de datos
+  // Relación Muchos a Muchos: Un mazo tiene muchas cartas
+  @ManyToMany(fetch = FetchType.EAGER)
   private List<Carta> cartas = new ArrayList<>();
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
 
   public List<Carta> getCartas() {
     return cartas;
@@ -21,4 +30,8 @@ public class Mazo {
   public void setCartas(List<Carta> cartas) {
     this.cartas = cartas;
   }
+
+    public List<MazoCarta> getMazoCartas() {
+      return this.mazoCartas;
+    }
 }

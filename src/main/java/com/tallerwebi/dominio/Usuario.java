@@ -26,6 +26,17 @@ public class Usuario {
     this.mazoActivo = mazoActivo;
   }
 
+  @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
+  private Jugador jugador;
+
+  public Jugador getJugador() {
+    return jugador;
+  }
+
+  public void setJugador(Jugador jugador) {
+    this.jugador = jugador;
+  }
+
   public Long getId() {
     return id;
   }

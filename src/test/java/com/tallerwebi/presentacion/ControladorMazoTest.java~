@@ -8,7 +8,7 @@ import com.tallerwebi.dominio.ServicioMazo;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.springframework.ui.ModelMap;
+import org.springframework.web.servlet.ModelAndView;
 
 public class ControladorMazoTest {
 
@@ -22,12 +22,10 @@ public class ControladorMazoTest {
       cartasIds.add(i);
     }
 
-    // Instanciamos el ModelMap para cumplir con la nueva firma
-    ModelMap modelo = new ModelMap();
-    String vista = controlador.guardarMazo(cartasIds, modelo);
+    ModelAndView mav = controlador.guardarMazo(cartasIds);
 
     // Then
-    assertThat(vista, is("redirect:/lobby"));
+    assertThat(mav.getViewName(), is("redirect:/lobby"));
     verify(servicioMock, times(1)).validarYGuardarMazo(any());
   }
 
@@ -45,12 +43,10 @@ public class ControladorMazoTest {
       cartasIds.add(i);
     }
 
-    // Instanciamos el ModelMap
-    ModelMap modelo = new ModelMap();
-    String vista = controlador.guardarMazo(cartasIds, modelo);
+    ModelAndView mav = controlador.guardarMazo(cartasIds);
 
-    // Then: Validamos contra el String de la vista y sacamos el error directo del ModelMap
-    assertThat(vista, is("deckbuilding"));
-    assertThat(modelo.get("error").toString(), containsString("Error de validación"));
+    // Then
+    assertThat(mav.getViewName(), is("deckbuilding"));
+    assertThat(mav.getModel().get("error").toString(), containsString("Error de validación"));
   }
 }

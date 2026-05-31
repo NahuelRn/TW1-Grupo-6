@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Lobby - MythicStack</title>
+    <!-- Boostrap core css -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <!-- custom style -->
+    <link rel="stylesheet" th:href="@{/css/main.css}" />
+</head>
+<body>
+<main role="main" class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+    <div class="col-md-8 col-sm-10 mythic-panel text-center">
+
+        <h1 class="mb-3" style="color: var(--game-epic);">Bienvenido a MythicStack</h1>
+        <h4 class="mb-5" style="color: var(--game-muted);">Que deseas hacer, guerrero?</h4>
+
+        <div class="d-grid gap-3 col-md-8 mx-auto">
+            <form action="deckbuilding" method="GET">
+                <button type="submit" class="btn btn-lg btn-mythic-blood w-100">Jugar (Armar Mazo)</button>
+            </form>
+
+            <form action="combate" method="GET">
+                <button type="submit" class="btn btn-lg btn-mythic-blood w-100">Ir al Combate</button>
+            </form>
+
+            <form action="contrato-mejora" method="GET">
+                <button type="submit" class="btn btn-lg btn-mythic-epic w-100">Contrato de Mejora</button>
+            </form>
+        </div>
+
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+        crossorigin="anonymous"></script>
+</body>
+</html>

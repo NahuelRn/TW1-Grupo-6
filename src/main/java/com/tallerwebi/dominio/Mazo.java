@@ -27,7 +27,14 @@ public class Mazo {
     return cartas;
   }
 
+  @Transient
+  private List<MazoCarta> mazoCartas = new ArrayList<>();
+
   public void setCartas(List<Carta> cartas) {
     this.cartas = cartas;
+  }
+
+  public List<MazoCarta> getMazoCartas() {
+    return this.mazoCartas;
   }
 }
