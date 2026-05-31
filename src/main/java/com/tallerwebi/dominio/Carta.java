@@ -1,9 +1,6 @@
 package com.tallerwebi.dominio;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class Carta {
@@ -21,6 +18,10 @@ public class Carta {
   private Integer duracion;
   private String rareza;
   private String descripcion;
+
+// Relación opcional: saber en qué mazos está esta carta
+//@OneToMany(mappedBy = "carta")
+//private final List<MazoCarta> mazoCartas = new ArrayList<>();
 
   public Long getId() {
     return id;

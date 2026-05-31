@@ -1,9 +1,8 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.Carta;
-import com.tallerwebi.dominio.Mazo;
-import com.tallerwebi.dominio.ServicioMazo;
-import java.util.ArrayList;
+import com.tallerwebi.dominio.*;
+
+//import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,62 +15,58 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class ControladorMazo {
 
-  private ServicioMazo servicioMazo;
+  private final ServicioMazo servicioMazo;
 
   @Autowired
   public ControladorMazo(ServicioMazo servicioMazo) {
     this.servicioMazo = servicioMazo;
   }
 
-  // Método para mostrar la pantalla de armado de mazo
   @RequestMapping("/deckbuilding")
   public ModelAndView irADeckbuilding() {
     ModelMap modelo = new ModelMap();
-
-    // Aquí deberías traer las cartas del inventario del usuario desde un servicio
-    // Por ahora, pasamos una lista vacía o de ejemplo para que la vista no falle
-    List<Carta> inventario = obtenerInventarioEjemplo();
+    // Datos de prueba para ver cartas en la pantalla
+    List<Carta> inventario = servicioMazo.buscarCartasPorIds(List.of(1L, 2L, 3L, 4L, 5L));
     modelo.put("inventario", inventario);
-
     return new ModelAndView("deckbuilding", modelo);
   }
 
   // Método para recibir los datos del formulario (POST)
   @RequestMapping(path = "/mazo/guardar", method = RequestMethod.POST)
   public ModelAndView guardarMazo(@RequestParam("cartasIds") List<Long> cartasIds) {
+    ModelMap modelo = new ModelMap();
     try {
-      // Creamos el objeto Mazo y le asignamos las cartas según los ID recibidos
+      // 1. Creamos el objeto Mazo principal
       Mazo nuevoMazo = new Mazo();
-      List<Carta> cartasSeleccionadas = transformarIdsEnCartas(cartasIds);
-      nuevoMazo.setCartas(cartasSeleccionadas);
 
-      // Llamamos al servicio para validar las reglas (15 cartas, sin repetidos)
+      // 2. Obtenemos las cartas elegidas
+      List<Carta> cartasSeleccionadas = this.servicioMazo.buscarCartasPorIds(cartasIds);
+
+      // 3. ¡IMPORTANTE! Creamos la entidad intermedia (MazoCarta) para cada carta
+      for (Carta carta : cartasSeleccionadas) {
+        MazoCarta nexo = new MazoCarta();
+        nexo.setMazo(nuevoMazo);
+        nexo.setCarta(carta);
+        // Agregamos el nexo a la lista del mazo
+        nuevoMazo.getMazoCartas().add(nexo);
+      }
+
+      // 4. Llamamos al servicio para validar (15 cartas, sin repetidos)
       servicioMazo.validarYGuardarMazo(nuevoMazo);
 
-      // Si todo está bien, redirigimos al Lobby
+      // 5. Si todo está OK, redirigimos (GET) al lobby [4, 5]
       return new ModelAndView("redirect:/lobby");
+
     } catch (Exception e) {
-      ModelMap modelo = new ModelMap();
-      // Si hay un error (ej: menos de 15 cartas), volvemos a la vista con el mensaje
+      // 6. Si falla la validación, volvemos a la vista con el error [6, 7]
       modelo.put("error", e.getMessage());
-      // Volver a cargar el inventario para que la vista no quede vacía
-      modelo.put("inventario", obtenerInventarioEjemplo());
+      // Recargamos el inventario para que no desaparezcan las cartas de la vista
+      modelo.put("inventario", servicioMazo.buscarCartasPorIds(List.of(1L, 2L, 3L)));
       return new ModelAndView("deckbuilding", modelo);
     }
   }
 
-  // Métodos auxiliares
-  private List<Carta> transformarIdsEnCartas(List<Long> ids) {
-    List<Carta> cartas = new ArrayList<>();
-    for (Long id : ids) {
-      Carta carta = new Carta();
-      carta.setId(id);
-      cartas.add(carta);
-    }
-    return cartas;
-  }
-
-  private List<Carta> obtenerInventarioEjemplo() {
+   /*private List<Carta> obtenerInventarioEjemplo() {
     List<Carta> cartasDePrueba = new ArrayList<>();
 
     // cartas ficticias para verlas en la pantalla
@@ -97,5 +92,5 @@ public class ControladorMazo {
     cartasDePrueba.add(c4);
 
     return cartasDePrueba;
-  }
+  } */
 }

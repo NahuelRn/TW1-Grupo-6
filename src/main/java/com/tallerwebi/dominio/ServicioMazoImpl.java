@@ -1,8 +1,11 @@
 package com.tallerwebi.dominio;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import java.util.ArrayList;
 
 @Service
 @Transactional // Asegura que si algo falla, no se guarde nada a medias
@@ -17,21 +20,36 @@ public class ServicioMazoImpl implements ServicioMazo {
 
   @Override
   public void validarYGuardarMazo(Mazo mazo) throws Exception {
-    List<Carta> cartas = mazo.getCartas();
+    // obtenemos la lista del nexo intermedio
+    List<MazoCarta> nexos = mazo.getMazoCartas();
 
     // REGLA 1: Exactamente 15 cartas
-    if (cartas.size() != MAX_CARTAS) {
+    if (nexos.size() != MAX_CARTAS) {
       throw new Exception("El mazo debe tener exactamente 15 cartas");
     }
 
     // REGLA 2: No se pueden repetir cartas
-    for (int i = 0; i < cartas.size(); i++) {
-      for (int j = i + 1; j < cartas.size(); j++) {
-        if (cartas.get(i).getId().equals(cartas.get(j).getId())) {
-          throw new Exception("No puedes incluir cartas repetidas: " + cartas.get(i).getNombre());
-        }
+    Set<Long> idsUnicos = new HashSet<>();
+
+    for (MazoCarta nexo : nexos) {
+      Carta carta = nexo.getCarta(); // Accedemos a la carta a través del nexo
+
+      if (!idsUnicos.add(carta.getId())) {
+        throw new Exception("No puedes incluir cartas repetidas: " + carta.getNombre());
       }
     }
+
     repositorioMazo.guardar(mazo);
+  }
+
+  @Override
+  public List<Carta> buscarCartasPorIds(List<Long> ids) {
+    List<Carta> cartas = new ArrayList<>();
+      for (Long id : ids) {
+        Carta carta = new Carta();
+        carta.setId(id);
+        cartas.add(carta);
+      }
+      return cartas;
   }
 }
