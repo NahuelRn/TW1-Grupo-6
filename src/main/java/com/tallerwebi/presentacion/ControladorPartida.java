@@ -24,8 +24,7 @@ public class ControladorPartida {
 
   @GetMapping("/seleccionar-zona")
   public ModelAndView irASeleccionDeZona() {
-    ModelMap modelo = new ModelMap();
-    return new ModelAndView("seleccion-zona", modelo);
+    return new ModelAndView("seleccion-zona");
   }
 
   @PostMapping("/iniciar-combate")
