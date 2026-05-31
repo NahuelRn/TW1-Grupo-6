@@ -19,7 +19,6 @@ public class RepositorioUsuarioImpl implements RepositorioUsuario {
 
   @Override
   public Usuario buscarUsuario(String email, String password) {
-    /* Se utiliza sessionFactory.getCurrentSession() directamente para que el recurso sea gestionado por Spring y PMD no exija cerrarlo manualmente */
     return (Usuario) sessionFactory
       .getCurrentSession()
       .createCriteria(Usuario.class)

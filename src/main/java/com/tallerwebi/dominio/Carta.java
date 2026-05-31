@@ -19,9 +19,9 @@ public class Carta {
   private String rareza;
   private String descripcion;
 
-// Relación opcional: saber en qué mazos está esta carta
-//@OneToMany(mappedBy = "carta")
-//private final List<MazoCarta> mazoCartas = new ArrayList<>();
+  // Relación opcional: saber en qué mazos está esta carta
+  //@OneToMany(mappedBy = "carta")
+  //private final List<MazoCarta> mazoCartas = new ArrayList<>();
 
   public Long getId() {
     return id;

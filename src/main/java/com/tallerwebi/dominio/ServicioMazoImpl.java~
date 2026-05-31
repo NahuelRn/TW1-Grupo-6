@@ -1,11 +1,11 @@
 package com.tallerwebi.dominio;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import java.util.ArrayList;
 
 @Service
 @Transactional // Asegura que si algo falla, no se guarde nada a medias
@@ -20,10 +20,11 @@ public class ServicioMazoImpl implements ServicioMazo {
 
   @Override
   public void validarYGuardarMazo(Mazo mazo) throws Exception {
+    // obtenemos la lista del nexo intermedio
     List<MazoCarta> nexos = mazo.getMazoCartas();
 
-    // REGLA 1: Usamos la constante en vez del literal "15"
-    if (nexos.size() != MAX_CARTAS) {
+    // REGLA 1: Exactamente 15 cartas
+    if (nexos.size() != 15) { // Asegurate de que MAX_CARTAS esté definido, o usá 15 directo
       throw new Exception("El mazo debe tener exactamente 15 cartas");
     }
 
@@ -31,31 +32,27 @@ public class ServicioMazoImpl implements ServicioMazo {
     Set<Long> idsUnicos = new HashSet<>();
 
     for (MazoCarta nexo : nexos) {
-      Carta carta = nexo.getCarta();
+      Carta carta = nexo.getCarta(); // Accedemos a la carta a través del nexo
 
+      // Al usar contains() estamos "LEYENDO" la variable, lo que elimina el error DU de PMD
       if (idsUnicos.contains(carta.getId())) {
         throw new Exception("No puedes incluir cartas repetidas: " + carta.getNombre());
       }
 
+      // Si pasa la validación, lo guardamos en la bolsa
       idsUnicos.add(carta.getId());
-    }
-
-    // EL TRUCO PARA PMD: Leemos la variable al final de todo para matar la anomalía DU
-    if (idsUnicos.size() != MAX_CARTAS) {
-      throw new Exception("Error de validación interna con las cartas");
     }
 
     repositorioMazo.guardar(mazo);
   }
-
   @Override
   public List<Carta> buscarCartasPorIds(List<Long> ids) {
     List<Carta> cartas = new ArrayList<>();
-    for (Long id : ids) {
-      Carta carta = new Carta();
-      carta.setId(id);
-      cartas.add(carta);
-    }
-    return cartas;
+      for (Long id : ids) {
+        Carta carta = new Carta();
+        carta.setId(id);
+        cartas.add(carta);
+      }
+      return cartas;
   }
 }

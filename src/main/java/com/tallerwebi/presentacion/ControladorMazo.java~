@@ -1,9 +1,10 @@
 package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.Carta;
+import com.tallerwebi.dominio.ServicioMazo;
 import com.tallerwebi.dominio.Mazo;
 import com.tallerwebi.dominio.MazoCarta;
-import com.tallerwebi.dominio.ServicioMazo;
+
 //import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,8 @@ public class ControladorMazo {
 
   // Método para recibir los datos del formulario (POST)
   @RequestMapping(path = "/mazo/guardar", method = RequestMethod.POST)
-  public String guardarMazo(@RequestParam("cartasIds") List<Long> cartasIds, ModelMap modelo) {
+  public ModelAndView guardarMazo(@RequestParam("cartasIds") List<Long> cartasIds) {
+    ModelMap modelo = new ModelMap();
     try {
       // 1. Creamos el objeto Mazo principal
       Mazo nuevoMazo = new Mazo();
@@ -43,27 +45,31 @@ public class ControladorMazo {
       // 2. Obtenemos las cartas elegidas
       List<Carta> cartasSeleccionadas = this.servicioMazo.buscarCartasPorIds(cartasIds);
 
-      // 3. Creamos la entidad intermedia (MazoCarta) para cada carta
+      // 3. ¡IMPORTANTE! Creamos la entidad intermedia (MazoCarta) para cada carta
       for (Carta carta : cartasSeleccionadas) {
         MazoCarta nexo = new MazoCarta();
         nexo.setMazo(nuevoMazo);
         nexo.setCarta(carta);
+        // Agregamos el nexo a la lista del mazo
         nuevoMazo.getMazoCartas().add(nexo);
       }
 
       // 4. Llamamos al servicio para validar (15 cartas, sin repetidos)
       servicioMazo.validarYGuardarMazo(nuevoMazo);
 
-      // 5. Si todo está OK, redirigimos directamente
-      return "redirect:/lobby";
+      // 5. Si todo está OK, redirigimos (GET) al lobby [4, 5]
+      return new ModelAndView("redirect:/lobby");
+
     } catch (Exception e) {
-      // 6. Si falla la validación, cargamos el error y volvemos a la vista
+      // 6. Si falla la validación, volvemos a la vista con el error [6, 7]
       modelo.put("error", e.getMessage());
+      // Recargamos el inventario para que no desaparezcan las cartas de la vista
       modelo.put("inventario", servicioMazo.buscarCartasPorIds(List.of(1L, 2L, 3L)));
-      return "deckbuilding";
+      return new ModelAndView("deckbuilding", modelo);
     }
   }
-  /*private List<Carta> obtenerInventarioEjemplo() {
+
+   /*private List<Carta> obtenerInventarioEjemplo() {
     List<Carta> cartasDePrueba = new ArrayList<>();
 
     // cartas ficticias para verlas en la pantalla

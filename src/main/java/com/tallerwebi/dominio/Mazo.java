@@ -16,8 +16,26 @@ public class Mazo {
   @OneToMany(mappedBy = "mazo", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   private List<MazoCarta> mazoCartas = new ArrayList<>();
 
-  public Long getId() { return id; }
-  public void setId(Long id) { this.id = id; }
-  public List<MazoCarta> getMazoCartas() { return mazoCartas; }
-  public void setMazoCartas(List<MazoCarta> mazoCartas) { this.mazoCartas = mazoCartas; }
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public List<Carta> getCartas() {
+    return cartas;
+  }
+
+  @Transient
+  private List<MazoCarta> mazoCartas = new ArrayList<>();
+
+  public void setCartas(List<Carta> cartas) {
+    this.cartas = cartas;
+  }
+
+  public List<MazoCarta> getMazoCartas() {
+    return this.mazoCartas;
+  }
 }
