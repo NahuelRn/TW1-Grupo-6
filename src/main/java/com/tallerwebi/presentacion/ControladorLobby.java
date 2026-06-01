@@ -12,5 +12,4 @@ public class ControladorLobby {
   public String irAlLobby(ModelMap modelo) {
     return "lobby";
   }
-
 }

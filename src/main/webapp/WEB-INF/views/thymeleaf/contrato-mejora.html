@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MythicStack - Contrato de Mejora</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/globals.css}">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Roboto:wght@400;700&display=swap');
+
+        body {
+            background-color: var(--game-void);
+            color: var(--game-text);
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .titulo-epico {
+            font-family: 'Cinzel', serif;
+            color: var(--game-epic);
+            text-shadow: var(--shadow-game);
+            text-align: center;
+        }
+
+        .card-carta {
+            background-color: var(--game-panel);
+            border: 1px solid var(--game-border);
+            border-radius: 6px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card-carta:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-game);
+        }
+
+        .btn-mejora {
+            background-color: var(--game-epic);
+            color: var(--game-void);
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            border-radius: 6px;
+            padding: 12px 30px;
+            border: none;
+        }
+
+        .btn-mejora:hover {
+            background-color: var(--game-epic-hover);
+        }
+
+        .alert-error {
+            background-color: var(--game-blood);
+            color: white;
+            border: none;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container mt-5">
+    <h1 class="titulo-epico mb-4">Contrato de Mejora</h1>
+
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-8 text-center">
+            <p class="text-muted">Entrega 4 cartas de la misma rareza para obtener una de nivel superior.</p>
+        </div>
+    </div>
+
+    <!-- Mensajes de Feedback -->
+    <div th:if="${error}" class="alert alert-error text-center mb-4">
+        <i class="fa-solid fa-triangle-exclamation"></i> <span th:text="${error}"></span>
+    </div>
+
+    <form th:action="@{/contrato-mejora/intercambiar}" method="POST">
+        <div class="row">
+            <!-- Iteración del inventario del usuario -->
+            <div th:each="item : ${inventario}" class="col-md-3 mb-4">
+                <div class="card card-carta h-100 p-3 text-center">
+                    <h5 class="titulo-epico" style="font-size: 1.1rem;" th:text="${item.carta.nombre}">Nombre</h5>
+                    <p class="small text-muted" th:text="${item.carta.rareza}">RAREZA</p>
+                    <p class="small text-muted">Cantidad: <span th:text="${item.cantidad}">1</span></p>
+                    <div class="mt-auto form-check">
+                        <input type="checkbox"
+                               name="ids"
+                               th:value="${item.carta.id}"
+                               class="form-check-input"
+                               th:id="'carta-' + ${item.carta.id}">
+                        <label class="form-check-label" th:for="'carta-' + ${item.carta.id}">Seleccionar</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botón de Acción Principal -->
+        <div class="text-center mt-5 mb-5">
+            <button type="submit" class="btn btn-mejora">
+                FIRMAR CONTRATO
+            </button>
+        </div>
+    </form>
+
+    <div class="text-center">
+        <a th:href="@{/lobby}" class="btn btn-outline-secondary" style="color: var(--game-muted); border-color: var(--game-muted);">
+            Volver al Campamento
+        </a>
+    </div>
+</div>
+
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

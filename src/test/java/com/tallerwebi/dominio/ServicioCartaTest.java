@@ -1,36 +1,56 @@
 package com.tallerwebi.dominio;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.Mockito.*;
+
 import java.util.ArrayList;
 import java.util.List;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ServicioCartaTest {
 
-    private ServicioCarta servicioCarta;
-    private RepositorioCarta repositorioCarta;
+  private ServicioCarta servicioCarta;
+  private RepositorioCarta repositorioCarta;
 
-    @Before
-    public void init() {
-        repositorioCarta = mock(RepositorioCarta.class);
-        servicioCarta = new ServicioCartaImpl(repositorioCarta);
-    }
+  @BeforeEach
+  public void init() {
+    repositorioCarta = mock(RepositorioCarta.class);
+    servicioCarta = new ServicioCartaImpl(repositorioCarta);
+  }
 
-    @Test
-    public void queAlPedirTodasLasCartasSeLlameAlRepositorio() {
-        // Preparación
-        List<Carta> cartasSimuladas = new ArrayList<>();
-        cartasSimuladas.add(new Carta());
-        when(repositorioCarta.listarTodas()).thenReturn(cartasSimuladas);
+  @Test
+  public void queAlPedirTodasLasCartasSeLlameAlRepositorio() {
+    List<Carta> cartasSimuladas = new ArrayList<>();
+    cartasSimuladas.add(new Carta());
+    when(repositorioCarta.listarTodas()).thenReturn(cartasSimuladas);
 
-        // Ejecución
-        List<Carta> resultado = servicioCarta.obtenerTodas();
+    List<Carta> resultado = servicioCarta.obtenerTodas();
 
-        // Verificación
-        assertEquals(1, resultado.size());
-        verify(repositorioCarta, times(1)).listarTodas();
-    }
+    assertThat(resultado, hasSize(1));
+    verify(repositorioCarta, times(1)).listarTodas();
+  }
+
+  @Test
+  public void queAlPedirUnaCartaPorIdSeLlameAlRepositorio() {
+    Carta cartaSimulada = new Carta();
+    cartaSimulada.setId(1L);
+    when(repositorioCarta.buscarPorId(1L)).thenReturn(cartaSimulada);
+
+    Carta resultado = servicioCarta.obtenerCartaPorId(1L);
+
+    assertThat(resultado, notNullValue());
+    assertThat(resultado.getId(), is(1L));
+    verify(repositorioCarta, times(1)).buscarPorId(1L);
+  }
+
+  @Test
+  public void queAlPedirUnaCartaInexistentePorIdRetorneNull() {
+    when(repositorioCarta.buscarPorId(99L)).thenReturn(null);
+
+    Carta resultado = servicioCarta.obtenerCartaPorId(99L);
+
+    assertThat(resultado, nullValue());
+  }
 }

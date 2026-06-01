@@ -2,6 +2,7 @@ package com.tallerwebi.dominio;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.persistence.*;
 
 @Entity
@@ -11,8 +12,6 @@ public class Mazo {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  // Un mazo tiene muchas entradas en la tabla intermedia
-  // mappedBy indica el nombre del atributo en la clase MazoCarta
   @OneToMany(mappedBy = "mazo", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   private List<MazoCarta> mazoCartas = new ArrayList<>();
 
@@ -24,18 +23,21 @@ public class Mazo {
     this.id = id;
   }
 
-  public List<Carta> getCartas() {
-    return cartas;
+  public List<MazoCarta> getMazoCartas() {
+    return mazoCartas;
   }
 
-  @Transient
-  private List<MazoCarta> mazoCartas = new ArrayList<>();
+  public List<Carta> getCartas() {
+    return mazoCartas.stream().map(MazoCarta::getCarta).collect(Collectors.toList());
+  }
 
   public void setCartas(List<Carta> cartas) {
-    this.cartas = cartas;
-  }
-
-  public List<MazoCarta> getMazoCartas() {
-    return this.mazoCartas;
+    this.mazoCartas = new ArrayList<>();
+    for (Carta carta : cartas) {
+      MazoCarta nexo = new MazoCarta();
+      nexo.setMazo(this);
+      nexo.setCarta(carta);
+      this.mazoCartas.add(nexo);
+    }
   }
 }

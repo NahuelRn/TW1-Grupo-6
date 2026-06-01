@@ -15,7 +15,7 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class ControladorLogin {
 
-  private ServicioLogin servicioLogin;
+  private final ServicioLogin servicioLogin;
 
   @Autowired
   public ControladorLogin(ServicioLogin servicioLogin) {
@@ -40,9 +40,9 @@ public class ControladorLogin {
     );
     if (usuarioBuscado != null) {
       request.getSession().setAttribute("ROL", usuarioBuscado.getRol());
-      return new ModelAndView("redirect:/lobby");
+      return new ModelAndView("redirect:/home");
     } else {
-      /* Se instancia el ModelMap solo cuando es necesario (en el flujo de error) para evitar anomalías en el flujo de datos (DU-anomaly de PMD) */
+      /* Sé instancia el ModelMap solo cuando es necesario (en el flujo de error) para evitar anomalías en el flujo de datos (DU-anomaly de PMD) */
       ModelMap model = new ModelMap();
       model.put("error", "Usuario o clave incorrecta");
       return new ModelAndView("login", model);

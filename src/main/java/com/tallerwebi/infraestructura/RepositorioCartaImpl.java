@@ -31,4 +31,13 @@ public class RepositorioCartaImpl implements RepositorioCarta {
       .add(Restrictions.eq("id", id))
       .uniqueResult();
   }
+
+  @Override
+  public List<Carta> buscarPorRareza(String rareza) {
+    return sessionFactory
+      .getCurrentSession()
+      .createCriteria(Carta.class)
+      .add(Restrictions.eq("rareza", rareza))
+      .list();
+  }
 }

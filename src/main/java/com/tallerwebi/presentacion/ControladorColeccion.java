@@ -32,24 +32,21 @@ public class ControladorColeccion {
 
   @RequestMapping(path = "/coleccion", method = RequestMethod.GET)
   public ModelAndView verColeccion(HttpServletRequest request) {
-    ModelMap modelo = new ModelMap();
-
-    // 1. Obtenemos el ID del jugador desde la sesion (asumiendo que lo guardaste al loguear)
     Long jugadorId = (Long) request.getSession().getAttribute("JUGADOR_ID");
 
-    // 2. Traemos todas las cartas existentes en el juego
-    List<Carta> todasLasCartas = servicioCarta.obtenerTodas();
+    if (jugadorId == null) {
+      return new ModelAndView("redirect:/login");
+    }
 
-    // 3. Traemos el inventario del jugador
+    ModelMap modelo = new ModelMap();
+    List<Carta> todasLasCartas = servicioCarta.obtenerTodas();
     List<ItemInventario> miInventario = repositorioInventario.listarInventarioDeJugador(jugadorId);
 
-    // 4. Creamos una lista de IDs de cartas que el jugador YA tiene
     Set<Long> cartasQueTengo = miInventario
       .stream()
       .map(item -> item.getCarta().getId())
       .collect(Collectors.toSet());
 
-    // 5. Mandamos ambos datos a la vista
     modelo.put("todasLasCartas", todasLasCartas);
     modelo.put("cartasQueTengo", cartasQueTengo);
 

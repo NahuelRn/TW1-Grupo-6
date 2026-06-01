@@ -1,28 +1,38 @@
 package com.tallerwebi.presentacion;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.ui.ModelMap;
-import static org.junit.Assert.assertEquals;
 
 public class ControladorLobbyTest {
 
-    private ControladorLobby controladorLobby;
+  private ControladorLobby controladorLobby;
 
-    @Before
-    public void init() {
-        controladorLobby = new ControladorLobby();
-    }
+  @BeforeEach
+  public void init() {
+    controladorLobby = new ControladorLobby();
+  }
 
-    @Test
-    public void alEntrarAlLobbySeMuestraLaVistaLobby() {
-        // 1. Preparamos un ModelMap vacío
-        ModelMap modelo = new ModelMap();
+  @Test
+  public void alEntrarAlLobbySeMuestraLaVistaLobby() {
+    ModelMap modelo = new ModelMap();
 
-        // 2. Ejecución
-        String vista = controladorLobby.irAlLobby(modelo);
+    String vista = controladorLobby.irAlLobby(modelo);
 
-        // 3. Verificación
-        assertEquals("lobby", vista);
-    }
+    assertThat(vista, equalTo("lobby"));
+  }
+
+  @Test
+  public void alEntrarAlLobbyElModeloEstaDisponible() {
+    ModelMap modelo = new ModelMap();
+    modelo.put("dato", "valor");
+
+    String vista = controladorLobby.irAlLobby(modelo);
+
+    assertThat(vista, equalTo("lobby"));
+    assertThat(modelo.containsKey("dato"), is(true));
+  }
 }

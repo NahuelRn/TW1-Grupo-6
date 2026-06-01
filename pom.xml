@@ -59,8 +59,7 @@
             <artifactId>thymeleaf-spring5</artifactId>
             <version>${thymeleaf.spring.version}</version>
         </dependency>
-
-        <dependency>
+           <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
             <version>${servletapi.version}</version>
@@ -121,7 +120,7 @@
             <version>${servletapi.version}</version>
             <scope>provided</scope>
         </dependency>
-        -->
+         -->
     </dependencies>
 
     <build>
