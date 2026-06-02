@@ -12,20 +12,9 @@ public class ServicioCombateImpl implements ServicioCombate {
   private static final int TURNO_JUGADOR = 1;
   private static final int TURNO_ENEMIGO = 2;
 
-  private static final int PARTIDA_DE_PRUEBA = 1;
-
   private static final int MAX_CARTAS_REPETIDAS = 3;
 
-  private Partida partida = new Partida(100, 100, 1);
-
   private int contadorCartasRepetidas = 0;
-
-  //private RepositorioPartida repositorioPartida;
-//
-//@Autowired
-//public ServicioCombateImpl(RepositorioPartida repositorioPartida) {
-//  this.repositorioPartida = repositorioPartida;
-//}
 
   private RepositorioPartida repositorioPartida;
 
@@ -79,9 +68,9 @@ public class ServicioCombateImpl implements ServicioCombate {
   }
 
   private Integer calcularEfectoCarta() {
-    //      Formula -> danio = valor_base_carta * multiplicador + factor_suerte
+//  Formula -> danio = valor_base_carta * multiplicador + factor_suerte
 
-    //      Ejemplo:
+//  Ejemplo:
     int valorBaseCarta = 10;
     int multiplicador = 5;
     int factorSuerte = 5;
