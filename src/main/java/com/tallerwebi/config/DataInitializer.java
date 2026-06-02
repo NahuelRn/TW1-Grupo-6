@@ -2,6 +2,7 @@ package com.tallerwebi.config;
 
 import com.tallerwebi.dominio.Carta;
 import com.tallerwebi.dominio.ItemInventario;
+import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.RepositorioCarta;
 import com.tallerwebi.dominio.RepositorioInventario;
 import com.tallerwebi.dominio.RepositorioUsuario;
@@ -29,18 +30,27 @@ public class DataInitializer implements ApplicationListener<ContextRefreshedEven
   @Transactional
   public void onApplicationEvent(ContextRefreshedEvent event) {
     if (repositorioUsuario.buscarPorEmail("admin@admin.com") == null) {
+      // 1. Crear el jugador asociado al admin
+      Jugador jugador = new Jugador();
+
+      // 2. Crear el admin y asociarlo al jugador
       Usuario admin = new Usuario();
       admin.setEmail("admin@admin.com");
       admin.setPassword("1234");
       admin.setRol("ADMIN");
       admin.setActivo(true);
+      jugador.setUsuario(admin);
+      admin.setJugador(jugador);
+
+      // 3. Guardar el admin (el jugador se persiste por CascadeType.ALL)
       repositorioUsuario.guardar(admin);
 
+      // 4. Asignar todas las cartas al inventario del jugador
       List<Carta> todasLasCartas = repositorioCarta.listarTodas();
       for (Carta carta : todasLasCartas) {
         ItemInventario item = new ItemInventario();
         item.setCarta(carta);
-        item.setJugador(admin.getJugador());
+        item.setJugador(jugador);
         item.setCantidad(10);
         repositorioInventario.guardar(item);
       }

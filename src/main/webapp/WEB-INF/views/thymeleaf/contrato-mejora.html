@@ -26,11 +26,17 @@
             border: 1px solid var(--game-border);
             border-radius: 6px;
             transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer; /* Añadido para mejor UX */
         }
 
         .card-carta:hover {
             transform: translateY(-5px);
             box-shadow: var(--shadow-game);
+        }
+
+        .card-carta.seleccionada {
+            border-color: var(--game-epic);
+            box-shadow: 0 0 10px var(--game-epic);
         }
 
         .btn-mejora {
@@ -53,6 +59,49 @@
             border: none;
             border-radius: 6px;
         }
+
+        .titulo-rareza {
+            font-family: 'Cinzel', serif;
+            color: var(--game-muted);
+            border-bottom: 1px solid var(--game-border);
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+            margin-top: 24px;
+            display: flex;
+            align-items: center;
+        }
+
+        .btn-filtro {
+            font-family: 'Cinzel', serif;
+            font-size: 0.85rem;
+            border-radius: 20px;
+            padding: 6px 16px;
+            border: 1px solid var(--game-border);
+            background-color: var(--game-panel);
+            color: var(--game-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-filtro:hover,
+        .btn-filtro.activo {
+            background-color: var(--game-epic);
+            color: var(--game-void);
+            border-color: var(--game-epic);
+        }
+
+        /* Nuevos indicadores de rareza con CSS (Adiós símbolos raros) */
+        .indicador-rareza {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .indicador-comun { background-color: #e0e0e0; box-shadow: 0 0 8px #e0e0e0; }
+        .indicador-poco-comun { background-color: #2eb846; box-shadow: 0 0 8px #2eb846; }
+        .indicador-rara { background-color: #007bff; box-shadow: 0 0 8px #007bff; }
+        .indicador-exotica { background-color: #9b51e0; box-shadow: 0 0 8px #9b51e0; }
     </style>
 </head>
 <body>
@@ -60,52 +109,198 @@
 <div class="container mt-5">
     <h1 class="titulo-epico mb-4">Contrato de Mejora</h1>
 
-    <div class="row justify-content-center mb-5">
+    <div class="row justify-content-center mb-3">
         <div class="col-md-8 text-center">
             <p class="text-muted">Entrega 4 cartas de la misma rareza para obtener una de nivel superior.</p>
         </div>
     </div>
 
-    <!-- Mensajes de Feedback -->
     <div th:if="${error}" class="alert alert-error text-center mb-4">
         <i class="fa-solid fa-triangle-exclamation"></i> <span th:text="${error}"></span>
     </div>
 
+    <div class="d-flex flex-wrap gap-2 justify-content-center mb-4" id="filtros">
+        <button type="button" class="btn-filtro activo" onclick="filtrar('TODOS', this)">Todas</button>
+    </div>
+
     <form th:action="@{/contrato-mejora/intercambiar}" method="POST">
-        <div class="row">
-            <!-- Iteración del inventario del usuario -->
-            <div th:each="item : ${inventario}" class="col-md-3 mb-4">
-                <div class="card card-carta h-100 p-3 text-center">
-                    <h5 class="titulo-epico" style="font-size: 1.1rem;" th:text="${item.carta.nombre}">Nombre</h5>
-                    <p class="small text-muted" th:text="${item.carta.rareza}">RAREZA</p>
-                    <p class="small text-muted">Cantidad: <span th:text="${item.cantidad}">1</span></p>
-                    <div class="mt-auto form-check">
-                        <input type="checkbox"
-                               name="ids"
-                               th:value="${item.carta.id}"
-                               class="form-check-input"
-                               th:id="'carta-' + ${item.carta.id}">
-                        <label class="form-check-label" th:for="'carta-' + ${item.carta.id}">Seleccionar</label>
+
+        <div class="grupo-rareza" data-rareza="Comun">
+            <h4 class="titulo-rareza"><span class="indicador-rareza indicador-comun"></span>Comun</h4>
+            <div class="row">
+                <div th:each="item : ${inventario}"
+                     th:if="${item.carta.rareza == 'Comun'}"
+                     class="col-md-3 mb-4 carta-item"
+                     th:attr="data-rareza=${item.carta.rareza}">
+                    <div class="card card-carta h-100 p-3 text-center">
+                        <h5 class="titulo-epico" style="font-size: 1.1rem;" th:text="${item.carta.nombre}">Nombre</h5>
+                        <p class="small text-muted" th:text="${item.carta.rareza}">RAREZA</p>
+                        <p class="small text-muted">Cantidad: <span th:text="${item.cantidad}">1</span></p>
+                        <div class="mt-auto form-check">
+                            <input type="checkbox" name="ids"
+                                   th:value="${item.carta.id}"
+                                   class="form-check-input checkbox-carta"
+                                   th:id="'carta-' + ${item.carta.id}">
+                            <label class="form-check-label" th:for="'carta-' + ${item.carta.id}"> Seleccionar </label>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Botón de Acción Principal -->
-        <div class="text-center mt-5 mb-5">
+        <div class="grupo-rareza" data-rareza="Poco Comun">
+            <h4 class="titulo-rareza"><span class="indicador-rareza indicador-poco-comun"></span>Poco Comun</h4>
+            <div class="row">
+                <div th:each="item : ${inventario}"
+                     th:if="${item.carta.rareza == 'Poco Comun'}"
+                     class="col-md-3 mb-4 carta-item"
+                     th:attr="data-rareza=${item.carta.rareza}">
+                    <div class="card card-carta h-100 p-3 text-center">
+                        <h5 class="titulo-epico" style="font-size: 1.1rem;" th:text="${item.carta.nombre}">Nombre</h5>
+                        <p class="small text-muted" th:text="${item.carta.rareza}">RAREZA</p>
+                        <p class="small text-muted">Cantidad: <span th:text="${item.cantidad}">1</span></p>
+                        <div class="mt-auto form-check">
+                            <input type="checkbox" name="ids"
+                                   th:value="${item.carta.id}"
+                                   class="form-check-input checkbox-carta"
+                                   th:id="'carta-' + ${item.carta.id}">
+                            <label class="form-check-label" th:for="'carta-' + ${item.carta.id}">Seleccionar</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grupo-rareza" data-rareza="Rara">
+            <h4 class="titulo-rareza"><span class="indicador-rareza indicador-rara"></span>Rara</h4>
+            <div class="row">
+                <div th:each="item : ${inventario}"
+                     th:if="${item.carta.rareza == 'Rara'}"
+                     class="col-md-3 mb-4 carta-item"
+                     th:attr="data-rareza=${item.carta.rareza}">
+                    <div class="card card-carta h-100 p-3 text-center">
+                        <h5 class="titulo-epico" style="font-size: 1.1rem;" th:text="${item.carta.nombre}">Nombre</h5>
+                        <p class="small text-muted" th:text="${item.carta.rareza}">RAREZA</p>
+                        <p class="small text-muted">Cantidad: <span th:text="${item.cantidad}">1</span></p>
+                        <div class="mt-auto form-check">
+                            <input type="checkbox" name="ids"
+                                   th:value="${item.carta.id}"
+                                   class="form-check-input checkbox-carta"
+                                   th:id="'carta-' + ${item.carta.id}">
+                            <label class="form-check-label" th:for="'carta-' + ${item.carta.id}">Seleccionar</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grupo-rareza" data-rareza="Exotica">
+            <h4 class="titulo-rareza"><span class="indicador-rareza indicador-exotica"></span>Exotica</h4>
+            <div class="row">
+                <div th:each="item : ${inventario}"
+                     th:if="${item.carta.rareza == 'Exotica'}"
+                     class="col-md-3 mb-4 carta-item"
+                     th:attr="data-rareza=${item.carta.rareza}">
+                    <div class="card card-carta h-100 p-3 text-center">
+                        <h5 class="titulo-epico" style="font-size: 1.1rem;" th:text="${item.carta.nombre}">Nombre</h5>
+                        <p class="small text-muted" th:text="${item.carta.rareza}">RAREZA</p>
+                        <p class="small text-muted">Cantidad: <span th:text="${item.cantidad}">1</span></p>
+                        <div class="mt-auto form-check">
+                            <input type="checkbox" name="ids"
+                                   th:value="${item.carta.id}"
+                                   class="form-check-input checkbox-carta"
+                                   th:id="'carta-' + ${item.carta.id}">
+                            <label class="form-check-label" th:for="'carta-' + ${item.carta.id}">Seleccionar</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-center mt-5 mb-5">
             <button type="submit" class="btn btn-mejora">
                 FIRMAR CONTRATO
             </button>
         </div>
     </form>
 
-    <div class="text-center">
-        <a th:href="@{/lobby}" class="btn btn-outline-secondary" style="color: var(--game-muted); border-color: var(--game-muted);">
+    <div class="text-center mb-5">
+        <a th:href="@{/lobby}" class="btn btn-outline-secondary"
+           style="color: var(--game-muted); border-color: var(--game-muted);">
             Volver al Campamento
         </a>
     </div>
 </div>
 
 <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+<script>
+    // ── Construir filtros dinámicamente según rarezas presentes ──────────────
+    document.addEventListener('DOMContentLoaded', function () {
+        const rarezasPresentes = new Set();
+        const orden = ['Comun', 'Poco Comun', 'Rara', 'Exotica'];
+
+        // Detectar qué grupos tienen al menos una carta
+        document.querySelectorAll('.grupo-rareza').forEach(function (grupo) {
+            const tieneCartas = grupo.querySelectorAll('.carta-item').length > 0;
+            if (!tieneCartas) {
+                grupo.style.display = 'none';
+            } else {
+                rarezasPresentes.add(grupo.dataset.rareza);
+            }
+        });
+
+        // Agregar botones de filtro solo para rarezas presentes
+        const contenedorFiltros = document.getElementById('filtros');
+        orden.forEach(function (rareza) {
+            if (rarezasPresentes.has(rareza)) {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'btn-filtro';
+                btn.textContent = rareza;
+                btn.onclick = function () { filtrar(rareza, this); };
+                contenedorFiltros.appendChild(btn);
+            }
+        });
+
+        // CORRECCIÓN DE SELECCIÓN: Resaltar carta cuidando la propagación del evento
+        document.querySelectorAll('.card-carta').forEach(function (card) {
+            const checkbox = card.querySelector('.checkbox-carta');
+
+            card.addEventListener('click', function (event) {
+                // Si el usuario hace clic DIRECTAMENTE en el checkbox o en su etiqueta <label>,
+                // dejamos que el navegador maneje el cambio solo y solo actualizamos la clase visual.
+                if (event.target === checkbox || event.target.tagName === 'LABEL' || event.target.closest('.form-check')) {
+                    // Usamos un pequeño timeout para asegurarnos de capturar el estado final real del checkbox
+                    setTimeout(() => {
+                        card.classList.toggle('seleccionada', checkbox.checked);
+                    }, 10);
+                    return;
+                }
+
+                // Si hace clic en cualquier otra parte de la tarjeta, hacemos el toggle manualmente
+                checkbox.checked = !checkbox.checked;
+                card.classList.toggle('seleccionada', checkbox.checked);
+            });
+        });
+    });
+
+    // ── Lógica de filtrado ────────────────────────────────────────────────────
+    function filtrar(rareza, boton) {
+        document.querySelectorAll('.btn-filtro').forEach(function (b) {
+            b.classList.remove('activo');
+        });
+        boton.classList.add('activo');
+
+        document.querySelectorAll('.grupo-rareza').forEach(function (grupo) {
+            const tieneCartas = grupo.querySelectorAll('.carta-item').length > 0;
+            if (!tieneCartas) return;
+            if (rareza === 'TODOS' || grupo.dataset.rareza === rareza) {
+                grupo.style.display = 'block';
+            } else {
+                grupo.style.display = 'none';
+            }
+        });
+    }
+</script>
 </body>
 </html>

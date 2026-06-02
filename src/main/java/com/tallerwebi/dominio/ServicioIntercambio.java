@@ -4,12 +4,14 @@ import java.util.List;
 
 public interface ServicioIntercambio {
   /**
-   * Procesa la mejora de 4 cartas a una de rareza superior.
+   * Procesa la mejora de 4 cartas a una de rareza superior, descontando las cartas
+   * sacrificadas e impactando la nueva carta aleatoria en el inventario del jugador.
+   * @param jugadorId ID del jugador que realiza la mejora.
    * @param idsCartasEntregadas Lista de IDs de las 4 cartas a sacrificar.
    * @return La nueva carta obtenida aleatoriamente.
-   * @throws Exception Si no son 4 cartas, no son de la misma rareza, o son legendarias.
+   * @throws Exception Si no son 4 cartas, no son de la misma rareza, son legendarias, o no tiene stock.
    */
-  Carta realizarMejora(List<Long> idsCartasEntregadas) throws Exception;
+  Carta realizarMejora(Long jugadorId, List<Long> idsCartasEntregadas) throws Exception;
 
   /**
    * Calcula y procesa la conversión de una carta en oro.

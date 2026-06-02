@@ -12,14 +12,4 @@ public class ControladorLobby {
   public String irAlLobby(ModelMap modelo) {
     return "lobby";
   }
-
-  @RequestMapping(path = "/contrato", method = RequestMethod.GET)
-  public String irAContrato() {
-    return "contrato";
-  }
-
-  @RequestMapping(path = "/mercado", method = RequestMethod.GET)
-  public String irAMercado() {
-    return "intercambio";
-  }
 }

@@ -2,8 +2,9 @@ package com.tallerwebi.dominio;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
+//import java.util.Locale;
 import javax.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,7 +15,13 @@ public class ServicioIntercambioImpl implements ServicioIntercambio {
 
   private final RepositorioCarta repositorioCarta;
   private final RepositorioInventario repositorioInventario;
+  private static final String RAREZA_COMUN = "Comun";
+  private static final String RAREZA_POCO_COMUN = "Poco Comun";
+  private static final String RAREZA_RARA = "Rara";
+  private static final String RAREZA_EXOTICA = "Exotica";
+  private static final String RAREZA_LEGENDARIA = "Legendaria";
 
+  @Autowired
   public ServicioIntercambioImpl(
     RepositorioCarta repositorioCarta,
     RepositorioInventario repositorioInventario
@@ -28,27 +35,31 @@ public class ServicioIntercambioImpl implements ServicioIntercambio {
     return repositorioInventario.listarInventarioDeJugador(jugadorId);
   }
 
+  // En com.tallerwebi.dominio.ServicioIntercambioImpl.java
+
   @Override
-  public Carta realizarMejora(List<Long> idsCartasEntregadas) throws Exception {
-    if (idsCartasEntregadas.size() != CANTIDAD_CARTAS_REQUERIDAS) {
-      throw new Exception("Debes entregar exactamente 4 cartas");
+  public Carta realizarMejora(Long jugadorId, List<Long> idsCartasEntregadas) throws Exception {
+
+    // 1. Tus validaciones de tamaño de lista...
+    if (idsCartasEntregadas == null || idsCartasEntregadas.size() != 4) {
+      throw new Exception("Debes seleccionar exactamente 4 cartas.");
     }
 
-    String rarezaActual = obtenerRarezaDeLaPrimera(idsCartasEntregadas);
-    validarRarezaUniforme(idsCartasEntregadas, rarezaActual);
+    // 2. Tu lógica actual para buscar las cartas en repoCartaMock...
 
-    List<Carta> posiblesPremios = repositorioCarta.buscarPorRareza(
-      obtenerSiguienteRareza(rarezaActual)
-    );
-    if (posiblesPremios == null || posiblesPremios.isEmpty()) {
-      throw new Exception("No hay cartas disponibles de la rareza superior");
-    }
+    // 3. ¡Ojo acá! Si adentro del método necesitas buscar el inventario del jugador,
+    // ahora ya tenés disponible la variable 'jugadorId' para pasársela al repositorio:
+    // List<ItemInventario> inventario = repositorioInventario.listarInventarioDeJugador(jugadorId);
+
+    // 4. Tu lógica de remover cartas, buscar la nueva y retornar el premio...
+
+    return cartaPremio;
+  }
 
     Collections.shuffle(posiblesPremios);
     return posiblesPremios.get(0);
   }
 
-  // solo obtiene la rareza de la primera carta
   private String obtenerRarezaDeLaPrimera(List<Long> ids) throws Exception {
     Carta primera = repositorioCarta.buscarPorId(ids.get(0));
     if (primera == null) {
@@ -57,7 +68,6 @@ public class ServicioIntercambioImpl implements ServicioIntercambio {
     return primera.getRareza();
   }
 
-  // solo valida que el resto tenga la misma rareza
   private void validarRarezaUniforme(List<Long> ids, String rareza) throws Exception {
     for (int i = 1; i < ids.size(); i++) {
       Carta carta = repositorioCarta.buscarPorId(ids.get(i));
@@ -77,13 +87,15 @@ public class ServicioIntercambioImpl implements ServicioIntercambio {
   }
 
   private String obtenerSiguienteRareza(String actual) throws Exception {
-    switch (actual.toUpperCase(Locale.ROOT)) {
-      case "COMUN":
-        return "ESPECIAL";
-      case "ESPECIAL":
-        return "EPICA";
-      case "EPICA":
-        return "LEGENDARIA";
+    switch (actual.trim()) {
+      case RAREZA_COMUN:
+        return RAREZA_POCO_COMUN;
+      case RAREZA_POCO_COMUN:
+        return RAREZA_RARA;
+      case RAREZA_RARA:
+        return RAREZA_EXOTICA;
+      case RAREZA_EXOTICA:
+        return RAREZA_LEGENDARIA;
       default:
         throw new Exception("No se puede mejorar una carta Legendaria");
     }

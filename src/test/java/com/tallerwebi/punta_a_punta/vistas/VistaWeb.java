@@ -14,8 +14,7 @@ public class VistaWeb {
   }
 
   public URL obtenerURLActual() throws MalformedURLException {
-    URL url = new URL(page.url());
-    return url;
+    return new URL(page.url());
   }
 
   protected String obtenerTextoDelElemento(String selectorCSS) {

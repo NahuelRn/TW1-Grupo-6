@@ -1,5 +1,6 @@
 package com.tallerwebi.config;
 
+import java.util.Objects;
 import java.util.Properties;
 import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
@@ -54,7 +55,9 @@ public class HibernateConfig {
 
   @Bean
   public HibernateTransactionManager transactionManager() {
-    return new HibernateTransactionManager(sessionFactory(dataSource()).getObject());
+    return new HibernateTransactionManager(
+      Objects.requireNonNull(sessionFactory(dataSource()).getObject())
+    );
   }
 
   private Properties hibernateProperties() {
@@ -62,7 +65,8 @@ public class HibernateConfig {
     properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL8Dialect");
     properties.setProperty("hibernate.show_sql", "true");
     properties.setProperty("hibernate.format_sql", "true");
-    properties.setProperty("hibernate.hbm2ddl.auto", "create");
+    // ✅ update: mantiene los datos entre reinicios y solo agrega columnas/tablas nuevas
+    properties.setProperty("hibernate.hbm2ddl.auto", "update");
     properties.setProperty("hibernate.connection.characterEncoding", "utf8");
     properties.setProperty("hibernate.connection.CharSet", "utf8");
     properties.setProperty("hibernate.connection.useUnicode", "true");

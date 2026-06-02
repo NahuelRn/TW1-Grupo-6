@@ -12,6 +12,13 @@ import org.junit.jupiter.api.Test;
 
 public class ServicioIntercambioTest {
 
+  // ─── Constantes de rareza ─────────────────────────────────────────────────
+  private static final String RAREZA_COMUN = "Comun";
+  private static final String RAREZA_POCO_COMUN = "Poco Comun";
+  private static final String RAREZA_RARA = "Rara";
+  private static final String RAREZA_EXOTICA = "Exotica";
+  private static final String RAREZA_LEGENDARIA = "Legendaria";
+
   private RepositorioCarta repoCartaMock;
   private RepositorioInventario repoItemMock;
   private ServicioIntercambio servicio;
@@ -23,13 +30,13 @@ public class ServicioIntercambioTest {
     servicio = new ServicioIntercambioImpl(repoCartaMock, repoItemMock);
   }
 
-  // ─── Validación de cantidad ────────────────────────────────────────────────
+  // ─── Validación de cantidad ───────────────────────────────────────────────
 
   @Test
   public void siSeEntreganMenosDe4CartasDebeLanzarError() {
     List<Long> ids = List.of(1L, 2L, 3L);
 
-    Exception ex = assertThrows(Exception.class, () -> servicio.realizarMejora(ids));
+    Exception ex = assertThrows(Exception.class, () -> servicio.realizarMejora(1L, ids));
     assertThat(ex.getMessage(), containsString("exactamente 4 cartas"));
   }
 
@@ -37,25 +44,25 @@ public class ServicioIntercambioTest {
   public void siSeEntreganMasDe4CartasDebeLanzarError() {
     List<Long> ids = List.of(1L, 2L, 3L, 4L, 5L);
 
-    Exception ex = assertThrows(Exception.class, () -> servicio.realizarMejora(ids));
+    Exception ex = assertThrows(Exception.class, () -> servicio.realizarMejora(1L, ids));
     assertThat(ex.getMessage(), containsString("exactamente 4 cartas"));
   }
 
-  // ─── Validación de rareza uniforme ────────────────────────────────────────
+  // ─── Validación de rareza uniforme ───────────────────────────────────────
 
   @Test
   public void siLasCartasSonDeDistintaRarezaDebeLanzarError() {
-    Carta comun = cartaConRareza("COMUN");
-    Carta especial = cartaConRareza("ESPECIAL");
+    Carta comun = cartaConRareza(RAREZA_COMUN);
+    Carta pocoCom = cartaConRareza(RAREZA_POCO_COMUN);
 
     when(repoCartaMock.buscarPorId(1L)).thenReturn(comun);
     when(repoCartaMock.buscarPorId(2L)).thenReturn(comun);
     when(repoCartaMock.buscarPorId(3L)).thenReturn(comun);
-    when(repoCartaMock.buscarPorId(4L)).thenReturn(especial); // la distinta
+    when(repoCartaMock.buscarPorId(4L)).thenReturn(pocoCom);
 
     Exception ex = assertThrows(
       Exception.class,
-      () -> servicio.realizarMejora(List.of(1L, 2L, 3L, 4L))
+      () -> servicio.realizarMejora(1L, List.of(1L, 2L, 3L, 4L))
     );
     assertThat(ex.getMessage(), containsString("misma rareza"));
   }
@@ -64,76 +71,90 @@ public class ServicioIntercambioTest {
 
   @Test
   public void siLasCartasSonLegendariasDebeLanzarError() {
-    Carta legendaria = cartaConRareza("LEGENDARIA");
-
+    Carta legendaria = cartaConRareza(RAREZA_LEGENDARIA);
     when(repoCartaMock.buscarPorId(anyLong())).thenReturn(legendaria);
 
     Exception ex = assertThrows(
       Exception.class,
-      () -> servicio.realizarMejora(List.of(1L, 2L, 3L, 4L))
+      () -> servicio.realizarMejora(1L, List.of(1L, 2L, 3L, 4L))
     );
     assertThat(ex.getMessage(), containsString("No se puede mejorar una carta Legendaria"));
   }
 
-  // ─── Caso feliz: mejora correcta ─────────────────────────────────────────
+  // ─── Casos felices ────────────────────────────────────────────────────────
 
   @Test
-  public void siSeEntreganCuatroCartasComunesDebeRetornarUnaEspecial() throws Exception {
-    Carta comun = cartaConRareza("COMUN");
-    Carta especial = cartaConRareza("ESPECIAL");
-    especial.setNombre("Carta Especial Premio");
+  public void siSeEntreganCuatroCartasComunesDebeRetornarUnaPocoComon() throws Exception {
+    Carta comun = cartaConRareza(RAREZA_COMUN);
+    Carta pocoCom = cartaConRareza(RAREZA_POCO_COMUN);
+    pocoCom.setNombre("Carta Poco Comun Premio");
 
     when(repoCartaMock.buscarPorId(anyLong())).thenReturn(comun);
-    when(repoCartaMock.buscarPorRareza("ESPECIAL")).thenReturn(List.of(especial));
+    when(repoCartaMock.buscarPorRareza(RAREZA_POCO_COMUN)).thenReturn(List.of(pocoCom));
 
-    Carta resultado = servicio.realizarMejora(List.of(1L, 2L, 3L, 4L));
+    Carta resultado = servicio.realizarMejora(1L, List.of(1L, 2L, 3L, 4L));
 
     assertThat(resultado, notNullValue());
-    assertThat(resultado.getRareza(), is("ESPECIAL"));
+    assertThat(resultado.getRareza(), is(RAREZA_POCO_COMUN));
   }
 
   @Test
-  public void siSeEntreganCuatroCartasEspecialesDebeRetornarUnaEpica() throws Exception {
-    Carta especial = cartaConRareza("ESPECIAL");
-    Carta epica = cartaConRareza("EPICA");
-    epica.setNombre("Carta Épica Premio");
+  public void siSeEntreganCuatroCartasPocoComunesDebeRetornarUnaRara() throws Exception {
+    Carta pocoCom = cartaConRareza(RAREZA_POCO_COMUN);
+    Carta rara = cartaConRareza(RAREZA_RARA);
+    rara.setNombre("Carta Rara Premio");
 
-    when(repoCartaMock.buscarPorId(anyLong())).thenReturn(especial);
-    when(repoCartaMock.buscarPorRareza("EPICA")).thenReturn(List.of(epica));
+    when(repoCartaMock.buscarPorId(anyLong())).thenReturn(pocoCom);
+    when(repoCartaMock.buscarPorRareza(RAREZA_RARA)).thenReturn(List.of(rara));
 
-    Carta resultado = servicio.realizarMejora(List.of(1L, 2L, 3L, 4L));
+    Carta resultado = servicio.realizarMejora(1L, List.of(1L, 2L, 3L, 4L));
 
     assertThat(resultado, notNullValue());
-    assertThat(resultado.getRareza(), is("EPICA"));
+    assertThat(resultado.getRareza(), is(RAREZA_RARA));
   }
 
   @Test
-  public void siSeEntreganCuatroCartasEpicasDebeRetornarUnaLegendaria() throws Exception {
-    Carta epica = cartaConRareza("EPICA");
-    Carta legendaria = cartaConRareza("LEGENDARIA");
+  public void siSeEntreganCuatroCartasRarasDebeRetornarUnaExotica() throws Exception {
+    Carta rara = cartaConRareza(RAREZA_RARA);
+    Carta exotica = cartaConRareza(RAREZA_EXOTICA);
+    exotica.setNombre("Carta Exotica Premio");
+
+    when(repoCartaMock.buscarPorId(anyLong())).thenReturn(rara);
+    when(repoCartaMock.buscarPorRareza(RAREZA_EXOTICA)).thenReturn(List.of(exotica));
+
+    Carta resultado = servicio.realizarMejora(1L, List.of(1L, 2L, 3L, 4L));
+
+    assertThat(resultado, notNullValue());
+    assertThat(resultado.getRareza(), is(RAREZA_EXOTICA));
+  }
+
+  @Test
+  public void siSeEntreganCuatroCartasExoticasDebeRetornarUnaLegendaria() throws Exception {
+    Carta rara = cartaConRareza(RAREZA_EXOTICA);
+    Carta legendaria = cartaConRareza(RAREZA_LEGENDARIA);
     legendaria.setNombre("Carta Legendaria Premio");
 
-    when(repoCartaMock.buscarPorId(anyLong())).thenReturn(epica);
-    when(repoCartaMock.buscarPorRareza("LEGENDARIA")).thenReturn(List.of(legendaria));
+    when(repoCartaMock.buscarPorId(anyLong())).thenReturn(rara);
+    when(repoCartaMock.buscarPorRareza(RAREZA_LEGENDARIA)).thenReturn(List.of(legendaria));
 
-    Carta resultado = servicio.realizarMejora(List.of(1L, 2L, 3L, 4L));
+    Carta resultado = servicio.realizarMejora(1L, List.of(1L, 2L, 3L, 4L));
 
     assertThat(resultado, notNullValue());
-    assertThat(resultado.getRareza(), is("LEGENDARIA"));
+    assertThat(resultado.getRareza(), is(RAREZA_LEGENDARIA));
   }
 
   // ─── Sin premios disponibles ──────────────────────────────────────────────
 
   @Test
   public void siNoHayCartasDelSiguienteNivelDebeLanzarError() {
-    Carta comun = cartaConRareza("COMUN");
+    Carta comun = cartaConRareza(RAREZA_COMUN);
 
     when(repoCartaMock.buscarPorId(anyLong())).thenReturn(comun);
-    when(repoCartaMock.buscarPorRareza("ESPECIAL")).thenReturn(Collections.emptyList());
+    when(repoCartaMock.buscarPorRareza(RAREZA_POCO_COMUN)).thenReturn(Collections.emptyList());
 
     Exception ex = assertThrows(
       Exception.class,
-      () -> servicio.realizarMejora(List.of(1L, 2L, 3L, 4L))
+      () -> servicio.realizarMejora(1L, List.of(1L, 2L, 3L, 4L))
     );
     assertThat(ex.getMessage(), containsString("No hay cartas disponibles"));
   }

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MythicStack - Contrato Firmado</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/globals.css}">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Roboto:wght@400;700&display=swap');
+
+        body {
+            background-color: var(--game-void);
+            color: var(--game-text);
+            font-family: 'Roboto', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .titulo-resultado {
+            font-family: 'Cinzel', serif;
+            color: #ffcc00;
+            text-shadow: 0 0 15px rgba(255, 204, 0, 0.6);
+            text-align: center;
+        }
+
+        .contenedor-premio {
+            background: radial-gradient(circle, rgba(50,10,10,1) 0%, rgba(10,5,5,1) 100%);
+            border: 2px solid #ffcc00;
+            border-radius: 12px;
+            box-shadow: 0 0 30px rgba(255, 204, 0, 0.4);
+            max-width: 450px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        .carta-ganada {
+            background-color: var(--game-panel);
+            border: 2px solid var(--game-epic);
+            border-radius: 8px;
+            box-shadow: 0 0 20px var(--game-epic);
+            padding: 25px;
+            margin: 20px auto;
+        }
+
+        .tipo-badge {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background-color: rgba(255,255,255,0.05);
+            padding: 4px 12px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="contenedor-premio text-center text-white">
+        <h1 class="titulo-resultado mb-2">¡Contrato Ejecutado!</h1>
+        <p class="text-muted small">Los dioses de MythicStack han aceptado tu sacrificio.</p>
+
+        <div class="carta-ganada" th:if="${cartaPremio}">
+            <h2 class="titulo-epico th-text" th:text="${cartaPremio.nombre}" style="color: #ffcc00;">Nombre Carta</h2>
+            <div class="my-3">
+                <span class="tipo-badge text-muted" th:text="${cartaPremio.tipo} + ' - ' + ${cartaPremio.subtipo}">TIPO</span>
+            </div>
+            <p class="mb-3" th:text="${cartaPremio.descripcion}">Descripción de la carta obtenida de forma aleatoria.</p>
+            <hr style="border-color: var(--game-border);">
+            <div class="d-flex justify-content-around small text-muted">
+                <span>Rareza: <strong th:text="${cartaPremio.rareza}" class="text-warning">Rara</strong></span>
+                <span>Valor: <strong th:text="${cartaPremio.valorOroBase} + ' Oro'">100</strong></span>
+            </div>
+        </div>
+
+        <div th:unless="${cartaPremio}" class="alert alert-danger my-4">
+            No se detectó ninguna carta obtenida. Vuelve a intentar el proceso.
+        </div>
+
+        <div class="mt-4">
+            <a th:href="@{/contrato-mejora}" class="btn btn-mejora w-100">
+                Volver a Intentar
+            </a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

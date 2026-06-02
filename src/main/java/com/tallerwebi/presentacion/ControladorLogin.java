@@ -40,17 +40,15 @@ public class ControladorLogin {
     );
 
     if (usuarioBuscado != null) {
-      // 1. Guardamos el ROL original
       request.getSession().setAttribute("ROL", usuarioBuscado.getRol());
-
-      // 2. AGREGAMOS ESTO: Guardamos el ID en la sesión
-      // Guardamos ambos por si otros controladores (como el Mazo) buscan USUARIO_ID
       request.getSession().setAttribute("USUARIO_ID", usuarioBuscado.getId());
-      request.getSession().setAttribute("JUGADOR_ID", usuarioBuscado.getId());
+
+      if (usuarioBuscado.getJugador() != null) {
+        request.getSession().setAttribute("jugadorId", usuarioBuscado.getJugador().getId());
+      }
 
       return new ModelAndView("redirect:/lobby");
     } else {
-      /* Se instancia el ModelMap solo cuando es necesario (en el flujo de error) para evitar anomalías en el flujo de datos (DU-anomaly de PMD) */
       ModelMap model = new ModelMap();
       model.put("error", "Usuario o clave incorrecta");
       return new ModelAndView("login", model);

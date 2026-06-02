@@ -13,7 +13,7 @@ import org.springframework.ui.ModelMap;
 public class ControladorMazoTest {
 
   @Test
-  public void siElMazoSeGuardaExitosamenteDebeRedirigirAlLobby() throws Exception {
+  public void siElMazoSeGuardaExitosamenteDebeRedirigirASeleccionZona() throws Exception {
     ServicioMazo servicioMock = mock(ServicioMazo.class);
     ControladorMazo controlador = new ControladorMazo(servicioMock);
     List<Long> cartasIds = new ArrayList<>();
@@ -22,12 +22,10 @@ public class ControladorMazoTest {
       cartasIds.add(i);
     }
 
-    // Instanciamos el ModelMap para cumplir con la nueva firma
     ModelMap modelo = new ModelMap();
     String vista = controlador.guardarMazo(cartasIds, modelo);
 
-    // Then
-    assertThat(vista, is("redirect:/lobby"));
+    assertThat(vista, is("redirect:/seleccion-zona"));
     verify(servicioMock, times(1)).validarYGuardarMazo(any());
   }
 
