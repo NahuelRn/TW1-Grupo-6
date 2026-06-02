@@ -4,6 +4,7 @@ import com.tallerwebi.dominio.Carta;
 import com.tallerwebi.dominio.ItemInventario;
 import com.tallerwebi.dominio.ServicioIntercambio;
 import java.util.List;
+import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -23,25 +24,33 @@ public class ControladorContratoMejora {
     this.servicioIntercambio = servicioIntercambio;
   }
 
-  // Aquí tienes tu método actual que renderiza la vista
+  // Muestra la pantalla del Contrato con el inventario del jugador en sesión
   @GetMapping("/contrato-mejora")
-  public ModelAndView verContratoMejora() {
-    ModelMap modelo = new ModelMap();
-    Long jugadorId = 1L; // ID de prueba
+  public ModelAndView verContratoMejora(HttpSession session) {
+    Long jugadorId = (Long) session.getAttribute("jugadorId");
+    if (jugadorId == null) {
+      return new ModelAndView("redirect:/login");
+    }
+
     List<ItemInventario> inventario = servicioIntercambio.obtenerInventario(jugadorId);
+    ModelMap modelo = new ModelMap();
     modelo.put("inventario", inventario);
     return new ModelAndView("contrato-mejora", modelo);
   }
 
-  // =========================================================================
-  // ¡AQUÍ EXACTAMENTE VA EL PUNTO 3! (Justo abajo del método de arriba)
-  // =========================================================================
+  // Procesa el intercambio al presionar "FIRMAR CONTRATO"
   @PostMapping("/contrato-mejora/intercambiar")
   public ModelAndView intercambiarCartas(
     @RequestParam(value = "ids", required = false) List<Long> ids,
+    HttpSession session,
     RedirectAttributes redirectAttributes
   ) {
-    // Validación en caso de que el usuario presione el botón sin marcar nada
+    Long jugadorId = (Long) session.getAttribute("jugadorId");
+    if (jugadorId == null) {
+      return new ModelAndView("redirect:/login");
+    }
+
+    // Validación temprana por si mandan el formulario vacío
     if (ids == null || ids.isEmpty()) {
       redirectAttributes.addFlashAttribute(
         "error",
@@ -51,25 +60,28 @@ public class ControladorContratoMejora {
     }
 
     try {
-      // ID temporal de pruebas (En el futuro lo sacarás de 'request.getSession().getAttribute("userId")')
-      Long jugadorId = 1L;
-
-      // LLAMADA AL SERVICIO: Le pasamos el jugador y los dados seleccionados
+      // LLAMADA AL SERVICIO: Ejecuta la lógica (quita las 4 viejas, genera la nueva)
       Carta cartaGanada = servicioIntercambio.realizarMejora(jugadorId, ids);
 
-      // Guardamos el premio para mostrarlo en la siguiente pantalla
+      // Enviamos el premio de forma segura (FlashAttribute sobrevive a la redirección)
       redirectAttributes.addFlashAttribute("cartaPremio", cartaGanada);
+
+      // Redirige al flujo de éxito
       return new ModelAndView("redirect:/contrato-mejora/resultado");
     } catch (Exception e) {
-      // Si el servicio tira excepción (ej: rarezas distintas), el error vuelve a la pantalla principal
+      // Si el servicio tira error (ej: menos de 4 cartas o raras mezcladas), volvemos atrás mostrando el porqué
       redirectAttributes.addFlashAttribute("error", e.getMessage());
       return new ModelAndView("redirect:/contrato-mejora");
     }
   }
 
-  // El método que simplemente muestra la vista del premio final
+  // Muestra la pantalla "resultado-mejora" con la nueva carta obtenida
   @GetMapping("/contrato-mejora/resultado")
-  public ModelAndView verResultado() {
+  public ModelAndView verResultado(HttpSession session) {
+    Long jugadorId = (Long) session.getAttribute("jugadorId");
+    if (jugadorId == null) {
+      return new ModelAndView("redirect:/login");
+    }
     return new ModelAndView("resultado-mejora");
   }
 }

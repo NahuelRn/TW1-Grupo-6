@@ -12,14 +12,14 @@ import org.springframework.stereotype.Service;
 public class ServicioIntercambioImpl implements ServicioIntercambio {
 
   private static final int CANTIDAD_CARTAS_REQUERIDAS = 4;
-
-  private final RepositorioCarta repositorioCarta;
-  private final RepositorioInventario repositorioInventario;
   private static final String RAREZA_COMUN = "Comun";
   private static final String RAREZA_POCO_COMUN = "Poco Comun";
   private static final String RAREZA_RARA = "Rara";
   private static final String RAREZA_EXOTICA = "Exotica";
   private static final String RAREZA_LEGENDARIA = "Legendaria";
+
+  private final RepositorioCarta repositorioCarta;
+  private final RepositorioInventario repositorioInventario;
 
   @Autowired
   public ServicioIntercambioImpl(
@@ -35,26 +35,22 @@ public class ServicioIntercambioImpl implements ServicioIntercambio {
     return repositorioInventario.listarInventarioDeJugador(jugadorId);
   }
 
-  // En com.tallerwebi.dominio.ServicioIntercambioImpl.java
-
+  // SOLUCIÓN: Agregamos 'Long jugadorId' para cumplir con el contrato de la interfaz
   @Override
   public Carta realizarMejora(Long jugadorId, List<Long> idsCartasEntregadas) throws Exception {
-
-    // 1. Tus validaciones de tamaño de lista...
-    if (idsCartasEntregadas == null || idsCartasEntregadas.size() != 4) {
-      throw new Exception("Debes seleccionar exactamente 4 cartas.");
+    if (idsCartasEntregadas == null || idsCartasEntregadas.size() != CANTIDAD_CARTAS_REQUERIDAS) {
+      throw new Exception("Debes entregar exactamente 4 cartas");
     }
 
-    // 2. Tu lógica actual para buscar las cartas en repoCartaMock...
+    String rarezaActual = obtenerRarezaDeLaPrimera(idsCartasEntregadas);
+    validarRarezaUniforme(idsCartasEntregadas, rarezaActual);
 
-    // 3. ¡Ojo acá! Si adentro del método necesitas buscar el inventario del jugador,
-    // ahora ya tenés disponible la variable 'jugadorId' para pasársela al repositorio:
-    // List<ItemInventario> inventario = repositorioInventario.listarInventarioDeJugador(jugadorId);
-
-    // 4. Tu lógica de remover cartas, buscar la nueva y retornar el premio...
-
-    return cartaPremio;
-  }
+    List<Carta> posiblesPremios = repositorioCarta.buscarPorRareza(
+      obtenerSiguienteRareza(rarezaActual)
+    );
+    if (posiblesPremios == null || posiblesPremios.isEmpty()) {
+      throw new Exception("No hay cartas disponibles de la rareza superior");
+    }
 
     Collections.shuffle(posiblesPremios);
     return posiblesPremios.get(0);
