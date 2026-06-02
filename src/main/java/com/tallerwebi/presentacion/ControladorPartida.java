@@ -6,9 +6,7 @@ import com.tallerwebi.dominio.Usuario;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
@@ -41,5 +39,10 @@ public class ControladorPartida {
     request.getSession().setAttribute("PARTIDA_ACTUAL", partida);
 
     return new ModelAndView("redirect:/home");
+  }
+
+  @RequestMapping(path = "/seleccion-zona", method = RequestMethod.GET)
+  public ModelAndView elegirZona() {
+    return new ModelAndView("seleccion-zona");
   }
 }

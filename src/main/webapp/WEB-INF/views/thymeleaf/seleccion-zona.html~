@@ -85,15 +85,15 @@
 
 <div class="game-panel">
     <h2 class="game-title">Elige tu destino</h2>
-    <p class="game-subtitle">Prepara tu mazo. El peligro aguarda en cada rincón.</p>
+    <p class="game-subtitle">Prepara tu mazo. El peligro te espera en cada rincon.</p>
 
     <form th:action="@{/iniciar-combate}" method="POST" class="zonas-container">
         <button type="submit" name="zona" value="Bosque Oscuro" class="btn-zona">
-            🌲 Bosque Oscuro
+            Bosque Oscuro
         </button>
 
         <button type="submit" name="zona" value="Cueva del Dragón" class="btn-zona btn-boss">
-            🐉 Cueva del Dragón
+            Cueva del Dragon
         </button>
     </form>
 </div>

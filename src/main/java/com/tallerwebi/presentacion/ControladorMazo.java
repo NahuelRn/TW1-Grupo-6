@@ -4,7 +4,6 @@ import com.tallerwebi.dominio.Carta;
 import com.tallerwebi.dominio.Mazo;
 import com.tallerwebi.dominio.MazoCarta;
 import com.tallerwebi.dominio.ServicioMazo;
-//import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -54,8 +53,8 @@ public class ControladorMazo {
       // 4. Llamamos al servicio para validar (15 cartas, sin repetidos)
       servicioMazo.validarYGuardarMazo(nuevoMazo);
 
-      // 5. Si todo está OK, redirigimos directamente
-      return "redirect:/lobby";
+      // 5. CAMBIO APLICADO: Si todo está OK, redirigimos a la Selección de Zona
+      return "redirect:/seleccion-zona";
     } catch (Exception e) {
       // 6. Si falla la validación, cargamos el error y volvemos a la vista
       modelo.put("error", e.getMessage());

@@ -17,21 +17,24 @@
         <h1 class="mb-3" style="color: var(--game-epic);">Bienvenido a MythicStack</h1>
         <h4 class="mb-5" style="color: var(--game-muted);">¿Que deseas hacer, guerrero?</h4>
 
-        <div class="d-grid gap-3 col-md-8 mx-auto">
-            <form action="deckbuilding" method="GET">
-                <button type="submit" class="btn btn-lg btn-mythic-blood w-100">Comenzar</button>
-            </form>
+        <div class="d-grid gap-3 col-6 mx-auto mt-4">
 
-            <form action="combate" method="GET">
-                <button type="submit" class="btn btn-lg btn-mythic-blood w-100">Ver Inventario</button>
-            </form>
+            <a th:href="@{/deckbuilding.html}" class="btn btn-danger btn-lg" style="background-color: #8b0000; border-color: #8b0000;">Comenzar</a>
 
-            <form action="contrato-mejora" method="GET">
-                <button type="submit" class="btn btn-lg btn-mythic-epic w-100">Contrato de Mejora</button>
-            </form>
+            <a th:href="@{/coleccion.html}" class="btn btn-danger btn-lg" style="background-color: #8b0000; border-color: #8b0000;">Ver Inventario</a>
+
+            <div class="dropdown">
+                <button class="btn btn-outline-warning btn-lg dropdown-toggle w-100" type="button" id="dropdownIntercambio" data-bs-toggle="dropdown" aria-expanded="false" style="color: #d4af37; border-color: #d4af37;">
+                    Intercambio de cartas
+                </button>
+                <ul class="dropdown-menu w-100 dropdown-menu-dark" aria-labelledby="dropdownIntercambio">
+                    <li><a class="dropdown-item" th:href="@{/contrato}">Contrato de Mejora</a></li>
+                    <li><a class="dropdown-item" th:href="@{/mercado}">Intercambio con Jugadores</a></li>
+                </ul>
+            </div>
+
         </div>
 
-    </div>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
