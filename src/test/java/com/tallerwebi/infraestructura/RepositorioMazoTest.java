@@ -29,27 +29,18 @@ public class RepositorioMazoTest {
 
   @Test
   public void queSePuedaGuardarUnMazoConCartas() {
-    // Given
     Mazo mazo = new Mazo();
-
     Carta carta = new Carta();
     carta.setNombre("Hechizo de Fuego");
 
-    // Creamos la entidad intermedia (el nexo)
     MazoCarta nexo = new MazoCarta();
 
-    // Seteamos las relaciones en el nexo
     nexo.setMazo(mazo);
     nexo.setCarta(carta);
 
-    // Agregamos el nexo a la lista del mazo (en lugar de la carta directamente)
     mazo.getMazoCartas().add(nexo);
 
-    // When
     repositorioMazo.guardar(mazo);
-
-    // Then
-    // Verificamos que se llame a saveOrUpdate con el objeto mazo
     verify(sessionMock, times(1)).saveOrUpdate(mazo);
   }
 }

@@ -58,6 +58,7 @@ public class ServicioCombateTest {
   @Test
   public void deberiaColocarEstadoGanadorJugadorCuandoHpEnemigoEsMenorOIgualACero() {
     Partida partida = new Partida(100, 100, 1);
+    // CORREGIDO: Mokeamos el repositorio, no el servicio real
     when(repositorioPartida.buscarPartidaPorIdentificador(1L)).thenReturn(partida);
 
     ArrayList<Integer> cartasEnMano = new ArrayList<>();
@@ -69,6 +70,8 @@ public class ServicioCombateTest {
     servicioCombate.jugarCarta(1, 1L);
     assertEquals(EnumEstadoPartida.GANADOR_JUGADOR, partida.getEnumEstadoPartida());
   }
+
+  // ─── NUEVOS TESTS PARA COMPLETAR EL 100% DE COBERTURA EN COMBATE ───
 
   @Test
   public void deberiaLanzarErrorCuandoElTurnoNoEstaDefinido() {

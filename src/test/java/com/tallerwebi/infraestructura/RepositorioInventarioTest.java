@@ -20,7 +20,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 @ExtendWith(SpringExtension.class)
-// IMPORTANTE: Esta es la configuración estándar de UNLaM para levantar la BD de prueba
 @ContextConfiguration(classes = { HibernateTestConfig.class })
 @Transactional
 @Rollback
@@ -29,10 +28,7 @@ public class RepositorioInventarioTest {
   @Autowired
   private SessionFactory sessionFactory;
 
-  // Le sacamos el @Autowired y lo declaramos normal
   private RepositorioInventario repositorioInventario;
-
-  // Instanciamos el repositorio antes de que arranque cada test
   @BeforeEach
   public void init() {
     this.repositorioInventario = new RepositorioInventarioImpl(sessionFactory);
@@ -40,7 +36,6 @@ public class RepositorioInventarioTest {
 
   @Test
   public void queSePuedaGuardarYBuscarUnItemEnElInventario() {
-    // Preparación: Para guardar un Item, primero tienen que existir el Jugador y la Carta en la BD
     Jugador jugador = new Jugador();
     sessionFactory.getCurrentSession().save(jugador);
 
@@ -87,7 +82,7 @@ public class RepositorioInventarioTest {
     repositorioInventario.guardar(item1);
     repositorioInventario.guardar(item2);
 
-    // Ejecución: Vamos a buscar el inventario del jugador
+    // Ejecución
     List<ItemInventario> inventario = repositorioInventario.listarInventarioDeJugador(
       jugador.getId()
     );
@@ -112,11 +107,10 @@ public class RepositorioInventarioTest {
     item.setCantidad(1);
     repositorioInventario.guardar(item);
 
-    // Ejecución: El jugador consiguió otra carta igual, actualizamos cantidad
+    // Ejecución
     item.sumarCantidad(1);
     repositorioInventario.actualizar(item);
 
-    // Buscamos de nuevo en la base para verificar el update
     ItemInventario itemActualizado = repositorioInventario.buscarItemDeJugador(
       jugador.getId(),
       carta.getId()

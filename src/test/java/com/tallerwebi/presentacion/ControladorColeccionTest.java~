@@ -71,7 +71,7 @@ public class ControladorColeccionTest {
     when(request.getSession()).thenReturn(session);
     when(request.getSession(anyBoolean())).thenReturn(session);
     when(session.getAttribute("jugadorId")).thenReturn(1L);
-
+    
     when(servicioCarta.obtenerColeccionAgrupada(1L)).thenReturn(coleccionDtoMock);
     when(coleccionDtoMock.getCartasUnicas()).thenReturn(null);
     when(coleccionDtoMock.getCantidades()).thenReturn(null);
