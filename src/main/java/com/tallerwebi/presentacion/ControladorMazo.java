@@ -5,6 +5,7 @@ import com.tallerwebi.dominio.Mazo;
 import com.tallerwebi.dominio.MazoCarta;
 import com.tallerwebi.dominio.ServicioMazo;
 import java.util.List;
+import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -24,25 +25,42 @@ public class ControladorMazo {
   }
 
   @RequestMapping("/deckbuilding")
-  public ModelAndView irADeckbuilding() {
+  public ModelAndView irADeckbuilding(HttpSession session) {
+    Long jugadorId = (Long) session.getAttribute("jugadorId");
+
+    if (jugadorId == null) {
+      return new ModelAndView("redirect:/login");
+    }
+
     ModelMap modelo = new ModelMap();
-    // Datos de prueba para ver cartas en la pantalla
-    List<Carta> inventario = servicioMazo.buscarCartasPorIds(List.of(1L, 2L, 3L, 4L, 5L));
+    List<Carta> inventario = servicioMazo.obtenerInventarioPorJugador(jugadorId);
     modelo.put("inventario", inventario);
     return new ModelAndView("deckbuilding", modelo);
   }
 
-  // Método para recibir los datos del formulario (POST)
   @RequestMapping(path = "/mazo/guardar", method = RequestMethod.POST)
-  public String guardarMazo(@RequestParam("cartasIds") List<Long> cartasIds, ModelMap modelo) {
-    try {
-      // 1. Creamos el objeto Mazo principal
-      Mazo nuevoMazo = new Mazo();
+  public ModelAndView guardarMazo(
+    @RequestParam(value = "cartasIds", required = false) List<Long> cartasIds,
+    HttpSession session
+  ) {
+    Long jugadorId = (Long) session.getAttribute("jugadorId");
 
-      // 2. Obtenemos las cartas elegidas
+    if (jugadorId == null) {
+      return new ModelAndView("redirect:/login");
+    }
+
+    // Si no seleccionó cartas, creamos el modelo LOCALMENTE porque solo se usa acá
+    if (cartasIds == null || cartasIds.isEmpty()) {
+      ModelMap modeloErrorValidacion = new ModelMap();
+      modeloErrorValidacion.put("error", "Debes seleccionar exactamente 15 cartas.");
+      modeloErrorValidacion.put("inventario", servicioMazo.obtenerInventarioPorJugador(jugadorId));
+      return new ModelAndView("deckbuilding", modeloErrorValidacion);
+    }
+
+    try {
+      Mazo nuevoMazo = new Mazo();
       List<Carta> cartasSeleccionadas = this.servicioMazo.buscarCartasPorIds(cartasIds);
 
-      // 3. Creamos la entidad intermedia (MazoCarta) para cada carta
       for (Carta carta : cartasSeleccionadas) {
         MazoCarta nexo = new MazoCarta();
         nexo.setMazo(nuevoMazo);
@@ -50,43 +68,15 @@ public class ControladorMazo {
         nuevoMazo.getMazoCartas().add(nexo);
       }
 
-      // 4. Llamamos al servicio para validar (15 cartas, sin repetidos)
       servicioMazo.validarYGuardarMazo(nuevoMazo);
-
-      // 5. CAMBIO APLICADO: Si todo está OK, redirigimos a la Selección de Zona
-      return "redirect:/seleccion-zona";
+      // Al redirigir en éxito, no arrastramos ninguna variable ModelMap vacía
+      return new ModelAndView("redirect:/seleccion-zona");
     } catch (Exception e) {
-      // 6. Si falla la validación, cargamos el error y volvemos a la vista
-      modelo.put("error", e.getMessage());
-      modelo.put("inventario", servicioMazo.buscarCartasPorIds(List.of(1L, 2L, 3L)));
-      return "deckbuilding";
+      // Si salta una excepción, recién acá creamos el modelo para la pantalla de error
+      ModelMap modeloErrorCatch = new ModelMap();
+      modeloErrorCatch.put("error", e.getMessage());
+      modeloErrorCatch.put("inventario", servicioMazo.obtenerInventarioPorJugador(jugadorId));
+      return new ModelAndView("deckbuilding", modeloErrorCatch);
     }
   }
-  /*private List<Carta> obtenerInventarioEjemplo() {
-    List<Carta> cartasDePrueba = new ArrayList<>();
-
-    // cartas ficticias para verlas en la pantalla
-    Carta c1 = new Carta();
-    c1.setId(1L);
-    c1.setNombre("Golpe de Escudo");
-
-    Carta c2 = new Carta();
-    c2.setId(2L);
-    c2.setNombre("Flecha Sombría");
-
-    Carta c3 = new Carta();
-    c3.setId(3L);
-    c3.setNombre("Poción de Furia");
-
-    Carta c4 = new Carta();
-    c4.setId(4L);
-    c4.setNombre("Invocación de Esqueleto");
-
-    cartasDePrueba.add(c1);
-    cartasDePrueba.add(c2);
-    cartasDePrueba.add(c3);
-    cartasDePrueba.add(c4);
-
-    return cartasDePrueba;
-  } */
 }

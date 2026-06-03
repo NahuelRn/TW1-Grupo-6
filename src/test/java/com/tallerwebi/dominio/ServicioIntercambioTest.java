@@ -172,7 +172,7 @@ public class ServicioIntercambioTest {
     verify(repoItemMock, times(1)).listarInventarioDeJugador(1L);
   }
 
-  // ─── Helper ───────────────────────────────────────────────────────────────
+  // ─── Helper
 
   private Carta cartaConRareza(String rareza) {
     Carta carta = new Carta();

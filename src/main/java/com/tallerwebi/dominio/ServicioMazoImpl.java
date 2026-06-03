@@ -8,39 +8,42 @@ import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 @Service
-@Transactional // Asegura que si algo falla, no se guarde nada a medias
+@Transactional
 public class ServicioMazoImpl implements ServicioMazo {
 
   private static final int MAX_CARTAS = 15;
   private final RepositorioMazo repositorioMazo;
+  private final RepositorioCarta repositorioCarta;
+  private final RepositorioInventario repositorioInventario;
 
-  public ServicioMazoImpl(RepositorioMazo repositorioMazo) {
+  // Inyectamos todos los repositorios necesarios
+  public ServicioMazoImpl(
+    RepositorioMazo repositorioMazo,
+    RepositorioCarta repositorioCarta,
+    RepositorioInventario repositorioInventario
+  ) {
     this.repositorioMazo = repositorioMazo;
+    this.repositorioCarta = repositorioCarta;
+    this.repositorioInventario = repositorioInventario;
   }
 
   @Override
   public void validarYGuardarMazo(Mazo mazo) throws Exception {
     List<MazoCarta> nexos = mazo.getMazoCartas();
 
-    // REGLA 1: Usamos la constante en vez del literal "15"
     if (nexos.size() != MAX_CARTAS) {
       throw new Exception("El mazo debe tener exactamente 15 cartas");
     }
 
-    // REGLA 2: No se pueden repetir cartas
     Set<Long> idsUnicos = new HashSet<>();
-
     for (MazoCarta nexo : nexos) {
       Carta carta = nexo.getCarta();
-
       if (idsUnicos.contains(carta.getId())) {
         throw new Exception("No puedes incluir cartas repetidas: " + carta.getNombre());
       }
-
       idsUnicos.add(carta.getId());
     }
 
-    // EL TRUCO PARA PMD: Leemos la variable al final de todo para matar la anomalía DU
     if (idsUnicos.size() != MAX_CARTAS) {
       throw new Exception("Error de validación interna con las cartas");
     }
@@ -52,10 +55,25 @@ public class ServicioMazoImpl implements ServicioMazo {
   public List<Carta> buscarCartasPorIds(List<Long> ids) {
     List<Carta> cartas = new ArrayList<>();
     for (Long id : ids) {
-      Carta carta = new Carta();
-      carta.setId(id);
-      cartas.add(carta);
+      Carta carta = repositorioCarta.buscarPorId(id); // Vaya a la base de datos de verdad
+      if (carta != null) {
+        cartas.add(carta);
+      }
     }
     return cartas;
+  }
+
+  @Override
+  public List<Carta> obtenerInventarioPorJugador(Long jugadorId) {
+    List<ItemInventario> items = repositorioInventario.listarInventarioDeJugador(jugadorId);
+    List<Carta> cartasDelJugador = new ArrayList<>();
+
+    // Convertimos los ítems del inventario a una lista limpia de Cartas
+    for (ItemInventario item : items) {
+      if (item.getCarta() != null) {
+        cartasDelJugador.add(item.getCarta());
+      }
+    }
+    return cartasDelJugador;
   }
 }
