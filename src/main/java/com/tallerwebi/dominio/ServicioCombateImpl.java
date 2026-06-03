@@ -1,9 +1,8 @@
 package com.tallerwebi.dominio;
 
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import javax.transaction.Transactional;
 
 @Service
 @Transactional
@@ -68,9 +67,9 @@ public class ServicioCombateImpl implements ServicioCombate {
   }
 
   private Integer calcularEfectoCarta() {
-//  Formula -> danio = valor_base_carta * multiplicador + factor_suerte
+    //  Formula -> danio = valor_base_carta * multiplicador + factor_suerte
 
-//  Ejemplo:
+    //  Ejemplo:
     int valorBaseCarta = 10;
     int multiplicador = 5;
     int factorSuerte = 5;

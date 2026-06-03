@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 
 public class ServicioIntercambioTest {
 
-  // ─── Constantes de rareza ─────────────────────────────────────────────────
   private static final String RAREZA_COMUN = "Comun";
   private static final String RAREZA_POCO_COMUN = "Poco Comun";
   private static final String RAREZA_RARA = "Rara";
@@ -30,7 +29,7 @@ public class ServicioIntercambioTest {
     servicio = new ServicioIntercambioImpl(repoCartaMock, repoItemMock);
   }
 
-  // ─── Validación de cantidad ───────────────────────────────────────────────
+  // Validación de cantidad
 
   @Test
   public void siSeEntreganMenosDe4CartasDebeLanzarError() {
@@ -48,7 +47,19 @@ public class ServicioIntercambioTest {
     assertThat(ex.getMessage(), containsString("exactamente 4 cartas"));
   }
 
-  // ─── Validación de rareza uniforme ───────────────────────────────────────
+  // Verifica el control de nulidad cuando mandan un ID de carta inexistente
+  @Test
+  public void siUnaCartaNoExisteEnElRepositorioDebeLanzarError() {
+    Carta comun = cartaConRareza(RAREZA_COMUN);
+    when(repoCartaMock.buscarPorId(1L)).thenReturn(comun);
+    when(repoCartaMock.buscarPorId(2L)).thenReturn(comun);
+    when(repoCartaMock.buscarPorId(3L)).thenReturn(comun);
+    when(repoCartaMock.buscarPorId(4L)).thenReturn(null); // ID roto o inválido
+
+    assertThrows(Exception.class, () -> servicio.realizarMejora(1L, List.of(1L, 2L, 3L, 4L)));
+  }
+
+  // Validación de rareza uniforme
 
   @Test
   public void siLasCartasSonDeDistintaRarezaDebeLanzarError() {
@@ -67,8 +78,7 @@ public class ServicioIntercambioTest {
     assertThat(ex.getMessage(), containsString("misma rareza"));
   }
 
-  // ─── Validación de carta legendaria ──────────────────────────────────────
-
+  // Validación de carta legendaria
   @Test
   public void siLasCartasSonLegendariasDebeLanzarError() {
     Carta legendaria = cartaConRareza(RAREZA_LEGENDARIA);
@@ -81,7 +91,7 @@ public class ServicioIntercambioTest {
     assertThat(ex.getMessage(), containsString("No se puede mejorar una carta Legendaria"));
   }
 
-  // ─── Casos felices ────────────────────────────────────────────────────────
+  // Casos felices
 
   @Test
   public void siSeEntreganCuatroCartasComunesDebeRetornarUnaPocoComon() throws Exception {
@@ -143,7 +153,7 @@ public class ServicioIntercambioTest {
     assertThat(resultado.getRareza(), is(RAREZA_LEGENDARIA));
   }
 
-  // ─── Sin premios disponibles ──────────────────────────────────────────────
+  //Sin premios disponibles
 
   @Test
   public void siNoHayCartasDelSiguienteNivelDebeLanzarError() {
@@ -159,7 +169,7 @@ public class ServicioIntercambioTest {
     assertThat(ex.getMessage(), containsString("No hay cartas disponibles"));
   }
 
-  // ─── obtenerInventario ────────────────────────────────────────────────────
+  // obtenerInventario
 
   @Test
   public void obtenerInventarioDebeRetornarItemsDelJugador() {
@@ -172,7 +182,16 @@ public class ServicioIntercambioTest {
     verify(repoItemMock, times(1)).listarInventarioDeJugador(1L);
   }
 
-  // ─── Helper
+  @Test
+  public void obtenerInventarioDebeRetornarListaVaciaSiElJugadorNoTieneCartas() {
+    when(repoItemMock.listarInventarioDeJugador(2L)).thenReturn(Collections.emptyList());
+
+    List<ItemInventario> resultado = servicio.obtenerInventario(2L);
+
+    assertThat(resultado, is(empty()));
+  }
+
+  // Helper
 
   private Carta cartaConRareza(String rareza) {
     Carta carta = new Carta();

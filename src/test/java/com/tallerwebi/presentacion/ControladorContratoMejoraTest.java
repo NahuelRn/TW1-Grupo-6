@@ -19,17 +19,17 @@ public class ControladorContratoMejoraTest {
   private ServicioIntercambio servicioIntercambioMock;
   private HttpSession sessionMock;
   private RedirectAttributes redirectAttributesMock;
-  private ControladorContratoMejora controlador; // CORRECCIÓN: Apunta al controlador correcto
+  private ControladorContratoMejora controlador;
 
   @BeforeEach
   public void setUp() {
     servicioIntercambioMock = mock(ServicioIntercambio.class);
     sessionMock = mock(HttpSession.class);
     redirectAttributesMock = mock(RedirectAttributes.class);
-    controlador = new ControladorContratoMejora(servicioIntercambioMock); // CORRECCIÓN: Instancia el controlador unificado
+    controlador = new ControladorContratoMejora(servicioIntercambioMock);
   }
 
-  // ─── GET /contrato-mejora ─────────────────────────────────────────────────
+  // GET /contrato-mejora
 
   @Test
   public void siNoHayJugadorEnSesionElGetDebeRedirigirALogin() {
@@ -92,13 +92,11 @@ public class ControladorContratoMejoraTest {
     String mensajeError = "Todas las cartas deben ser de la misma rareza";
 
     when(sessionMock.getAttribute("jugadorId")).thenReturn(jugadorId);
-    // Simulamos que el servicio lanza la excepción esperada
     when(servicioIntercambioMock.realizarMejora(jugadorId, ids))
       .thenThrow(new Exception(mensajeError));
 
     ModelAndView mav = controlador.intercambiarCartas(ids, sessionMock, redirectAttributesMock);
 
-    // CORRECCIÓN: Ahora el controlador redirige en vez de retornar la vista directa
     assertThat(mav.getViewName(), equalTo("redirect:/contrato-mejora"));
     verify(redirectAttributesMock, times(1)).addFlashAttribute("error", mensajeError);
   }
@@ -108,7 +106,6 @@ public class ControladorContratoMejoraTest {
     Long jugadorId = 1L;
     when(sessionMock.getAttribute("jugadorId")).thenReturn(jugadorId);
 
-    // Ejecutamos pasando la lista vacía o nula
     ModelAndView mav = controlador.intercambiarCartas(null, sessionMock, redirectAttributesMock);
 
     assertThat(mav.getViewName(), equalTo("redirect:/contrato-mejora"));
@@ -119,7 +116,26 @@ public class ControladorContratoMejoraTest {
       );
   }
 
-  // ─── GET /contrato-mejora/resultado ───────────────────────────────────────
+  @Test
+  public void siLaListaDeCartasEstaVaciaDebeRedirigirAContratoMejoraYMostrarError() {
+    Long jugadorId = 1L;
+    when(sessionMock.getAttribute("jugadorId")).thenReturn(jugadorId);
+
+    ModelAndView mav = controlador.intercambiarCartas(
+      List.of(),
+      sessionMock,
+      redirectAttributesMock
+    );
+
+    assertThat(mav.getViewName(), equalTo("redirect:/contrato-mejora"));
+    verify(redirectAttributesMock, times(1))
+      .addFlashAttribute(
+        "error",
+        "Debes seleccionar exactamente 4 cartas para firmar el contrato."
+      );
+  }
+
+  // GET /contrato-mejora/resultado
 
   @Test
   public void siNoHayJugadorEnSesionAlVerResultadoDebeRedirigirALogin() {
