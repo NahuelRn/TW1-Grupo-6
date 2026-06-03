@@ -1,13 +1,7 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.Carta;
-import com.tallerwebi.dominio.ItemInventario;
+import com.tallerwebi.dominio.ColeccionDTO;
 import com.tallerwebi.dominio.ServicioCarta;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -34,25 +28,12 @@ public class ControladorColeccion {
       return new ModelAndView("redirect:/login");
     }
 
+    // El controlador pide los datos ya procesados al servicio
+    ColeccionDTO miColeccion = servicioCarta.obtenerColeccionAgrupada(jugadorId);
+
     ModelMap modelo = new ModelMap();
-
-    // 1. Evitamos las cartas repetidas por si la BD hace producto cartesiano
-    List<Carta> todasLasCartasBruto = servicioCarta.obtenerTodas();
-    Map<Long, Carta> cartasUnicas = new TreeMap<>(); // TreeMap las ordena por ID
-    for (Carta c : todasLasCartasBruto) {
-      cartasUnicas.put(c.getId(), c);
-    }
-
-    // 2. Mapeamos el inventario: ID de la Carta -> Cantidad (Para hacer el x10)
-    List<ItemInventario> miInventario = servicioCarta.obtenerInventario(jugadorId);
-    Map<Long, Integer> misCantidades = new HashMap<>();
-    for (ItemInventario item : miInventario) {
-      misCantidades.put(item.getCarta().getId(), item.getCantidad());
-    }
-
-    // 3. Mandamos los datos limpios a la vista
-    modelo.put("todasLasCartas", new ArrayList<>(cartasUnicas.values()));
-    modelo.put("misCantidades", misCantidades);
+    modelo.put("todasLasCartas", miColeccion.getCartasUnicas());
+    modelo.put("misCantidades", miColeccion.getCantidades());
 
     return new ModelAndView("coleccion", modelo);
   }

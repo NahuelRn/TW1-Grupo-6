@@ -3,9 +3,11 @@ package com.tallerwebi.presentacion;
 import com.tallerwebi.dominio.Carta;
 import com.tallerwebi.dominio.ItemInventario;
 import com.tallerwebi.dominio.ServicioCarta;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,7 +19,6 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class ControladorColeccion {
 
-  // 1. Dejamos SOLO el ServicioCarta
   private final ServicioCarta servicioCarta;
 
   @Autowired
@@ -34,18 +35,24 @@ public class ControladorColeccion {
     }
 
     ModelMap modelo = new ModelMap();
-    List<Carta> todasLasCartas = servicioCarta.obtenerTodas();
 
-    // 2. ACÁ EL CAMBIO CLAVE: Llamamos a servicioCarta en vez de al repositorio
+    // 1. Evitamos las cartas repetidas por si la BD hace producto cartesiano
+    List<Carta> todasLasCartasBruto = servicioCarta.obtenerTodas();
+    Map<Long, Carta> cartasUnicas = new TreeMap<>(); // TreeMap las ordena por ID
+    for (Carta c : todasLasCartasBruto) {
+      cartasUnicas.put(c.getId(), c);
+    }
+
+    // 2. Mapeamos el inventario: ID de la Carta -> Cantidad (Para hacer el x10)
     List<ItemInventario> miInventario = servicioCarta.obtenerInventario(jugadorId);
+    Map<Long, Integer> misCantidades = new HashMap<>();
+    for (ItemInventario item : miInventario) {
+      misCantidades.put(item.getCarta().getId(), item.getCantidad());
+    }
 
-    Set<Long> cartasQueTengo = miInventario
-      .stream()
-      .map(item -> item.getCarta().getId())
-      .collect(Collectors.toSet());
-
-    modelo.put("todasLasCartas", todasLasCartas);
-    modelo.put("cartasQueTengo", cartasQueTengo);
+    // 3. Mandamos los datos limpios a la vista
+    modelo.put("todasLasCartas", new ArrayList<>(cartasUnicas.values()));
+    modelo.put("misCantidades", misCantidades);
 
     return new ModelAndView("coleccion", modelo);
   }

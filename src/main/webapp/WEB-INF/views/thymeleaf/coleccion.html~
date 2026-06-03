@@ -76,7 +76,7 @@
         <!-- ZONA DE ARTE -->
             <div class="mb-3 text-center">
                 <img th:if="${carta.imagen != null and not #strings.isEmpty(carta.imagen)}"
-                     th:src="@{'/img/' + ${carta.imagen}}"
+                     th:src="@{'/img/cartas/' + ${carta.imagen}}"
                      th:alt="${carta.nombre}"
                      class="carta-img shadow"
                      style="width: 100%; height: auto; max-width: 150px;">

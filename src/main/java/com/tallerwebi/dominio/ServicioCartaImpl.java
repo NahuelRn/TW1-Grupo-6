@@ -1,6 +1,10 @@
 package com.tallerwebi.dominio;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,14 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class ServicioCartaImpl implements ServicioCarta {
 
   private final RepositorioCarta repositorioCarta;
-  private final RepositorioInventario repositorioInventario; // 1. Agregamos el repositorio acá
+  private final RepositorioInventario repositorioInventario;
 
   @Autowired
   public ServicioCartaImpl(
     RepositorioCarta repositorioCarta,
     RepositorioInventario repositorioInventario
   ) {
-    // 2. Lo inyectamos en el constructor
     this.repositorioCarta = repositorioCarta;
     this.repositorioInventario = repositorioInventario;
   }
@@ -34,7 +37,32 @@ public class ServicioCartaImpl implements ServicioCarta {
 
   @Override
   public List<ItemInventario> obtenerInventario(Long jugadorId) {
-    // 3. Usamos la variable con MINÚSCULA para que use la instancia, no la clase estática
     return repositorioInventario.listarInventarioDeJugador(jugadorId);
+  }
+
+  @Override
+  public ColeccionDTO obtenerColeccionAgrupada(Long jugadorId) {
+    // 1. Obtenemos TODAS las cartas del juego (Para mantener el efecto "Álbum")
+    List<Carta> todasLasCartasBruto = this.obtenerTodas();
+    Map<Long, Carta> cartasUnicas = new TreeMap<>();
+    for (Carta c : todasLasCartasBruto) {
+      cartasUnicas.put(c.getId(), c);
+    }
+
+    // 2. Mapeamos el inventario real: ID de la Carta -> Cantidad
+    List<ItemInventario> miInventario = this.obtenerInventario(jugadorId);
+    Map<Long, Integer> misCantidades = new HashMap<>();
+
+    // Agregamos un chequeo por si el inventario viene nulo y SUMAMOS cantidades repetidas
+    if (miInventario != null) {
+      for (ItemInventario item : miInventario) {
+        Long idCarta = item.getCarta().getId();
+        Integer cantidadActual = misCantidades.getOrDefault(idCarta, 0);
+        misCantidades.put(idCarta, cantidadActual + item.getCantidad());
+      }
+    }
+
+    // 3. Servimos todo en la "bandeja" (DTO): TODAS las cartas y SOLO las cantidades que posee
+    return new ColeccionDTO(new ArrayList<>(cartasUnicas.values()), misCantidades);
   }
 }

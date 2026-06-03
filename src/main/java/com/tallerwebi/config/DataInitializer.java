@@ -51,7 +51,7 @@ public class DataInitializer implements ApplicationListener<ContextRefreshedEven
           ItemInventario item = new ItemInventario();
           item.setCarta(carta);
           item.setJugador(jugador);
-          item.setCantidad(10); // Le damos el x10
+          item.setCantidad(1); // Le damos el x10
           repositorioInventario.guardar(item);
         }
       }

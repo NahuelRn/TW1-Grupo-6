@@ -6,4 +6,5 @@ public interface ServicioCarta {
   List<Carta> obtenerTodas();
   Carta obtenerCartaPorId(Long id);
   List<ItemInventario> obtenerInventario(Long jugadorId);
+  ColeccionDTO obtenerColeccionAgrupada(Long jugadorId);
 }
