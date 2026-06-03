@@ -1,42 +1,208 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
-    <link rel="stylesheet" th:href="@{/css/globals.css}"> <!-- Tu archivo con variables -->
-    <title>MythicStack - Armar Mazo</title>
-</head>
-<body style="background-color: var(--game-void); color: var(--game-text);">
-<div class="container mt-5">
-    <h1 style="font-family: 'Cinzel', serif;">Armar mi Mazo</h1>
-    <p class="text-muted">Selecciona exactamente 15 cartas sin repetir</p>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MythicStack - Armado de Mazo</title>
 
-    <!-- Mensaje de Error -->
-    <div th:if="${error}" class="alert alert-danger" role="alert"
-         style="background-color: var(--game-blood); color: white; border-radius: var(--border-radius-general);">
-        <span th:text="${error}"></span>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #0c0c0e !important;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: #ffffff;
+        }
+        .titulo-seccion {
+            color: #e63946;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(230, 57, 70, 0.4);
+        }
+        .mythic-card {
+            background-color: #131316 !important;
+            border: 2px solid #e5a93b !important;
+            border-radius: 12px !important;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .mythic-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px rgba(229, 169, 59, 0.4);
+        }
+        .quantity-badge {
+            position: absolute;
+            top: -12px;
+            right: -12px;
+            background-color: #ff4d6d !important;
+            color: white !important;
+            font-weight: bold;
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 50%;
+            border: 2px solid #e5a93b;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+        .card-img-container {
+            height: 150px;
+            background-color: #09090b;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 1px solid #27272a;
+        }
+        .card-img-container img {
+            max-height: 100%;
+            max-width: 100%;
+            object-fit: contain;
+        }
+        .no-art {
+            color: #52525b;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 2px dashed #27272a;
+            width: 90%;
+            height: 90%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+        }
+        .card-title-mythic {
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 8px;
+            color: #ffffff;
+        }
+        .badge-rarity {
+            background-color: transparent !important;
+            border: 1px solid #e5a93b !important;
+            color: #e5a93b !important;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 3px 6px;
+        }
+        .badge-type {
+            background-color: #27272a !important;
+            color: #ffffff !important;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 3px 6px;
+        }
+        .card-desc-mythic {
+            color: #a1a1aa !important;
+            font-size: 0.75rem;
+            margin-top: 8px;
+            min-height: 35px;
+        }
+        .mythic-checkbox {
+            width: 20px;
+            height: 20px;
+            accent-color: #e63946;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container my-5">
+    <div class="text-center mb-5">
+        <h1 class="titulo-seccion">ARMADO DE MAZO</h1>
+        <p style="color: #ffffff !important; font-size: 1.1rem; font-weight: 500; opacity: 0.95;">Selecciona las 15 cartas que formaran tu mazo estrategico</p>
     </div>
 
-    <form th:action="@{/mazo/guardar}" method="POST" class="mt-4">
-        <div class="row">
-            <!-- itera las cartas del inventario del usuario -->
-            <div th:each="carta : ${inventario}" class="col-md-3 mb-3">
-                <div class="card" style="background-color: var(--game-panel); border: 1px solid var(--game-border); box-shadow: var(--shadow-game);">
-                    <div class="card-body text-center">
-                        <h5 class="card-title" th:text="${carta.nombre}"></h5>
-                        <input type="checkbox" name="cartasIds" th:value="${carta.id}"> Seleccionar
+    <div th:if="${error}" class="alert alert-danger text-center shadow" th:text="${error}"></div>
+
+    <form th:action="@{/mazo/guardar}" method="POST">
+        <div id="contenedor-cartas" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4 px-3">
+
+            <div class="col card-item-node" th:each="carta : ${inventario}">
+                <div class="card h-100 mythic-card p-3">
+
+                    <span class="quantity-badge">x1</span>
+
+                    <div class="card-img-container">
+                        <img th:if="${carta.imagen != null and not #strings.isEmpty(carta.imagen)}"
+                             th:src="@{/img/{img}(img=${carta.imagen})}"
+                             th:alt="${carta.nombre}">
+                        <div th:unless="${carta.imagen != null and not #strings.isEmpty(carta.imagen)}" class="no-art">
+                            <span>Arte no disponible</span>
+                        </div>
                     </div>
+
+                    <div class="text-center mt-2">
+                        <h5 class="card-title-mythic" th:text="${carta.nombre}">NOMBRE</h5>
+
+                        <div class="d-flex justify-content-center gap-1 my-2">
+                            <span class="badge badge-rarity" th:text="${carta.rareza != null} ? ${carta.rareza} : 'COMÚN'">COMÚN</span>
+                            <span class="badge badge-type" th:text="${carta.tipo != null} ? ${carta.tipo} : 'TIPO'">ATAQUE</span>
+                        </div>
+
+                        <p class="card-desc-mythic" th:text="${carta.descripcion != null} ? ${carta.descripcion} : 'Sin descripción disponible.'">Efecto de la carta</p>
+
+                        <div class="form-check d-flex justify-content-center mt-2">
+                            <input class="form-check-input mythic-checkbox" type="checkbox" name="cartasIds" th:value="${carta.id}">
+                        </div>
+                    </div>
+
                 </div>
             </div>
+
         </div>
 
-        <div class="text-center mt-4">
-            <!-- Botón Épico -->
-            <button type="submit" class="btn"
-                    style="background-color: var(--game-epic); color: var(--game-void); font-weight: bold; border-radius: var(--border-radius-general);">
-                GUARDAR MAZO
-            </button>
+        <div class="text-center mt-5">
+            <button type="submit" class="btn btn-danger btn-lg px-5 fw-bold shadow">GUARDAR MAZO</button>
         </div>
     </form>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const contenedor = document.getElementById("contenedor-cartas");
+        if (!contenedor) return;
+
+        const cartasNodes = Array.from(contenedor.querySelectorAll(".card-item-node"));
+
+        function mapearRarezaSegura(elemento) {
+            const badge = elemento.querySelector(".badge-rarity");
+            if (!badge) return "comun";
+            const texto = badge.textContent.toLowerCase();
+
+            if (texto.includes("poco")) return "poco-comun";
+            if (texto.includes("com")) return "comun";
+            if (texto.includes("rar")) return "raro";
+            if (texto.includes("ep") || texto.includes("ê") || texto.includes("é") || texto.includes("")) return "epico";
+            if (texto.includes("leg")) return "legendario";
+            return "comun";
+        }
+
+        const pesosRareza = {
+            "comun": 1,
+            "poco-comun": 2,
+            "raro": 3,
+            "epico": 4,
+            "legendario": 5
+        };
+
+        // Ejecuta la ordenación jerárquica al cargar
+        cartasNodes.sort((a, b) => {
+            const pesoA = pesosRareza[mapearRarezaSegura(a)] || 99;
+            const pesoB = pesosRareza[mapearRarezaSegura(b)] || 99;
+            return pesoA - pesoB;
+        });
+
+        cartasNodes.forEach(nodo => contenedor.appendChild(nodo));
+    });
+</script>
 </body>
 </html>

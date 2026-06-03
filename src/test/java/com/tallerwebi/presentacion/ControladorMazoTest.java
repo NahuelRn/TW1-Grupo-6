@@ -7,48 +7,62 @@ import static org.mockito.Mockito.*;
 import com.tallerwebi.dominio.ServicioMazo;
 import java.util.ArrayList;
 import java.util.List;
+import javax.servlet.http.HttpSession;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.ui.ModelMap;
+import org.springframework.web.servlet.ModelAndView;
 
 public class ControladorMazoTest {
 
+  private ServicioMazo servicioMock;
+  private HttpSession sessionMock;
+  private ControladorMazo controlador;
+
+  @BeforeEach
+  public void init() {
+    servicioMock = mock(ServicioMazo.class);
+    sessionMock = mock(HttpSession.class);
+    controlador = new ControladorMazo(servicioMock);
+
+    // Simulamos que siempre hay un jugador logueado con ID 1
+    when(sessionMock.getAttribute("jugadorId")).thenReturn(1L);
+  }
+
   @Test
   public void siElMazoSeGuardaExitosamenteDebeRedirigirASeleccionZona() throws Exception {
-    ServicioMazo servicioMock = mock(ServicioMazo.class);
-    ControladorMazo controlador = new ControladorMazo(servicioMock);
+    // Given
     List<Long> cartasIds = new ArrayList<>();
-
     for (long i = 1; i <= 15; i++) {
       cartasIds.add(i);
     }
 
-    ModelMap modelo = new ModelMap();
-    String vista = controlador.guardarMazo(cartasIds, modelo);
+    // When
+    ModelAndView modelAndView = controlador.guardarMazo(cartasIds, sessionMock);
 
-    assertThat(vista, is("redirect:/seleccion-zona"));
+    // Then
+    assertThat(modelAndView.getViewName(), is("redirect:/seleccion-zona"));
     verify(servicioMock, times(1)).validarYGuardarMazo(any());
   }
 
   @Test
   public void siElServicioLanzaExcepcionDebeVolverADeckbuildingConError() throws Exception {
     // Given
-    ServicioMazo servicioMock = mock(ServicioMazo.class);
     doThrow(new Exception("Error de validación")).when(servicioMock).validarYGuardarMazo(any());
-    ControladorMazo controlador = new ControladorMazo(servicioMock);
 
-    // When
     List<Long> cartasIds = new ArrayList<>();
-
     for (long i = 1; i <= 15; i++) {
       cartasIds.add(i);
     }
 
-    // Instanciamos el ModelMap
-    ModelMap modelo = new ModelMap();
-    String vista = controlador.guardarMazo(cartasIds, modelo);
+    // When
+    ModelAndView modelAndView = controlador.guardarMazo(cartasIds, sessionMock);
 
-    // Then: Validamos contra el String de la vista y sacamos el error directo del ModelMap
-    assertThat(vista, is("deckbuilding"));
-    assertThat(modelo.get("error").toString(), containsString("Error de validación"));
+    // Then
+    assertThat(modelAndView.getViewName(), is("deckbuilding"));
+    assertThat(
+      modelAndView.getModel().get("error").toString(),
+      containsString("Error de validación")
+    );
+    verify(servicioMock, times(1)).obtenerInventarioPorJugador(1L);
   }
 }
