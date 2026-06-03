@@ -23,6 +23,7 @@ public class Partida {
 
   // --- LO DE MIKA (Combate) ---
   private Integer turno;
+  private EnumEstadoPartida enumEstadoPartida;
   private String estado;
 
   @Transient
@@ -40,6 +41,7 @@ public class Partida {
     this.hpEnemigo = hpEnemigo;
     this.turno = turno;
     this.cartasEnManoJugador = new ArrayList<>();
+    this.enumEstadoPartida = EnumEstadoPartida.ACTIVA;
   }
 
   // GETTERS Y SETTERS
@@ -120,5 +122,13 @@ public class Partida {
 
   public void setCartasEnManoJugador(List<Integer> cartasEnManoJugador) {
     this.cartasEnManoJugador = cartasEnManoJugador;
+  }
+
+  public EnumEstadoPartida getEnumEstadoPartida() {
+    return enumEstadoPartida;
+  }
+
+  public void setEnumEstadoPartida(EnumEstadoPartida enumEstadoPartida) {
+    this.enumEstadoPartida = enumEstadoPartida;
   }
 }

@@ -1,14 +1,22 @@
 package com.tallerwebi.presentacion;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import com.tallerwebi.dominio.Partida;
+import com.tallerwebi.dominio.RepositorioPartida;
 import com.tallerwebi.dominio.ServicioCombate;
+import com.tallerwebi.dominio.ServicioCombateImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.ArrayList;
+
 public class ControladorCombateTest {
 
-  ServicioCombate servicioCombate = new ServicioCombate();
+  RepositorioPartida repositorioPartida = mock(RepositorioPartida.class);
+  ServicioCombate servicioCombate = new ServicioCombateImpl(repositorioPartida);
 
   @Test
   public void deberiaMostrarVistaCombate() {
@@ -23,7 +31,15 @@ public class ControladorCombateTest {
   public void deberiaJugarCartaYMostrarDatosEnVista() {
     ControladorCombate controladorCombate = new ControladorCombate(this.servicioCombate);
 
-    ModelAndView modelAndView = controladorCombate.jugarCarta(1, 1);
+    Partida partida = new Partida(100, 100, 1);
+    when(this.repositorioPartida.buscarPartidaPorIdentificador(1L)).thenReturn(partida);
+
+    ArrayList<Integer> cartasEnMano = new ArrayList<>();
+    cartasEnMano.add(1);
+
+    partida.setCartasEnManoJugador(cartasEnMano);
+
+    ModelAndView modelAndView = controladorCombate.jugarCarta(1, 1L);
 
     assertEquals("combate", modelAndView.getViewName());
   }
