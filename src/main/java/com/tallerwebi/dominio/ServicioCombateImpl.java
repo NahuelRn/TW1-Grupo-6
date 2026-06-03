@@ -67,9 +67,7 @@ public class ServicioCombateImpl implements ServicioCombate {
   }
 
   private Integer calcularEfectoCarta() {
-    //  Formula -> danio = valor_base_carta * multiplicador + factor_suerte
 
-    //  Ejemplo:
     int valorBaseCarta = 10;
     int multiplicador = 5;
     int factorSuerte = 5;

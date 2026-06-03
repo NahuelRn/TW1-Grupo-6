@@ -31,7 +31,6 @@ public class RepositorioInventarioImpl implements RepositorioInventario {
 
   @Override
   public ItemInventario buscarItemDeJugador(Long jugadorId, Long cartaId) {
-    // Llamamos al sessionFactory directo sin guardarlo en la variable 'session'
     Criteria criteria = sessionFactory.getCurrentSession().createCriteria(ItemInventario.class);
 
     criteria.createAlias("jugador", "j");
@@ -46,7 +45,6 @@ public class RepositorioInventarioImpl implements RepositorioInventario {
   @Override
   @SuppressWarnings("unchecked")
   public List<ItemInventario> listarInventarioDeJugador(Long jugadorId) {
-    // Mismo truco acá para esquivar a PMD
     Criteria criteria = sessionFactory.getCurrentSession().createCriteria(ItemInventario.class);
 
     criteria.createAlias("jugador", "j");

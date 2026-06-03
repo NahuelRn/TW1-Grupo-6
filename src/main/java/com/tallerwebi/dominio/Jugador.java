@@ -11,11 +11,9 @@ public class Jugador {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  // Estadísticas básicas del jugador
   private Integer nivel = 1;
   private Integer oro = 0;
 
-  // Relación 1 a 1: El Jugador es el "dueño" de la relación y guarda la foreign key
   @OneToOne
   @JoinColumn(name = "usuario_id")
   private Usuario usuario;

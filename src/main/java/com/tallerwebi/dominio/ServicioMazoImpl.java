@@ -16,7 +16,6 @@ public class ServicioMazoImpl implements ServicioMazo {
   private final RepositorioCarta repositorioCarta;
   private final RepositorioInventario repositorioInventario;
 
-  // Inyectamos todos los repositorios necesarios
   public ServicioMazoImpl(
     RepositorioMazo repositorioMazo,
     RepositorioCarta repositorioCarta,
@@ -68,7 +67,6 @@ public class ServicioMazoImpl implements ServicioMazo {
     List<ItemInventario> items = repositorioInventario.listarInventarioDeJugador(jugadorId);
     List<Carta> cartasDelJugador = new ArrayList<>();
 
-    // Convertimos los ítems del inventario a una lista limpia de Cartas
     for (ItemInventario item : items) {
       if (item.getCarta() != null) {
         cartasDelJugador.add(item.getCarta());

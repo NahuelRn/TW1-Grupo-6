@@ -83,7 +83,7 @@ public class ServicioCartaTest {
       .thenReturn(List.of(item1, item2));
 
     // Ejecución
-    ColeccionDTO resultado = servicioCarta.obtenerColeccionAgrupada(jugadorId);
+    ColeccionDto resultado = servicioCarta.obtenerColeccionAgrupada(jugadorId);
 
     // Validaciones
     assertThat(resultado, notNullValue());
@@ -103,7 +103,7 @@ public class ServicioCartaTest {
     when(repositorioInventario.listarInventarioDeJugador(jugadorId)).thenReturn(null);
 
     // Ejecución
-    ColeccionDTO resultado = servicioCarta.obtenerColeccionAgrupada(jugadorId);
+    ColeccionDto resultado = servicioCarta.obtenerColeccionAgrupada(jugadorId);
 
     // Validaciones
     assertThat(resultado, notNullValue());

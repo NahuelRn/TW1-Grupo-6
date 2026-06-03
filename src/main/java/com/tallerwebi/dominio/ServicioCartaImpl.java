@@ -41,19 +41,16 @@ public class ServicioCartaImpl implements ServicioCarta {
   }
 
   @Override
-  public ColeccionDTO obtenerColeccionAgrupada(Long jugadorId) {
-    // 1. Obtenemos TODAS las cartas del juego (Para mantener el efecto "Álbum")
+  public ColeccionDto obtenerColeccionAgrupada(Long jugadorId) {
     List<Carta> todasLasCartasBruto = this.obtenerTodas();
     Map<Long, Carta> cartasUnicas = new TreeMap<>();
     for (Carta c : todasLasCartasBruto) {
       cartasUnicas.put(c.getId(), c);
     }
 
-    // 2. Mapeamos el inventario real: ID de la Carta -> Cantidad
     List<ItemInventario> miInventario = this.obtenerInventario(jugadorId);
     Map<Long, Integer> misCantidades = new HashMap<>();
 
-    // Agregamos un chequeo por si el inventario viene nulo y SUMAMOS cantidades repetidas
     if (miInventario != null) {
       for (ItemInventario item : miInventario) {
         Long idCarta = item.getCarta().getId();
@@ -62,7 +59,6 @@ public class ServicioCartaImpl implements ServicioCarta {
       }
     }
 
-    // 3. Servimos todo en la "bandeja" (DTO): TODAS las cartas y SOLO las cantidades que posee
-    return new ColeccionDTO(new ArrayList<>(cartasUnicas.values()), misCantidades);
+    return new ColeccionDto(new ArrayList<>(cartasUnicas.values()), misCantidades);
   }
 }

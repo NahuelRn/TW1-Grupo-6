@@ -30,10 +30,8 @@ public class DataInitializer implements ApplicationListener<ContextRefreshedEven
   @Transactional
   public void onApplicationEvent(ContextRefreshedEvent event) {
     if (repositorioUsuario.buscarPorEmail("admin@admin.com") == null) {
-      // 1. Crear el jugador asociado al admin
       Jugador jugador = new Jugador();
 
-      // 2. Crear el admin y asociarlo
       Usuario admin = new Usuario();
       admin.setEmail("admin@admin.com");
       admin.setPassword("1234");
@@ -44,7 +42,6 @@ public class DataInitializer implements ApplicationListener<ContextRefreshedEven
 
       repositorioUsuario.guardar(admin);
 
-      // 3. Le damos al admin SOLO las 15 cartas que tienen imagen en el data.sql
       List<Carta> todasLasCartas = repositorioCarta.listarTodas();
       for (Carta carta : todasLasCartas) {
         if (carta.getImagen() != null) {

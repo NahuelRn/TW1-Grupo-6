@@ -9,17 +9,14 @@ public class MazoCarta {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  // Muchas instancias de esta relación pertenecen a un solo Mazo
   @ManyToOne
   @JoinColumn(name = "mazo_id")
   private Mazo mazo;
 
-  // Muchas instancias de esta relación apuntan a una sola Carta
   @ManyToOne
   @JoinColumn(name = "carta_id")
   private Carta carta;
 
-  // Getters y Setters
   public Long getId() {
     return id;
   }

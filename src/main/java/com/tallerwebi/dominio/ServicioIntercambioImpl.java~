@@ -35,6 +35,7 @@ public class ServicioIntercambioImpl implements ServicioIntercambio {
     return repositorioInventario.listarInventarioDeJugador(jugadorId);
   }
 
+  // SOLUCIÓN: Agregamos 'Long jugadorId' para cumplir con el contrato de la interfaz
   @Override
   public Carta realizarMejora(Long jugadorId, List<Long> idsCartasEntregadas) throws Exception {
     if (idsCartasEntregadas == null || idsCartasEntregadas.size() != CANTIDAD_CARTAS_REQUERIDAS) {

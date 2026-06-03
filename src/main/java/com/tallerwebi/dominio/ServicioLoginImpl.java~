@@ -40,12 +40,15 @@ public class ServicioLoginImpl implements ServicioLogin {
       throw new UsuarioExistente();
     }
 
+    // 1. Crear el Jugador asociado
     Jugador jugador = new Jugador();
     jugador.setUsuario(usuario);
     usuario.setJugador(jugador);
 
+    // 2. Guardar el usuario (jugador se persiste por CascadeType.ALL)
     repositorioUsuario.guardar(usuario);
 
+    // 3. Asignar todas las cartas al inventario del nuevo jugador
     List<Carta> todasLasCartas = repositorioCarta.listarTodas();
     for (Carta carta : todasLasCartas) {
       ItemInventario item = new ItemInventario();
