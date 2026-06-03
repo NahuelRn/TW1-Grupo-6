@@ -86,44 +86,25 @@ INSERT INTO Carta (nombre, tipo, subtipo, valorOroBase, nivelDesbloqueo, probabi
                                                                                                                           ('Planificacion',             'HECHIZO', 'ROBO',         150, 1, 100.00, 1,  'Poco Comun', 'Roba 1 de las primeras 3 cartas.'),
                                                                                                                           ('Ritual Oscuro',             'HECHIZO', 'ROBO',         250, 2, 100.00, 1,  'Rara', 'Descarta tu mano. Roba misma cantidad.'),
                                                                                                                           ('Piel de Obsidiana',         'HECHIZO', 'ESCUDO',       250, 2, 100.00, 2,  'Rara', 'Escudo que bloquea 10 de Danio.'),
-                                                                                                                          ('Contrato Demoniaco',        'HECHIZO', 'ROBO',         1000,5, 100.00, 1,  'Legendaria', 'Roba 5 cartas a 0 coste. -15 HP.');- ==========================================
--- DATA: ENEMIGOS
--- ==========================================
--- INSERT INTO enemigo (nombre, hp_base, dano_base, tipo, comportamiento) VALUES
-('Goblin Explorador',   30,  6,  'MINION',   'AGRESIVO'),
-('Esqueleto Guerrero',  50,  10, 'MINION',   'AGRESIVO'),
-('Orco Bárbaro',        80,  15, 'ELITE',    'AGRESIVO'),
-('Vampiro Señorial',    100, 12, 'ELITE',    'DEFENSIVO'),
-('Dragón Anciano',      250, 30, 'JEFE',     'AGRESIVO');
-
--- INSERT INTO accion_enemigo (enemigo_id, tipo, valor, probabilidad) VALUES
-(1, 'ATAQUE',  6,  70.00),
-(1, 'DEFENSA', 5,  30.00),
-(2, 'ATAQUE',  10, 60.00),
-(2, 'DEFENSA', 8,  40.00),
-(3, 'ATAQUE',  15, 80.00),
-(3, 'DEFENSA', 12, 20.00),
-(4, 'ATAQUE',  12, 50.00),
-(4, 'CURA',    20, 30.00),
-(4, 'DEFENSA', 15, 20.00),
-(5, 'ATAQUE',  30, 70.00),
-(5, 'CURA',    40, 15.00),
-(5, 'DEFENSA', 25, 15.00);
+                                                                                                                          ('Contrato Demoniaco',        'HECHIZO', 'ROBO',         1000,5, 100.00, 1,  'Legendaria', 'Roba 5 cartas a 0 coste. -15 HP.');
 
 -- ==========================================
--- DATA: INVENTARIO DEL USUARIO DE PRUEBA
+-- VINCULAR IMÁGENES A LAS 15 CARTAS INICIALES
 -- ==========================================
--- INSERT INTO inventario (usuario_id, carta_id, cantidad) VALUES
-(1,  4, 1), (1, 15, 1), (1, 24, 1), (1, 30, 1), (1, 50, 1), (1, 52, 1),
-(1,  2, 1), (1,  3, 1), (1,  9, 1), (1, 11, 1), (1, 33, 1),
-(1, 36, 1), (1, 37, 1), (1, 51, 1), (1, 55, 1);
+UPDATE Carta SET imagen = 'Patada_Voladora.jpg' WHERE nombre = 'Patada Voladora';
+UPDATE Carta SET imagen = 'Tajo_Basico.jpg' WHERE nombre = 'Tajo Basico';
+UPDATE Carta SET imagen = 'Puntazo.jpg' WHERE nombre = 'Punialada'; -- El nombre en la BD es Punialada
+UPDATE Carta SET imagen = 'Golpe_Pesado.jpg' WHERE nombre = 'Golpe Pesado';
+UPDATE Carta SET imagen = 'Tajo_Cruzado.jpg' WHERE nombre = 'Tajo Cruzado';
+UPDATE Carta SET imagen = 'Cuchillo_Arrojadizo.jpg' WHERE nombre = 'Cuchillo Arrojadizo';
 
--- ==========================================
--- DATA: MAZO INICIAL
--- ==========================================
--- INSERT INTO mazo (usuario_id, nombre, activo) VALUES (1, 'Mazo Inicial', TRUE);
+UPDATE Carta SET imagen = 'Escudo_de_Madera.jpg' WHERE nombre = 'Escudo de Madera';
+UPDATE Carta SET imagen = 'Bloqueo_Perfecto.jpg' WHERE nombre = 'Bloqueo Perfecto';
+UPDATE Carta SET imagen = 'Postura_Defensiva.jpg' WHERE nombre = 'Postura Defensiva';
+UPDATE Carta SET imagen = 'Anticipacion.jpg' WHERE nombre = 'Anticipacion';
+UPDATE Carta SET imagen = 'Sacrificio_de_Sangre.jpg' WHERE nombre = 'Sacrificio de Sangre';
+UPDATE Carta SET imagen = 'Muro_de_Piedra.jpg' WHERE nombre = 'Muro de Piedra';
 
--- INSERT INTO mazo_carta (mazo_id, carta_id) VALUES
-(1,  4), (1, 15), (1, 24), (1, 30), (1, 50), (1, 52),
-(1,  2), (1,  3), (1,  9), (1, 11), (1, 33),
-(1, 36), (1, 37), (1, 51), (1, 55);
+UPDATE Carta SET imagen = 'Pocion_Curativa.jpg' WHERE nombre = 'Pocion Curativa';
+UPDATE Carta SET imagen = 'Preparacion.png' WHERE nombre = 'Preparacion'; -- Era .png y decía Areparacion
+UPDATE Carta SET imagen = 'Afilado_de_Armas.png' WHERE nombre = 'Afilador de Armas'; -- Era .png

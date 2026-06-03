@@ -2,6 +2,7 @@ package com.tallerwebi.dominio;
 
 import javax.persistence.*;
 
+@SuppressWarnings("PMD.TooManyFields")
 @Entity
 public class Carta {
 
@@ -18,6 +19,7 @@ public class Carta {
   private Integer duracion;
   private String rareza;
   private String descripcion;
+  private String imagen;
 
   // Relación opcional: saber en qué mazos está esta carta
   //@OneToMany(mappedBy = "carta")
@@ -101,5 +103,13 @@ public class Carta {
 
   public void setDescripcion(String descripcion) {
     this.descripcion = descripcion;
+  }
+
+  public String getImagen() {
+    return imagen;
+  }
+
+  public void setImagen(String imagen) {
+    this.imagen = imagen;
   }
 }

@@ -13,11 +13,16 @@ public class ServicioCartaTest {
 
   private ServicioCarta servicioCarta;
   private RepositorioCarta repositorioCarta;
+  private RepositorioInventario repositorioInventario;
 
   @BeforeEach
   public void init() {
     repositorioCarta = mock(RepositorioCarta.class);
-    servicioCarta = new ServicioCartaImpl(repositorioCarta);
+    // 2. Inicializá el mock
+    repositorioInventario = mock(RepositorioInventario.class);
+
+    // 3. Pasale los DOS argumentos al constructor
+    servicioCarta = new ServicioCartaImpl(repositorioCarta, repositorioInventario);
   }
 
   @Test

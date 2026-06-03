@@ -9,7 +9,7 @@ VALUES ('jugador@unlam.edu.ar', '123456', 'USER', true);
 -- ==========================================
 INSERT INTO Carta (nombre, tipo, subtipo, valorOroBase, nivelDesbloqueo, probabilidad, duracion, rareza, descripcion) VALUES
                                                                                                                           ('Patada Voladora',      'ATAQUE', NULL,           50,  1, 100.00, 1, 'Comun', '5 - 7 Danio fisico.'),
-                                                                                                                          ('Punialada',            'ATAQUE', 'HEMORRAGIA',   150, 1, 70.00,  3, 'Poco Comun', '9 - 12 Danio. 70% chance de Hemorragia.'),
+                                                                                                                          ('Puntazo',            'ATAQUE', 'HEMORRAGIA',   150, 1, 70.00,  3, 'Poco Comun', '9 - 12 Danio. 70% chance de Hemorragia.'),
                                                                                                                           ('Disparo Rapido',       'ATAQUE', NULL,           150, 1, 100.00, 1, 'Poco Comun', '8 - 10 Danio. +50% danio a enemigos con Defensa.'),
                                                                                                                           ('Tajo Basico',          'ATAQUE', NULL,           50,  1, 100.00, 1, 'Comun', '4 - 6 Danio fisico.'),
                                                                                                                           ('Golpe Pesado',         'ATAQUE', NULL,           150, 1, 100.00, 1, 'Poco Comun', '14 - 18 Danio fisico.'),
@@ -87,3 +87,24 @@ INSERT INTO Carta (nombre, tipo, subtipo, valorOroBase, nivelDesbloqueo, probabi
                                                                                                                           ('Ritual Oscuro',             'HECHIZO', 'ROBO',         250, 2, 100.00, 1,  'Rara', 'Descarta tu mano. Roba misma cantidad.'),
                                                                                                                           ('Piel de Obsidiana',         'HECHIZO', 'ESCUDO',       250, 2, 100.00, 2,  'Rara', 'Escudo que bloquea 10 de Danio.'),
                                                                                                                           ('Contrato Demoniaco',        'HECHIZO', 'ROBO',         1000,5, 100.00, 1,  'Legendaria', 'Roba 5 cartas a 0 coste. -15 HP.');
+
+-- ==========================================
+-- VINCULAR IMÁGENES A LAS 15 CARTAS INICIALES
+-- ==========================================
+UPDATE Carta SET imagen = 'Patada_Voladora.jpg' WHERE nombre = 'Patada Voladora';
+UPDATE Carta SET imagen = 'Tajo_Basico.jpg' WHERE nombre = 'Tajo Basico';
+UPDATE Carta SET imagen = 'Puntazo.jpg' WHERE nombre = 'Puntazo'; -- El nombre en la BD es Punialada
+UPDATE Carta SET imagen = 'Golpe_Pesado.jpg' WHERE nombre = 'Golpe Pesado';
+UPDATE Carta SET imagen = 'Tajo_Cruzado.jpg' WHERE nombre = 'Tajo Cruzado';
+UPDATE Carta SET imagen = 'Cuchillo_Arrojadizo.jpg' WHERE nombre = 'Cuchillo Arrojadizo';
+
+UPDATE Carta SET imagen = 'Escudo_de_Madera.jpg' WHERE nombre = 'Escudo de Madera';
+UPDATE Carta SET imagen = 'Bloqueo_Perfecto.jpg' WHERE nombre = 'Bloqueo Perfecto';
+UPDATE Carta SET imagen = 'Postura_Defensiva.jpg' WHERE nombre = 'Postura Defensiva';
+UPDATE Carta SET imagen = 'Anticipacion.jpg' WHERE nombre = 'Anticipacion';
+UPDATE Carta SET imagen = 'Sacrificio_de_Sangre.jpg' WHERE nombre = 'Sacrificio de Sangre';
+UPDATE Carta SET imagen = 'Muro_de_Piedra.jpg' WHERE nombre = 'Muro de Piedra';
+
+UPDATE Carta SET imagen = 'Pocion_Curativa.jpg' WHERE nombre = 'Pocion Curativa';
+UPDATE Carta SET imagen = 'Preparacion.png' WHERE nombre = 'Preparacion'; -- Era .png y decía Areparacion
+UPDATE Carta SET imagen = 'Afilado_de_Armas.png' WHERE nombre = 'Afilador de Armas'; -- Era .png

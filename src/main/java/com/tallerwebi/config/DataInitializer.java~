@@ -46,8 +46,12 @@ public class DataInitializer implements ApplicationListener<ContextRefreshedEven
 
       // 3. Le damos al admin SOLO las 15 cartas que tienen imagen en el data.sql
       List<Carta> todasLasCartas = repositorioCarta.listarTodas();
-      for (Carta carta : todasLasCartas) {
-        if (carta.getImagen() != null) {
+      // 4. Asignar inventario SOLO a las cartas que tienen arte
+        todasLasCartas = repositorioCarta.listarTodas();
+      // 3. Le damos al admin SOLO las 15 cartas que tienen imagen en el data.sql
+      // Pasamos la llamada directamente al for para que PMD no se queje de la variable
+      for (Carta carta : repositorioCarta.listarTodas()) {
+        if (carta.getImagen() != null && !carta.getImagen().trim().isEmpty()) {
           ItemInventario item = new ItemInventario();
           item.setCarta(carta);
           item.setJugador(jugador);

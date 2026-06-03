@@ -1,10 +1,9 @@
 package com.tallerwebi.presentacion;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.*;
 
-import com.tallerwebi.dominio.RepositorioInventario;
 import com.tallerwebi.dominio.ServicioCarta;
 import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
@@ -15,38 +14,44 @@ import org.springframework.web.servlet.ModelAndView;
 
 public class ControladorColeccionTest {
 
-  private ControladorColeccion controladorColeccion;
-  private ServicioCarta servicioCarta;
-  private RepositorioInventario repositorioInventario;
   private HttpServletRequest request;
   private HttpSession session;
+  private ServicioCarta servicioCarta;
+  private ControladorColeccion controladorColeccion;
 
   @BeforeEach
   public void init() {
+    // 1. Solo mockeamos el servicio y las cosas web
     servicioCarta = mock(ServicioCarta.class);
-    repositorioInventario = mock(RepositorioInventario.class);
     request = mock(HttpServletRequest.class);
     session = mock(HttpSession.class);
-    controladorColeccion = new ControladorColeccion(servicioCarta, repositorioInventario);
+
+    // 2. Le pasamos UN SOLO parámetro al controlador
+    controladorColeccion = new ControladorColeccion(servicioCarta);
   }
 
   @Test
-  public void alIrAColeccionConSesionSeCarganLasCartasEnElModelo() {
+  public void alIrAColeccionMuestraLaVistaColeccion() {
+    // Preparación
     when(request.getSession()).thenReturn(session);
-    when(session.getAttribute("JUGADOR_ID")).thenReturn(1L);
-    when(servicioCarta.obtenerTodas()).thenReturn(new ArrayList<>());
-    when(repositorioInventario.listarInventarioDeJugador(1L)).thenReturn(new ArrayList<>());
+    when(session.getAttribute("jugadorId")).thenReturn(1L);
 
+    // 3. Cuando el controlador pida las cosas, el mock del SERVICIO le responde
+    when(servicioCarta.obtenerTodas()).thenReturn(new ArrayList<>());
+    when(servicioCarta.obtenerInventario(1L)).thenReturn(new ArrayList<>());
+
+    // Ejecución
     ModelAndView mav = controladorColeccion.verColeccion(request);
 
+    // Validación
     assertThat(mav.getViewName(), equalTo("coleccion"));
-    assertThat(mav.getModel().containsKey("todasLasCartas"), is(true));
+    assertThat(mav.getModel().containsKey("todasLasCartas"), equalTo(true));
   }
 
   @Test
   public void alIrAColeccionSinSesionDebeRedirigirALogin() {
     when(request.getSession()).thenReturn(session);
-    when(session.getAttribute("JUGADOR_ID")).thenReturn(null);
+    when(session.getAttribute("jugadorId")).thenReturn(null);
 
     ModelAndView mav = controladorColeccion.verColeccion(request);
 

@@ -40,4 +40,9 @@ public class RepositorioCartaImpl implements RepositorioCarta {
       .add(Restrictions.eq("rareza", rareza))
       .list();
   }
+
+  @Override
+  public void guardar(Carta carta) {
+    sessionFactory.getCurrentSession().save(carta);
+  }
 }

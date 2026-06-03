@@ -7,4 +7,6 @@ public interface RepositorioCarta {
   Carta buscarPorId(Long id);
 
   List<Carta> buscarPorRareza(String rareza);
+
+  void guardar(Carta carta);
 }
