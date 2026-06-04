@@ -15,6 +15,7 @@ public class ServicioCartaImpl implements ServicioCarta {
 
   private final RepositorioCarta repositorioCarta;
   private final RepositorioInventario repositorioInventario;
+  private static final int CANTIDAD_MINIMA = 1;
 
   @Autowired
   public ServicioCartaImpl(
@@ -48,15 +49,17 @@ public class ServicioCartaImpl implements ServicioCarta {
       cartasUnicas.put(c.getId(), c);
     }
 
-    List<ItemInventario> miInventario = this.obtenerInventario(jugadorId);
+    // 2. Mapeamos el inventario real: id de la Carta -> Cantidad
     Map<Long, Integer> misCantidades = new HashMap<>();
+    List<ItemInventario> miInventario = this.obtenerInventario(jugadorId);
 
-    if (miInventario != null) {
-      for (ItemInventario item : miInventario) {
-        Long idCarta = item.getCarta().getId();
-        Integer cantidadActual = misCantidades.getOrDefault(idCarta, 0);
-        misCantidades.put(idCarta, cantidadActual + item.getCantidad());
+    for (ItemInventario item : miInventario) {
+      if (item.getCantidad() < CANTIDAD_MINIMA) {
+        continue;
       }
+      Long idCarta = item.getCarta().getId();
+      Integer cantidadActual = misCantidades.getOrDefault(idCarta, 0);
+      misCantidades.put(idCarta, cantidadActual + item.getCantidad());
     }
 
     return new ColeccionDto(new ArrayList<>(cartasUnicas.values()), misCantidades);

@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>MythicStack - Contrato Firmado</title>
+
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/css/globals.css}">
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Roboto:wght@400;700&display=swap');
 
@@ -13,8 +15,38 @@
             color: var(--game-text);
             font-family: 'Roboto', sans-serif;
             min-height: 100vh;
+            margin: 0;
             display: flex;
+            justify-content: center;
             align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .contenedor-premio {
+            background: radial-gradient(
+                    circle,
+                    rgba(50,10,10,1) 0%,
+                    rgba(10,5,5,1) 100%
+            );
+            border: 2px solid #ffcc00;
+            border-radius: 16px;
+            box-shadow:
+                    0 0 30px rgba(255, 204, 0, 0.35),
+                    0 0 60px rgba(255, 204, 0, 0.15);
+            width: 100%;
+            max-width: 600px;
+            padding: 40px;
+        }
+
+        .icono-contrato {
+            font-size: 4rem;
+            margin-bottom: 10px;
         }
 
         .titulo-resultado {
@@ -22,67 +54,146 @@
             color: #ffcc00;
             text-shadow: 0 0 15px rgba(255, 204, 0, 0.6);
             text-align: center;
+            margin-bottom: 10px;
         }
 
-        .contenedor-premio {
-            background: radial-gradient(circle, rgba(50,10,10,1) 0%, rgba(10,5,5,1) 100%);
-            border: 2px solid #ffcc00;
-            border-radius: 12px;
-            box-shadow: 0 0 30px rgba(255, 204, 0, 0.4);
-            max-width: 450px;
-            margin: 0 auto;
-            padding: 30px;
+        .subtitulo {
+            color: #b8b8b8;
+            margin-bottom: 25px;
         }
 
         .carta-ganada {
             background-color: var(--game-panel);
             border: 2px solid var(--game-epic);
-            border-radius: 8px;
-            box-shadow: 0 0 20px var(--game-epic);
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(163, 53, 238, 0.4);
             padding: 25px;
-            margin: 20px auto;
+            margin-top: 20px;
+        }
+
+        .nombre-carta {
+            color: #ffcc00;
+            font-family: 'Cinzel', serif;
+            margin-bottom: 15px;
         }
 
         .tipo-badge {
             font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 1px;
-            background-color: rgba(255,255,255,0.05);
-            padding: 4px 12px;
-            border-radius: 4px;
+            background-color: rgba(255,255,255,0.08);
+            padding: 6px 14px;
+            border-radius: 20px;
             display: inline-block;
+        }
+
+        .descripcion-carta {
+            margin-top: 15px;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .datos-carta {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .btn-mejora {
+            width: 100%;
+            padding: 12px;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        .alert {
+            margin-top: 20px;
+        }
+
+        @media (max-width: 576px) {
+            .contenedor-premio {
+                padding: 25px;
+            }
+
+            .titulo-resultado {
+                font-size: 1.8rem;
+            }
+
+            .icono-contrato {
+                font-size: 3rem;
+            }
         }
     </style>
 </head>
+
 <body>
 
 <div class="container">
     <div class="contenedor-premio text-center text-white">
-        <h1 class="titulo-resultado mb-2">¡Contrato Ejecutado!</h1>
-        <p class="text-muted small">Los dioses de MythicStack han aceptado tu sacrificio.</p>
+
+        <div class="icono-contrato">📜</div>
+
+        <h1 class="titulo-resultado">
+            Contrato Ejecutado!
+        </h1>
+
+        <p class="subtitulo">
+            Los dioses de MythicStack han aceptado tu sacrificio.
+        </p>
 
         <div class="carta-ganada" th:if="${cartaPremio}">
-            <h2 class="titulo-epico th-text" th:text="${cartaPremio.nombre}" style="color: #ffcc00;">Nombre Carta</h2>
-            <div class="my-3">
-                <span class="tipo-badge text-muted" th:text="${cartaPremio.tipo} + ' - ' + ${cartaPremio.subtipo}">TIPO</span>
+
+            <h2 class="nombre-carta"
+                th:text="${cartaPremio.nombre}">
+                Nombre Carta
+            </h2>
+
+            <div class="mb-3">
+                <span class="tipo-badge"
+                      th:text="${cartaPremio.tipo + ' - ' + cartaPremio.subtipo}">
+                    Tipo - Subtipo
+                </span>
             </div>
-            <p class="mb-3" th:text="${cartaPremio.descripcion}">Descripción de la carta obtenida de forma aleatoria.</p>
+
+            <p class="descripcion-carta"
+               th:text="${cartaPremio.descripcion}">
+                Descripción de la carta obtenida.
+            </p>
+
             <hr style="border-color: var(--game-border);">
-            <div class="d-flex justify-content-around small text-muted">
-                <span>Rareza: <strong th:text="${cartaPremio.rareza}" class="text-warning">Rara</strong></span>
-                <span>Valor: <strong th:text="${cartaPremio.valorOroBase} + ' Oro'">100</strong></span>
+
+            <div class="datos-carta">
+                <span>
+                    Rareza:
+                    <strong class="text-warning"
+                            th:text="${cartaPremio.rareza}">
+                        Rara
+                    </strong>
+                </span>
+
+                <span>
+                    Valor:
+                    <strong th:text="${cartaPremio.valorOroBase + ' Oro'}">
+                        100 Oro
+                    </strong>
+                </span>
             </div>
+
         </div>
 
-        <div th:unless="${cartaPremio}" class="alert alert-danger my-4">
-            No se detectó ninguna carta obtenida. Vuelve a intentar el proceso.
+        <div th:unless="${cartaPremio}" class="alert alert-danger">
+            No se detectó ninguna carta obtenida.
+            Vuelve a intentar el proceso.
         </div>
 
         <div class="mt-4">
-            <a th:href="@{/contrato-mejora}" class="btn btn-mejora w-100">
+            <a th:href="@{/contrato-mejora(t=${#dates.createNow().getTime()})}"
+               class="btn btn-mejora btn-warning">
                 Volver a Intentar
             </a>
         </div>
+
     </div>
 </div>
 

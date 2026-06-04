@@ -2,12 +2,11 @@ package com.tallerwebi.dominio;
 
 import java.util.Collections;
 import java.util.List;
-//import java.util.Locale;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service
+@Service("servicioIntercambio")
 @Transactional
 public class ServicioIntercambioImpl implements ServicioIntercambio {
 
@@ -32,7 +31,19 @@ public class ServicioIntercambioImpl implements ServicioIntercambio {
 
   @Override
   public List<ItemInventario> obtenerInventario(Long jugadorId) {
-    return repositorioInventario.listarInventarioDeJugador(jugadorId);
+    List<ItemInventario> inventarioCompleto = repositorioInventario.listarInventarioDeJugador(
+      jugadorId
+    );
+
+    if (inventarioCompleto == null) {
+      return java.util.Collections.emptyList();
+    }
+
+    // Filtramos para que solo pasen los ítems con cantidad >= 1
+    return inventarioCompleto
+      .stream()
+      .filter(item -> item.getCantidad() > 0)
+      .collect(java.util.stream.Collectors.toList());
   }
 
   @Override
@@ -51,8 +62,54 @@ public class ServicioIntercambioImpl implements ServicioIntercambio {
       throw new Exception("No hay cartas disponibles de la rareza superior");
     }
 
+    // Modularizamos el descuento de las cartas entregadas
+    descontarCartasEntregadas(jugadorId, idsCartasEntregadas);
+
+    // Mezclamos y definimos el premio justo al final para evitar la anomalía DU
     Collections.shuffle(posiblesPremios);
-    return posiblesPremios.get(0);
+    Carta premio = posiblesPremios.get(0);
+
+    // Modularizamos la asignación del premio al inventario
+    otorgarCartaPremio(jugadorId, premio);
+
+    return premio;
+  }
+
+  private void descontarCartasEntregadas(Long jugadorId, List<Long> idsCartasEntregadas)
+    throws Exception {
+    for (Long idCartaEntregada : idsCartasEntregadas) {
+      ItemInventario itemEncontrado = repositorioInventario.buscarItemDeJugador(
+        jugadorId,
+        idCartaEntregada
+      );
+
+      if (itemEncontrado == null || itemEncontrado.getCantidad() < 1) {
+        throw new Exception(
+          "No tienes suficientes copias en tu inventario de la carta con ID: " + idCartaEntregada
+        );
+      }
+
+      itemEncontrado.setCantidad(itemEncontrado.getCantidad() - 1);
+      repositorioInventario.actualizar(itemEncontrado);
+    }
+  }
+
+  private void otorgarCartaPremio(Long jugadorId, Carta premio) {
+    ItemInventario itemPremio = repositorioInventario.buscarItemDeJugador(
+      jugadorId,
+      premio.getId()
+    );
+
+    if (itemPremio != null) {
+      itemPremio.setCantidad(itemPremio.getCantidad() + 1);
+      repositorioInventario.actualizar(itemPremio);
+    } else {
+      ItemInventario nuevoItem = new ItemInventario();
+      nuevoItem.setCarta(premio);
+      nuevoItem.setCantidad(1);
+
+      repositorioInventario.guardar(nuevoItem);
+    }
   }
 
   private String obtenerRarezaDeLaPrimera(List<Long> ids) throws Exception {
