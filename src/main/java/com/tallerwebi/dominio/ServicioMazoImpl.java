@@ -68,9 +68,9 @@ public class ServicioMazoImpl implements ServicioMazo {
     List<ItemInventario> items = repositorioInventario.listarInventarioDeJugador(jugadorId);
     List<Carta> cartasDelJugador = new ArrayList<>();
 
-    // Convertimos los ítems del inventario a una lista limpia de Cartas
     for (ItemInventario item : items) {
-      if (item.getCarta() != null) {
+      // ignorar ítems con cantidad 0 o menor
+      if (item.getCarta() != null && item.getCantidad() >= 1) {
         cartasDelJugador.add(item.getCarta());
       }
     }
