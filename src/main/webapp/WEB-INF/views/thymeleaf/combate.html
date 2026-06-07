@@ -1,35 +1,108 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
-    <title>Combate</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MythicStack - Combate</title>
+
+    <style>
+        body {
+            background-color: #0c0c0e;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+            max-width: 1000px;
+            margin: auto;
+            zoom: 1.1;
+        }
+
+        h2 {
+            color: #e63946;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(230, 57, 70, 0.4);
+            font-size: 40px;
+        }
+
+        .div_panel {
+            background-color: #131316;
+            border: 2px solid #e5a93b;
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 500px;
+            margin: auto;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+        }
+
+        .info {
+            color: #a1a1aa;
+            margin: 10px 0;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        input {
+            background: #09090b;
+            border: 1px solid #27272a;
+            color: white;
+            padding: 8px;
+            margin: 5px;
+            border-radius: 6px;
+            width: 90%;
+        }
+
+        button {
+            margin-top: 10px;
+            background: #e63946;
+            border: none;
+            padding: 10px 16px;
+            color: white;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        button:hover {
+            box-shadow: 0 0 10px rgba(230, 57, 70, 0.4);
+        }
+
+        input[type="number"]::placeholder {
+            color: #a1a1aa;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-weight: 500;
+        }
+
+        .div_panel {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .div_panel:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 0 20px rgba(229, 169, 59, 0.25);
+        }
+    </style>
 </head>
 
-<style>
-    body {
-        margin: auto;
-        text-align: center;
-        max-width: 750px;
-    }
-</style>
-
 <body>
-
 <h2>COMBATE</h2>
 
-<p>Daño realizado: <span th:text="${danioCartaHaciaEnemigo}"></span></p>
+<div class="div_panel">
+    <p class="info">Daño realizado: <span th:text="${danioCartaHaciaEnemigo}"></span></p>
 
-<p>HP enemigo: <span th:text="${hpEnemigo}"></span></p>
+    <p class="info">Hp enemigo: <span th:text="${hpEnemigo}"></span></p>
 
-<p>Turno actual: <span th:text="${turno}"></span></p>
+    <p class="info">Turno actual: <span th:text="${turno}"></span></p>
 
-<form th:action="@{/jugar-carta}" method="POST">
-    <input type="number" name="identificadorCarta">
-    <input type="number" name="identificadorPartida">
+    <form th:action="@{/jugar-carta}" method="POST">
+        <input type="number" name="identificadorCarta" placeholder="ID carta">
+        <input type="number" name="identificadorPartida" placeholder="ID partida">
 
-    <button type="submit">JUGAR CARTA</button>
-</form>
+        <button type="submit">JUGAR CARTA</button>
+    </form>
+</div>
 
 </body>
 </html>
