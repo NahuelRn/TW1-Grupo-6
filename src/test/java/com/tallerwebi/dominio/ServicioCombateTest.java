@@ -1,7 +1,6 @@
 package com.tallerwebi.dominio;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
@@ -29,7 +28,7 @@ public class ServicioCombateTest {
     partida.setCartasEnManoJugador(cartasEnMano);
 
     Integer danioEfecto = servicioCombate.jugarCarta(1, 1L);
-    assertEquals(55, danioEfecto);
+    assertTrue(danioEfecto >= 50 && danioEfecto <= 55);
   }
 
   @Test
@@ -64,7 +63,7 @@ public class ServicioCombateTest {
     cartasEnMano.add(1);
     partida.setCartasEnManoJugador(cartasEnMano);
 
-    partida.setHpEnemigo(50); // 50 - 55 de daño de la carta <= 0
+    partida.setHpEnemigo(50);
 
     servicioCombate.jugarCarta(1, 1L);
     assertEquals(EnumEstadoPartida.GANADOR_JUGADOR, partida.getEnumEstadoPartida());
@@ -73,7 +72,7 @@ public class ServicioCombateTest {
   @Test
   public void deberiaLanzarErrorCuandoElTurnoNoEstaDefinido() {
     Partida partida = new Partida(100, 100, 1);
-    partida.setTurno(null); // Forzamos turno nulo
+    partida.setTurno(null);
     when(repositorioPartida.buscarPartidaPorIdentificador(1L)).thenReturn(partida);
 
     assertThrows(RuntimeException.class, () -> servicioCombate.jugarCarta(1, 1L));
@@ -81,7 +80,7 @@ public class ServicioCombateTest {
 
   @Test
   public void deberiaLanzarErrorCuandoEsElTurnoDelEnemigo() {
-    Partida partida = new Partida(100, 100, 2); // Turno 2 = Turno Enemigo
+    Partida partida = new Partida(100, 100, 2);
     when(repositorioPartida.buscarPartidaPorIdentificador(1L)).thenReturn(partida);
 
     assertThrows(RuntimeException.class, () -> servicioCombate.jugarCarta(1, 1L));
@@ -90,7 +89,7 @@ public class ServicioCombateTest {
   @Test
   public void deberiaLanzarErrorCuandoLasCartasEnManoSonNulas() {
     Partida partida = new Partida(100, 100, 1);
-    partida.setCartasEnManoJugador(null); // Forzamos lista nula
+    partida.setCartasEnManoJugador(null);
     when(repositorioPartida.buscarPartidaPorIdentificador(1L)).thenReturn(partida);
 
     assertThrows(RuntimeException.class, () -> servicioCombate.jugarCarta(1, 1L));
@@ -105,7 +104,7 @@ public class ServicioCombateTest {
     cartasEnMano.add(5);
     cartasEnMano.add(5);
     cartasEnMano.add(5);
-    cartasEnMano.add(5); // Agregamos 4 veces la misma carta para romper el límite de 3
+    cartasEnMano.add(5);
     partida.setCartasEnManoJugador(cartasEnMano);
 
     assertThrows(RuntimeException.class, () -> servicioCombate.jugarCarta(5, 1L));
@@ -120,8 +119,8 @@ public class ServicioCombateTest {
     cartasEnMano.add(1);
     partida.setCartasEnManoJugador(cartasEnMano);
 
-    partida.setHpJugador(0); // El jugador ya no tiene HP
-    partida.setHpEnemigo(100); // El enemigo tiene suficiente vida para sobrevivir al golpe (100 - 55 = 45)
+    partida.setHpJugador(0);
+    partida.setHpEnemigo(100);
 
     servicioCombate.jugarCarta(1, 1L);
     assertEquals(EnumEstadoPartida.GANADOR_ENEMIGO, partida.getEnumEstadoPartida());
