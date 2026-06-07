@@ -8,12 +8,12 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class ServicioCombateImpl implements ServicioCombate {
 
-  private static final int TURNO_JUGADOR = 1;
-  private static final int TURNO_ENEMIGO = 2;
-
   private static final int MAX_CARTAS_REPETIDAS = 3;
 
   private int contadorCartasRepetidas = 0;
+
+  private static final int TURNO_JUGADOR = 1;
+  private static final int TURNO_ENEMIGO = 2;
 
   private RepositorioPartida repositorioPartida;
 
@@ -67,17 +67,11 @@ public class ServicioCombateImpl implements ServicioCombate {
   }
 
   private Integer calcularEfectoCarta() {
-
     int valorBaseCarta = 10;
     int multiplicador = 5;
-    int factorSuerte = 5;
+    int factorSuerte = (int) (Math.random() * 6);
 
     return valorBaseCarta * multiplicador + factorSuerte;
-  }
-
-  @Override
-  public Partida obtenerPartidaPorIdentificador(Long identificadorPartida) {
-    return this.repositorioPartida.buscarPartidaPorIdentificador(identificadorPartida);
   }
 
   private void actualizarEstadoPartida(Partida partida) {
@@ -99,5 +93,10 @@ public class ServicioCombateImpl implements ServicioCombate {
     } else if (partida.getHpJugador() <= 0) {
       partida.setEnumEstadoPartida(EnumEstadoPartida.GANADOR_ENEMIGO);
     }
+  }
+
+  @Override
+  public Partida obtenerPartidaPorIdentificador(Long identificadorPartida) {
+    return this.repositorioPartida.buscarPartidaPorIdentificador(identificadorPartida);
   }
 }
