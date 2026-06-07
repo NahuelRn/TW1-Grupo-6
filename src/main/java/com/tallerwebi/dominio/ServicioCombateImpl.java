@@ -10,10 +10,7 @@ public class ServicioCombateImpl implements ServicioCombate {
 
   private static final int TURNO_JUGADOR = 1;
   private static final int TURNO_ENEMIGO = 2;
-
   private static final int MAX_CARTAS_REPETIDAS = 3;
-
-  private int contadorCartasRepetidas = 0;
 
   private RepositorioPartida repositorioPartida;
 
@@ -51,29 +48,27 @@ public class ServicioCombateImpl implements ServicioCombate {
   private void validarCartaEnMano(Integer identificadorCarta, Long identificadorPartida) {
     Partida partida = obtenerPartidaPorIdentificador(identificadorPartida);
 
-    if (partida.getCartasEnManoJugador() == null || partida.getCartasEnManoJugador().size() == 0) {
+    if (partida.getCartasEnManoJugador() == null || partida.getCartasEnManoJugador().isEmpty()) {
       throw new RuntimeException("Error, el jugador no tiene cartas en mano.");
     }
 
-    for (Integer carta : partida.getCartasEnManoJugador()) {
-      if (carta.equals(identificadorCarta)) {
-        contadorCartasRepetidas++;
+    contarYValidarRepetidas(identificadorCarta, partida);
+  }
 
-        if (contadorCartasRepetidas > MAX_CARTAS_REPETIDAS) {
-          throw new RuntimeException("Error, máximo 3 cartas del mismo tipo.");
-        }
-      }
+  private void contarYValidarRepetidas(Integer identificadorCarta, Partida partida) {
+    int repetidas = java.util.Collections.frequency(
+      partida.getCartasEnManoJugador(),
+      identificadorCarta
+    );
+    if (repetidas > MAX_CARTAS_REPETIDAS) {
+      throw new RuntimeException("Error, máximo 3 cartas del mismo tipo.");
     }
   }
 
   private Integer calcularEfectoCarta() {
-    //  Formula -> danio = valor_base_carta * multiplicador + factor_suerte
-
-    //  Ejemplo:
     int valorBaseCarta = 10;
     int multiplicador = 5;
     int factorSuerte = 5;
-
     return valorBaseCarta * multiplicador + factorSuerte;
   }
 

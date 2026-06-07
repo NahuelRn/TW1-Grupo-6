@@ -1,6 +1,7 @@
 package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.Carta;
+import com.tallerwebi.dominio.ItemInventario;
 import com.tallerwebi.dominio.Mazo;
 import com.tallerwebi.dominio.MazoCarta;
 import com.tallerwebi.dominio.ServicioMazo;
@@ -27,13 +28,12 @@ public class ControladorMazo {
   @RequestMapping("/deckbuilding")
   public ModelAndView irADeckbuilding(HttpSession session) {
     Long jugadorId = (Long) session.getAttribute("jugadorId");
-
     if (jugadorId == null) {
       return new ModelAndView("redirect:/login");
     }
 
     ModelMap modelo = new ModelMap();
-    List<Carta> inventario = servicioMazo.obtenerInventarioPorJugador(jugadorId);
+    List<ItemInventario> inventario = servicioMazo.obtenerInventarioPorJugador(jugadorId);
     modelo.put("inventario", inventario);
     return new ModelAndView("deckbuilding", modelo);
   }

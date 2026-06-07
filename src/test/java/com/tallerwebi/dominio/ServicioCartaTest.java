@@ -57,8 +57,6 @@ public class ServicioCartaTest {
     assertThat(resultado, nullValue());
   }
 
-  // ─── NUEVOS TESTS PARA SUBIR LA COBERTURA DE JACOCO AL 100% ────────────────
-
   @Test
   public void obtenerColeccionAgrupadaDebeRetornarTodasLasCartasYLasCantidadesCorrectas() {
     Long jugadorId = 1L;

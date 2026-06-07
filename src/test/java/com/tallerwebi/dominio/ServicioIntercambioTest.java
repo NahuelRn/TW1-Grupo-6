@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 
 public class ServicioIntercambioTest {
 
@@ -27,9 +28,16 @@ public class ServicioIntercambioTest {
     repoCartaMock = mock(RepositorioCarta.class);
     repoItemMock = mock(RepositorioInventario.class);
     servicio = new ServicioIntercambioImpl(repoCartaMock, repoItemMock);
+
+    // Mock por defecto para descontarCartasEntregadas — item con cantidad suficiente
+    ItemInventario itemMock = new ItemInventario();
+    itemMock.setCantidad(5);
+    when(repoItemMock.buscarItemDeJugador(anyLong(), anyLong())).thenReturn(itemMock);
   }
 
-  // Validación de cantidad
+  // =========================================================================
+  //  Validación de cantidad
+  // =========================================================================
 
   @Test
   public void siSeEntreganMenosDe4CartasDebeLanzarError() {
@@ -47,19 +55,20 @@ public class ServicioIntercambioTest {
     assertThat(ex.getMessage(), containsString("exactamente 4 cartas"));
   }
 
-  // Verifica el control de nulidad cuando mandan un ID de carta inexistente
   @Test
   public void siUnaCartaNoExisteEnElRepositorioDebeLanzarError() {
     Carta comun = cartaConRareza(RAREZA_COMUN);
     when(repoCartaMock.buscarPorId(1L)).thenReturn(comun);
     when(repoCartaMock.buscarPorId(2L)).thenReturn(comun);
     when(repoCartaMock.buscarPorId(3L)).thenReturn(comun);
-    when(repoCartaMock.buscarPorId(4L)).thenReturn(null); // ID roto o inválido
+    when(repoCartaMock.buscarPorId(4L)).thenReturn(null);
 
     assertThrows(Exception.class, () -> servicio.realizarMejora(1L, List.of(1L, 2L, 3L, 4L)));
   }
 
-  // Validación de rareza uniforme
+  // =========================================================================
+  //  Validación de rareza uniforme
+  // =========================================================================
 
   @Test
   public void siLasCartasSonDeDistintaRarezaDebeLanzarError() {
@@ -78,7 +87,6 @@ public class ServicioIntercambioTest {
     assertThat(ex.getMessage(), containsString("misma rareza"));
   }
 
-  // Validación de carta legendaria
   @Test
   public void siLasCartasSonLegendariasDebeLanzarError() {
     Carta legendaria = cartaConRareza(RAREZA_LEGENDARIA);
@@ -91,7 +99,9 @@ public class ServicioIntercambioTest {
     assertThat(ex.getMessage(), containsString("No se puede mejorar una carta Legendaria"));
   }
 
-  // Casos felices
+  // =========================================================================
+  //  Casos felices
+  // =========================================================================
 
   @Test
   public void siSeEntreganCuatroCartasComunesDebeRetornarUnaPocoComon() throws Exception {
@@ -153,7 +163,9 @@ public class ServicioIntercambioTest {
     assertThat(resultado.getRareza(), is(RAREZA_LEGENDARIA));
   }
 
-  //Sin premios disponibles
+  // =========================================================================
+  //  Sin premios disponibles
+  // =========================================================================
 
   @Test
   public void siNoHayCartasDelSiguienteNivelDebeLanzarError() {
@@ -169,11 +181,14 @@ public class ServicioIntercambioTest {
     assertThat(ex.getMessage(), containsString("No hay cartas disponibles"));
   }
 
-  // obtenerInventario
+  // =========================================================================
+  //  obtenerInventario
+  // =========================================================================
 
   @Test
   public void obtenerInventarioDebeRetornarItemsDelJugador() {
     ItemInventario item = new ItemInventario();
+    item.setCantidad(2);
     when(repoItemMock.listarInventarioDeJugador(1L)).thenReturn(List.of(item));
 
     List<ItemInventario> resultado = servicio.obtenerInventario(1L);
@@ -189,6 +204,77 @@ public class ServicioIntercambioTest {
     List<ItemInventario> resultado = servicio.obtenerInventario(2L);
 
     assertThat(resultado, is(empty()));
+  }
+
+  // =========================================================================
+  //  Nuevos Tests para Cobertura Estricta (JaCoCo)
+  // =========================================================================
+
+  @Test
+  public void siElJugadorNoTieneLaCartaEnSuInventarioDebeLanzarError() {
+    Carta comun = cartaConRareza(RAREZA_COMUN);
+    Carta pocoCom = cartaConRareza(RAREZA_POCO_COMUN);
+
+    when(repoCartaMock.buscarPorId(anyLong())).thenReturn(comun);
+    when(repoCartaMock.buscarPorRareza(RAREZA_POCO_COMUN)).thenReturn(List.of(pocoCom));
+    when(repoItemMock.buscarItemDeJugador(1L, 1L)).thenReturn(null);
+
+    Exception ex = assertThrows(
+      Exception.class,
+      () -> servicio.realizarMejora(1L, List.of(1L, 1L, 1L, 1L))
+    );
+    assertThat(ex.getMessage(), containsString("No tienes suficientes copias"));
+  }
+
+  @Test
+  public void siLaCantidadDeLaCartaEnElInventarioEsCeroDebeLanzarError() {
+    Carta comun = cartaConRareza(RAREZA_COMUN);
+    Carta pocoCom = cartaConRareza(RAREZA_POCO_COMUN);
+
+    when(repoCartaMock.buscarPorId(anyLong())).thenReturn(comun);
+    when(repoCartaMock.buscarPorRareza(RAREZA_POCO_COMUN)).thenReturn(List.of(pocoCom));
+
+    ItemInventario itemCero = new ItemInventario();
+    itemCero.setCantidad(0);
+    when(repoItemMock.buscarItemDeJugador(1L, 1L)).thenReturn(itemCero);
+
+    Exception ex = assertThrows(
+      Exception.class,
+      () -> servicio.realizarMejora(1L, List.of(1L, 1L, 1L, 1L))
+    );
+    assertThat(ex.getMessage(), containsString("No tienes suficientes copias"));
+  }
+
+  @Test
+  public void siElPremioEsUnaCartaNuevaDebeGuardarUnNuevoItemEnElInventario() throws Exception {
+    Carta comun = cartaConRareza(RAREZA_COMUN);
+    Carta pocoCom = cartaConRareza(RAREZA_POCO_COMUN);
+    pocoCom.setId(99L);
+
+    when(repoCartaMock.buscarPorId(anyLong())).thenReturn(comun);
+    when(repoCartaMock.buscarPorRareza(RAREZA_POCO_COMUN)).thenReturn(List.of(pocoCom));
+
+    ItemInventario itemMateriales = new ItemInventario();
+    itemMateriales.setCantidad(4);
+
+    when(repoItemMock.buscarItemDeJugador(1L, 1L)).thenReturn(itemMateriales);
+    when(repoItemMock.buscarItemDeJugador(1L, 99L)).thenReturn(null);
+
+    Carta resultado = servicio.realizarMejora(1L, List.of(1L, 1L, 1L, 1L));
+
+    assertThat(resultado, notNullValue());
+    verify(repoItemMock, times(1)).guardar(ArgumentMatchers.any(ItemInventario.class));
+  }
+
+  @Test
+  public void transformarEnOroDebeRetornarLaMitadDelValorBase() {
+    Carta carta = new Carta();
+    carta.setValorOroBase(100);
+    when(repoCartaMock.buscarPorId(1L)).thenReturn(carta);
+
+    Double resultado = servicio.transformarEnOro(1L);
+
+    assertThat(resultado, is(50.0));
   }
 
   // Helper

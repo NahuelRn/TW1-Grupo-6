@@ -64,16 +64,14 @@ public class ServicioMazoImpl implements ServicioMazo {
   }
 
   @Override
-  public List<Carta> obtenerInventarioPorJugador(Long jugadorId) {
+  public List<ItemInventario> obtenerInventarioPorJugador(Long jugadorId) {
     List<ItemInventario> items = repositorioInventario.listarInventarioDeJugador(jugadorId);
-    List<Carta> cartasDelJugador = new ArrayList<>();
-
-    for (ItemInventario item : items) {
-      // ignorar ítems con cantidad 0 o menor
-      if (item.getCarta() != null && item.getCantidad() >= 1) {
-        cartasDelJugador.add(item.getCarta());
-      }
+    if (items == null) {
+      return java.util.Collections.emptyList();
     }
-    return cartasDelJugador;
+    return items
+      .stream()
+      .filter(item -> item.getCarta() != null && item.getCantidad() >= 1)
+      .collect(java.util.stream.Collectors.toList());
   }
 }

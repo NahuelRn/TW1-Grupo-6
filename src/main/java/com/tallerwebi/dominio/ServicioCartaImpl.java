@@ -38,7 +38,12 @@ public class ServicioCartaImpl implements ServicioCarta {
 
   @Override
   public List<ItemInventario> obtenerInventario(Long jugadorId) {
-    return repositorioInventario.listarInventarioDeJugador(jugadorId);
+    List<ItemInventario> inventario = repositorioInventario.listarInventarioDeJugador(jugadorId);
+    // ✅ si el repo devuelve null, evitamos el NullPointer en el stream
+    if (inventario == null) {
+      return java.util.Collections.emptyList();
+    }
+    return inventario;
   }
 
   @Override

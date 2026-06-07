@@ -29,20 +29,35 @@ public class ServicioIntercambioImpl implements ServicioIntercambio {
     this.repositorioInventario = repositorioInventario;
   }
 
+  // Modificado: Ahora el servicio puede recibir una rareza para filtrar nativamente
   @Override
   public List<ItemInventario> obtenerInventario(Long jugadorId) {
     List<ItemInventario> inventarioCompleto = repositorioInventario.listarInventarioDeJugador(
       jugadorId
     );
-
     if (inventarioCompleto == null) {
       return java.util.Collections.emptyList();
     }
 
-    // Filtramos para que solo pasen los ítems con cantidad >= 1
+    // Mantenemos el filtro básico de cantidad > 0 para no arrastrar fantasmas
     return inventarioCompleto
       .stream()
       .filter(item -> item.getCantidad() > 0)
+      .collect(java.util.stream.Collectors.toList());
+  }
+
+  // Sobrecarga opcional por si tu controlador necesita filtrar directamente por Rareza desde Java
+  public List<ItemInventario> obtenerInventarioFiltrado(Long jugadorId, String rareza) {
+    List<ItemInventario> inventario = obtenerInventario(jugadorId);
+    if (rareza == null || rareza.equalsIgnoreCase("all") || rareza.isEmpty()) {
+      return inventario;
+    }
+
+    return inventario
+      .stream()
+      .filter(item ->
+        item.getCarta().getRareza() != null && item.getCarta().getRareza().equalsIgnoreCase(rareza)
+      )
       .collect(java.util.stream.Collectors.toList());
   }
 
@@ -62,14 +77,11 @@ public class ServicioIntercambioImpl implements ServicioIntercambio {
       throw new Exception("No hay cartas disponibles de la rareza superior");
     }
 
-    // Modularizamos el descuento de las cartas entregadas
     descontarCartasEntregadas(jugadorId, idsCartasEntregadas);
 
-    // Mezclamos y definimos el premio justo al final para evitar la anomalía DU
     Collections.shuffle(posiblesPremios);
     Carta premio = posiblesPremios.get(0);
 
-    // Modularizamos la asignación del premio al inventario
     otorgarCartaPremio(jugadorId, premio);
 
     return premio;
@@ -107,7 +119,6 @@ public class ServicioIntercambioImpl implements ServicioIntercambio {
       ItemInventario nuevoItem = new ItemInventario();
       nuevoItem.setCarta(premio);
       nuevoItem.setCantidad(1);
-
       repositorioInventario.guardar(nuevoItem);
     }
   }

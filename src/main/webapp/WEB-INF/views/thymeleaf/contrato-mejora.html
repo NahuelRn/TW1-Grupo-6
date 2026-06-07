@@ -19,6 +19,13 @@
             letter-spacing: 2px;
             text-shadow: 0 0 10px rgba(230, 57, 70, 0.4);
         }
+        .instrucciones-caja {
+            background-color: #1a1a24;
+            border-left: 4px solid #e5a93b;
+            border-radius: 4px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
         .mythic-card {
             background-color: #131316 !important;
             border: 2px solid #e5a93b !important;
@@ -137,6 +144,14 @@
     <div class="text-center mb-4">
         <h1 class="titulo-seccion">CONTRATO DE MEJORA</h1>
         <p style="color: #ffffff !important; font-size: 1.1rem; font-weight: 500; opacity: 0.95;">Selecciona las cartas que vas a sacrificar para la mejora</p>
+
+        <div class="instrucciones-caja p-3 my-3 text-start shadow-sm">
+            <span class="text-warning fw-bold"> Reglas del Contrato:</span>
+            <p class="m-0 text-secondary small">Para forjar una carta superior, es necesario que selecciones <strong>exactamente 4 cartas</strong> y que todas compartan estrictamente la <strong>misma rareza</strong>.</p>
+        </div>
+        <div class="mt-2">
+            <span class="badge bg-secondary p-2" id="contador-intercambio">Cartas seleccionadas: 0 / 4</span>
+        </div>
     </div>
 
     <div class="d-flex justify-content-center gap-2 mb-5 flex-wrap">
@@ -187,7 +202,7 @@
         </div>
 
         <div class="text-center mt-5">
-            <button type="submit" class="btn btn-danger btn-lg px-5 fw-bold shadow">REALIZAR INTERCAMBIO</button>
+            <button type="submit" id="btn-submit-intercambio" class="btn btn-danger btn-lg px-5 fw-bold shadow" disabled>REALIZAR INTERCAMBIO</button>
         </div>
     </form>
 </div>
@@ -200,8 +215,9 @@
         if (!contenedor) return;
 
         const cartasNodes = Array.from(contenedor.querySelectorAll(".card-item-node"));
+        const btnSubmit = document.getElementById("btn-submit-intercambio");
+        const contadorTexto = document.getElementById("contador-intercambio");
 
-        // Procesa substrings de forma segura evadiendo cualquier rotura de caracteres/acentos de la BD
         function mapearRarezaSegura(elemento) {
             const badge = elemento.querySelector(".badge-rarity");
             if (!badge) return "comun";
@@ -214,25 +230,33 @@
             return "comun";
         }
 
-        // Pesos definidos para la jerarquía del juego
-        const pesosRareza = {
-            "comun": 1,
-            "poco-comun": 2,
-            "raro": 3,
-            "epico": 4
-        };
+        const pesosRareza = { "comun": 1, "poco-comun": 2, "raro": 3, "epico": 4 };
 
-        // 1. Ejecutar Ordenamiento por Rareza de manera nativa
         cartasNodes.sort((a, b) => {
             const pesoA = pesosRareza[mapearRarezaSegura(a)] || 99;
             const pesoB = pesosRareza[mapearRarezaSegura(b)] || 99;
             return pesoA - pesoB;
         });
 
-        // Re-inyectar elementos ordenados al DOM
         cartasNodes.forEach(nodo => contenedor.appendChild(nodo));
 
-        // 2. Gestionar Clics de Filtrado sin recarga de página
+        // CORRECCIÓN PROFESORA: Control dinámico de checkboxes (Bloqueo si != 4)
+        const checkboxes = contenedor.querySelectorAll(".mythic-checkbox");
+        checkboxes.forEach(cb => {
+            cb.addEventListener("change", function() {
+                const marcados = contenedor.querySelectorAll(".mythic-checkbox:checked").length;
+                contadorTexto.textContent = `Cartas seleccionadas: ${marcados} / 4`;
+
+                if(marcados === 4) {
+                    btnSubmit.removeAttribute("disabled");
+                    contadorTexto.classList.replace("bg-secondary", "bg-success");
+                } else {
+                    btnSubmit.setAttribute("disabled", "true");
+                    contadorTexto.classList.replace("bg-success", "bg-secondary");
+                }
+            });
+        });
+
         document.querySelectorAll('.btn-filter').forEach(button => {
             button.addEventListener('click', function() {
                 document.querySelectorAll('.btn-filter').forEach(btn => btn.classList.remove('active'));
