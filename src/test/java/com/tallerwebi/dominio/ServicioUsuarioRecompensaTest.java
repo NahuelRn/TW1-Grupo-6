@@ -13,7 +13,11 @@ public class ServicioUsuarioRecompensaTest {
     RepositorioCarta repositorioCarta = mock(RepositorioCarta.class);
     RepositorioInventario repositorioInventario = mock(RepositorioInventario.class);
 
-    ServicioUsuario servicioUsuario = new ServicioUsuarioImpl(repositorioUsuario, repositorioCarta, repositorioInventario);
+    ServicioUsuario servicioUsuario = new ServicioUsuarioImpl(
+      repositorioUsuario,
+      repositorioCarta,
+      repositorioInventario
+    );
 
     Usuario usuario = new Usuario();
     usuario.setOro(100);

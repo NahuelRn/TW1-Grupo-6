@@ -9,7 +9,11 @@ public class ServicioUsuarioImpl implements ServicioUsuario {
   private final RepositorioCarta REPOSITORIO_CARTA;
   private final RepositorioInventario REPOSITORIO_INVENTARIO;
 
-  public ServicioUsuarioImpl(RepositorioUsuario REPOSITORIO_USUARIO, RepositorioCarta REPOSITORIO_CARTA, RepositorioInventario REPOSITORIO_INVENTARIO) {
+  public ServicioUsuarioImpl(
+    RepositorioUsuario REPOSITORIO_USUARIO,
+    RepositorioCarta REPOSITORIO_CARTA,
+    RepositorioInventario REPOSITORIO_INVENTARIO
+  ) {
     this.REPOSITORIO_USUARIO = REPOSITORIO_USUARIO;
     this.REPOSITORIO_CARTA = REPOSITORIO_CARTA;
     this.REPOSITORIO_INVENTARIO = REPOSITORIO_INVENTARIO;
