@@ -17,7 +17,6 @@ public class PropuestaIntercambio {
 
   private String rarezaBuscada; // Lo que pide a cambio
 
-  // --- GETTERS Y SETTERS COMPLETOS ---
   public Long getId() {
     return id;
   }

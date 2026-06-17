@@ -5,6 +5,9 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
@@ -38,6 +41,7 @@ public class ServicioMercadoTest {
     // Configuración Emisor
     emisor = new Usuario();
     emisor.setId(10L);
+
     Jugador jugadorEmisor = new Jugador();
     jugadorEmisor.setUsuario(emisor);
     emisor.setJugador(jugadorEmisor);
@@ -50,13 +54,10 @@ public class ServicioMercadoTest {
     receptor.setJugador(jugadorReceptor);
   }
 
-  // =========================================================================
   //  Tests Publicar Oferta
-  // =========================================================================
 
   @Test
   public void siElUsuarioNoTieneLaCartaEnSuInventarioAlPublicarDebeLanzarError() {
-    // Inventario vacío
     Exception ex = assertThrows(
       Exception.class,
       () -> servicio.publicarOferta(emisor, cartaComun, "Rara")
@@ -68,7 +69,7 @@ public class ServicioMercadoTest {
   public void siElUsuarioTieneLaCartaPeroNoEstaRepetidaDebeLanzarError() {
     ItemInventario item = new ItemInventario();
     item.setCarta(cartaComun);
-    item.setCantidad(1); // No está repetida
+    item.setCantidad(1);
     emisor.getInventario().add(item);
 
     Exception ex = assertThrows(
@@ -82,7 +83,7 @@ public class ServicioMercadoTest {
   public void siLaCartaEstaRepetidaDebeGuardarLaPropuestaExitosamente() throws Exception {
     ItemInventario item = new ItemInventario();
     item.setCarta(cartaComun);
-    item.setCantidad(3); // Repetidísima
+    item.setCantidad(3);
     emisor.getInventario().add(item);
 
     servicio.publicarOferta(emisor, cartaComun, "Rara");
@@ -90,9 +91,7 @@ public class ServicioMercadoTest {
     verify(repoMercadoMock, times(1)).guardar(ArgumentMatchers.any(PropuestaIntercambio.class));
   }
 
-  // =========================================================================
   //  Tests Aceptar Oferta
-  // =========================================================================
 
   @Test
   public void siLaPropuestaNoExisteAlAceptarDebeLanzarError() {
@@ -108,11 +107,10 @@ public class ServicioMercadoTest {
     propuesta.setId(1L);
     propuesta.setUsuarioEmisor(emisor);
     propuesta.setCartaOfrecida(cartaComun);
-    propuesta.setRarezaBuscada("Rara"); // Pide una rara
+    propuesta.setRarezaBuscada("Rara");
 
     when(repoMercadoMock.buscarPorId(1L)).thenReturn(propuesta);
 
-    // El receptor solo tiene una común, no tiene la Rara solicitada
     ItemInventario itemReceptor = new ItemInventario();
     itemReceptor.setCarta(cartaComun);
     itemReceptor.setCantidad(1);
@@ -132,26 +130,66 @@ public class ServicioMercadoTest {
 
     when(repoMercadoMock.buscarPorId(1L)).thenReturn(propuesta);
 
-    // Stock Inicial Emisor: Ofrece la común (tiene 2)
     ItemInventario itemEmisor = new ItemInventario();
     itemEmisor.setCarta(cartaComun);
     itemEmisor.setCantidad(2);
     emisor.getInventario().add(itemEmisor);
 
-    // Stock Inicial Receptor: Paga con una Rara (tiene 1)
     ItemInventario itemReceptor = new ItemInventario();
     itemReceptor.setCarta(cartaRara);
     itemReceptor.setCantidad(1);
     receptor.getInventario().add(itemReceptor);
 
-    // Ejecución del trade
     servicio.aceptarOferta(receptor, 1L);
 
-    // Verificaciones de stock final
-    assertThat(itemEmisor.getCantidad(), is(1)); // Bajó de 2 a 1
-    assertThat(itemReceptor.getCantidad(), is(0)); // Bajó de 1 a 0
+    assertThat(itemEmisor.getCantidad(), is(1));
+    assertThat(itemReceptor.getCantidad(), is(0));
 
-    // El mercado debe dar de baja la propuesta transaccionada
     verify(repoMercadoMock, times(1)).eliminar(propuesta);
+  }
+
+  // CORREGIDO: Cambiado a Set para solucionar el WrongTypeOfReturnValue
+  @Test
+  public void siElUsuarioCreaUnaPropuestaValidaSeDebeGuardarEnElRepositorio() throws Exception {
+    Usuario usuario = mock(Usuario.class);
+    Set<ItemInventario> inventarioSimulado = new LinkedHashSet<>();
+
+    Carta carta = new Carta();
+    carta.setId(10L);
+
+    ItemInventario item = new ItemInventario();
+    item.setCarta(carta);
+    item.setCantidad(2);
+    inventarioSimulado.add(item);
+
+    doReturn(inventarioSimulado).when(usuario).getInventario();
+
+    servicio.crearPropuesta(usuario, 10L, "EPICA");
+
+    verify(repoMercadoMock, times(1)).guardar(ArgumentMatchers.any(PropuestaIntercambio.class));
+  }
+
+  @Test
+  public void obtenerCartasRepetidasDebeFiltrarSoloLasQueTenganCantidadMayorAUno() {
+    Usuario usuario = mock(Usuario.class);
+    Set<ItemInventario> inventarioSimulado = new LinkedHashSet<>();
+
+    ItemInventario unica = new ItemInventario();
+    unica.setCarta(cartaComun);
+    unica.setCantidad(1);
+
+    ItemInventario repetida = new ItemInventario();
+    repetida.setCarta(cartaRara);
+    repetida.setCantidad(3);
+
+    inventarioSimulado.add(unica);
+    inventarioSimulado.add(repetida);
+
+    doReturn(inventarioSimulado).when(usuario).getInventario();
+
+    List<ItemInventario> resultado = servicio.obtenerCartasRepetidas(usuario);
+
+    assertThat(resultado, hasSize(1));
+    assertThat(resultado.get(0).getCarta().getId(), is(2L));
   }
 }

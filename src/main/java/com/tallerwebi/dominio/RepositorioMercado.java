@@ -7,6 +7,5 @@ public interface RepositorioMercado {
   void guardar(PropuestaIntercambio propuesta);
   PropuestaIntercambio buscarPorId(Long id);
   void eliminar(PropuestaIntercambio propuesta);
-  // Agregamos esto para acoplar prolijamente la búsqueda del usuario
   Usuario buscarUsuarioPorId(Long id);
 }

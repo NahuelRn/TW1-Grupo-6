@@ -1,6 +1,7 @@
 package com.tallerwebi.dominio;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -123,5 +124,42 @@ public class ServicioMercadoImpl implements ServicioMercado {
     }
 
     repositorioMercado.eliminar(propuesta);
+  }
+
+  @Override
+  public List<ItemInventario> obtenerCartasRepetidas(Usuario usuario) {
+    if (usuario == null || usuario.getInventario() == null) {
+      return List.of();
+    }
+    return usuario
+      .getInventario()
+      .stream()
+      .filter(item -> item.getCantidad() > MINIMO_COPIAS_PARA_TRADEAR)
+      .collect(Collectors.toList());
+  }
+
+  @Override
+  public void crearPropuesta(Usuario usuario, Long idCarta, String rarezaBuscada) throws Exception {
+    if (idCarta == null || rarezaBuscada == null || rarezaBuscada.isBlank()) {
+      throw new Exception("Datos de propuesta inválidos.");
+    }
+
+    ItemInventario item = usuario
+      .getInventario()
+      .stream()
+      .filter(i -> i.getCarta().getId().equals(idCarta))
+      .findFirst()
+      .orElseThrow(() -> new Exception("No posees esta carta en tu inventario."));
+
+    if (item.getCantidad() <= MINIMO_COPIAS_PARA_TRADEAR) {
+      throw new Exception("Solo puedes tradear cartas que tengas repetidas.");
+    }
+
+    PropuestaIntercambio propuesta = new PropuestaIntercambio();
+    propuesta.setUsuarioEmisor(usuario);
+    propuesta.setCartaOfrecida(item.getCarta());
+    propuesta.setRarezaBuscada(rarezaBuscada);
+
+    repositorioMercado.guardar(propuesta);
   }
 }

@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.PropuestaIntercambio;
-import com.tallerwebi.dominio.RepositorioMercado; // Importamos el repositorio
+import com.tallerwebi.dominio.RepositorioMercado;
 import com.tallerwebi.dominio.ServicioMercado;
 import com.tallerwebi.dominio.Usuario;
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class ControladorMercadoTest {
 
   private ServicioMercado servicioMercadoMock;
-  private RepositorioMercado repositorioMercadoMock; // Creamos la variable para el mock
+  private RepositorioMercado repositorioMercadoMock;
   private ControladorMercado controlador;
   private HttpSession sessionMock;
   private Usuario usuarioFake;
@@ -27,9 +27,8 @@ public class ControladorMercadoTest {
   @BeforeEach
   public void setUp() {
     servicioMercadoMock = mock(ServicioMercado.class);
-    repositorioMercadoMock = mock(RepositorioMercado.class); // Mockeamos el repositorio
+    repositorioMercadoMock = mock(RepositorioMercado.class);
 
-    // CORRECCIÓN: Le pasamos los dos parámetros requeridos por el nuevo constructor
     controlador = new ControladorMercado(servicioMercadoMock, repositorioMercadoMock);
 
     sessionMock = mock(HttpSession.class);
@@ -58,7 +57,7 @@ public class ControladorMercadoTest {
 
     ModelAndView mav = controlador.verMercado(sessionMock);
 
-    assertThat(mav.getViewName(), is("mercado"));
+    assertThat(mav.getViewName(), is("intercambio")); // Actualizado a intercambio
     assertThat(mav.getModel().get("ofertas"), notNullValue());
   }
 
@@ -85,8 +84,20 @@ public class ControladorMercadoTest {
 
     ModelAndView mav = controlador.aceptarTrade(1L, sessionMock);
 
-    assertThat(mav.getViewName(), is("mercado"));
+    assertThat(mav.getViewName(), is("intercambio")); // Actualizado a intercambio
     assertThat(mav.getModel().get("error"), is("No tienes la rareza solicitada"));
     assertThat(mav.getModel().get("ofertas"), notNullValue());
+  }
+
+  // CORREGIDO: Se alinearon los mocks con 'servicioMercadoMock' y 'repositorioMercadoMock'
+  @Test
+  public void alPublicarUnaOfertaExitosaDebeRedireccionarAlMercado() throws Exception {
+    when(sessionMock.getAttribute("jugadorId")).thenReturn(1L);
+    when(repositorioMercadoMock.buscarUsuarioPorId(1L)).thenReturn(usuarioFake);
+
+    ModelAndView mav = controlador.publicarOferta(10L, "LEGENDARIA", sessionMock);
+
+    assertThat(mav.getViewName(), is("redirect:/mercado"));
+    verify(servicioMercadoMock, times(1)).crearPropuesta(usuarioFake, 10L, "LEGENDARIA");
   }
 }

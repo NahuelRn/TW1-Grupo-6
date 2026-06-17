@@ -17,7 +17,6 @@ import org.springframework.web.servlet.ModelAndView;
 public class ControladorMercado {
 
   private static final String REDIRECT_LOGIN = "redirect:/login";
-  // CORRECCIÓN: El string que retorna la vista ahora coincide exactamente con tu archivo intercambio.html
   private static final String VISTA_MERCADO = "intercambio";
 
   private final ServicioMercado servicioMercado;
@@ -46,7 +45,9 @@ public class ControladorMercado {
 
     ModelMap modelo = new ModelMap();
     modelo.put("ofertas", servicioMercado.obtenerMercado(usuarioLogueado));
-    return new ModelAndView(VISTA_MERCADO, modelo); // Usa "intercambio"
+    modelo.put("misRepetidas", servicioMercado.obtenerCartasRepetidas(usuarioLogueado));
+
+    return new ModelAndView(VISTA_MERCADO, modelo);
   }
 
   @RequestMapping(path = "/mercado/aceptar", method = RequestMethod.POST)
@@ -69,7 +70,33 @@ public class ControladorMercado {
       ModelMap modeloError = new ModelMap();
       modeloError.put("error", e.getMessage());
       modeloError.put("ofertas", servicioMercado.obtenerMercado(usuarioLogueado));
-      return new ModelAndView(VISTA_MERCADO, modeloError); // Usa "intercambio"
+      modeloError.put("misRepetidas", servicioMercado.obtenerCartasRepetidas(usuarioLogueado));
+      return new ModelAndView(VISTA_MERCADO, modeloError);
+    }
+  }
+
+  @RequestMapping(path = "/mercado/publicar", method = RequestMethod.POST)
+  public ModelAndView publicarOferta(
+    @RequestParam("idCarta") Long idCarta,
+    @RequestParam("rarezaBuscada") String rarezaBuscada,
+    HttpSession session
+  ) {
+    Long jugadorId = (Long) session.getAttribute("jugadorId");
+    if (jugadorId == null) {
+      return new ModelAndView(REDIRECT_LOGIN);
+    }
+
+    Usuario usuarioLogueado = repositorioMercado.buscarUsuarioPorId(jugadorId);
+
+    try {
+      servicioMercado.crearPropuesta(usuarioLogueado, idCarta, rarezaBuscada);
+      return new ModelAndView("redirect:/mercado");
+    } catch (Exception e) {
+      ModelMap modeloError = new ModelMap();
+      modeloError.put("error", e.getMessage());
+      modeloError.put("ofertas", servicioMercado.obtenerMercado(usuarioLogueado));
+      modeloError.put("misRepetidas", servicioMercado.obtenerCartasRepetidas(usuarioLogueado));
+      return new ModelAndView(VISTA_MERCADO, modeloError);
     }
   }
 }

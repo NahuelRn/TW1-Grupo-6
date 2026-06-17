@@ -39,7 +39,6 @@
         .btn-trade:hover {
             background-color: #b30000;
         }
-        /* Estilo medieval personalizado para el botón de Volver */
         .btn-mythic-back {
             font-family: 'Cinzel', serif;
             color: #d4af37 !important;
@@ -55,39 +54,127 @@
             background-color: rgba(212, 175, 55, 0.15) !important;
             box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
         }
+        /* Estilos específicos para las Tabs Medievales */
+        .nav-tabs .nav-link {
+            color: var(--game-muted, #a09090);
+            font-family: 'Cinzel', serif;
+            border: none;
+            background: transparent;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+        .nav-tabs .nav-link.active {
+            color: #d4af37 !important;
+            background-color: transparent !important;
+            border-bottom: 3px solid #d4af37 !important;
+        }
+        .nav-tabs .nav-link:hover {
+            color: #f0ead6;
+            border-bottom: 3px solid rgba(212, 175, 55, 0.4);
+        }
+        .form-select, .form-control {
+            background-color: #0b0707 !important;
+            border: 1px solid var(--game-border, #4a1212) !important;
+            color: #f0ead6 !important;
+        }
+        .form-select:focus {
+            border-color: #d4af37 !important;
+            box-shadow: 0 0 8px rgba(212, 175, 55, 0.3) !important;
+        }
     </style>
 </head>
 <body>
-<div class="container d-flex flex-column align-items-center justify-content-center py-5" style="min-height: 90vh;">
+<div class="container d-flex flex-column align-items-center py-5" style="min-height: 90vh;">
 
-    <h1 class="titulo-mercado display-4">Mercado de Intercambio</h1>
-    <p class="mb-5" style="color: var(--game-muted, #a09090); font-size: 1.1rem;">Cambia tus cartas repetidas con la comunidad.</p>
+    <h1 class="titulo-mercado display-4 text-center">Mercado de Intercambio</h1>
+    <p class="mb-5 text-center" style="color: var(--game-muted, #a09090); font-size: 1.1rem;">Intercambia tus cartas repetidas con la comunidad de MythicStack.</p>
 
-    <div class="row w-100 justify-content-center">
-        <div th:each="oferta : ${ofertas}" class="col-md-4 mb-4">
-            <div class="card card-trade p-4 text-center">
-                <h3 class="titulo-mercado" style="font-size: 1.5rem;" th:text="${oferta.cartaOfrecida.nombre}">Carta</h3>
-                <div class="mb-3">
-                    <span class="badge" style="background-color: #4a1212; color: #d4af37;" th:text="${oferta.cartaOfrecida.rareza}">RAREZA</span>
+    <div th:if="${error != null}" class="alert alert-danger bg-dark border-danger text-danger w-100 text-center mb-4" style="max-width: 600px;">
+        ⚠️ <span th:text="${error}">Error</span>
+    </div>
+
+    <ul class="nav nav-tabs justify-content-center mb-5 w-100 border-bottom border-secondary" id="mercadoTabs" role="tablist" style="--bs-border-opacity: 0.2;">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="ofertas-tab" data-bs-toggle="tab" data-bs-target="#tab-ofertas" type="button" role="tab">
+                Ofertas de la Comunidad
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="publicar-tab" data-bs-toggle="tab" data-bs-target="#tab-publicar" type="button" role="tab">
+                Publicar mi Trade
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content w-100">
+
+        <div class="tab-pane fade show active" id="tab-ofertas" role="tabpanel">
+            <div class="row w-100 justify-content-center m-0">
+                <div th:each="oferta : ${ofertas}" class="col-md-4 mb-4">
+                    <div class="card card-trade p-4 text-center">
+                        <h3 class="titulo-mercado" style="font-size: 1.5rem;" th:text="${oferta.cartaOfrecida.nombre}">Carta</h3>
+                        <div class="mb-3">
+                            <span class="badge" style="background-color: #4a1212; color: #d4af37;" th:text="${oferta.cartaOfrecida.rareza}">RAREZA</span>
+                        </div>
+                        <p class="small text-muted">Ofrecido por: <span th:text="${oferta.usuarioEmisor.email}">Usuario</span></p>
+                        <hr style="border-color: var(--game-border, #4a1212);">
+                        <p>Busca a cambio: <strong th:text="${oferta.rarezaBuscada}">Cualquier Rareza</strong></p>
+
+                        <form th:action="@{/mercado/aceptar}" method="POST">
+                            <input type="hidden" name="idOferta" th:value="${oferta.id}">
+                            <button type="submit" class="btn btn-trade w-100 py-2">ACEPTAR TRADE</button>
+                        </form>
+                    </div>
                 </div>
-                <p class="small text-muted">Ofrecido por: <span th:text="${oferta.usuarioEmisor.email}">Usuario</span></p>
-                <hr style="border-color: var(--game-border, #4a1212);">
-                <p>Busca a cambio: <strong th:text="${oferta.rarezaBuscada}">Cualquier Rareza</strong></p>
 
-                <form th:action="@{/mercado/aceptar}" method="POST">
-                    <input type="hidden" name="idOferta" th:value="${oferta.id}">
-                    <button type="submit" class="btn btn-trade w-100 py-2">ACEPTAR TRADE</button>
+                <div th:if="${#lists.isEmpty(ofertas)}" class="col-12 text-center my-2">
+                    <div class="p-4 rounded" style="background-color: rgba(26, 17, 17, 0.6); border: 1px dashed var(--game-border, #4a1212); max-width: 600px; margin: 0 auto;">
+                        <p class="lead mb-0" style="color: var(--game-muted, #a09090); font-style: italic;">
+                            No hay propuestas de intercambio disponibles de otros jugadores en este momento. Se el primero en publicar una!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="tab-publicar" role="tabpanel">
+            <div class="card card-trade p-5 mx-auto text-start" style="max-width: 550px;">
+                <h3 class="titulo-mercado text-center h4 mb-4" style="color: #d4af37;">Crear Nueva Oferta</h3>
+
+                <form th:action="@{/mercado/publicar}" method="POST">
+
+                    <div class="mb-4">
+                        <label for="idCarta" class="form-label" style="color: #f0ead6; font-weight: 500;">1. Elige una de tus cartas repetidas:</label>
+                        <select id="idCarta" name="idCarta" class="form-select py-2" required>
+                            <option value="" disabled selected hidden>Selecciona una carta...</option>
+                            <div th:each="item : ${misRepetidas}">
+                                <option th:value="${item.carta.id}" th:text="${item.carta.nombre + ' (' + item.carta.rareza + ') - Repetidas: ' + (item.cantidad - 1)}"></option>
+                            </div>
+                        </select>
+                        <div th:if="${#lists.isEmpty(misRepetidas)}" class="form-text text-danger mt-1">
+                            No tienes cartas repetidas en tu inventario actualmente para poder ofrecer.
+                        </div>
+                    </div>
+
+                    <div class="mb-5">
+                        <label for="rarezaBuscada" class="form-label" style="color: #f0ead6; font-weight: 500;">2. Que pides a cambio de este trade?</label>
+                        <select id="rarezaBuscada" name="rarezaBuscada" class="form-select py-2" required>
+                            <option value="CUALQUIERA">Cualquier Rareza (Le sirve todo)</option>
+                            <option value="COMUN">Una carta Comun</option>
+                            <option value="RARA">Una carta Rara</option>
+                            <option value="EPICA">Una carta Epica</option>
+                            <option value="LEGENDARIA">Una carta Legendaria</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-trade w-100 py-3 text-uppercase" th:disabled="${#lists.isEmpty(misRepetidas)}">
+                        Publicar Propuesta
+                    </button>
                 </form>
             </div>
         </div>
 
-        <div th:if="${#lists.isEmpty(ofertas)}" class="col-12 text-center my-4">
-            <div class="p-4 rounded" style="background-color: rgba(26, 17, 17, 0.6); border: 1px dashed var(--game-border, #4a1212); max-width: 600px; margin: 0 auto;">
-                <p class="lead mb-0" style="color: var(--game-muted, #a09090); font-style: italic;">
-                    No hay propuestas de intercambio disponibles en este momento.
-                </p>
-            </div>
-        </div>
     </div>
 
     <div class="mt-5">
