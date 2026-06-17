@@ -11,11 +11,13 @@ public class ServicioCombateTest {
 
   private RepositorioPartida repositorioPartida;
   private ServicioCombate servicioCombate;
+  private ServicioHistorial servicioHistorial;
 
   @BeforeEach
   public void init() {
-    repositorioPartida = mock(RepositorioPartida.class);
-    servicioCombate = new ServicioCombateImpl(repositorioPartida);
+    this.repositorioPartida = mock(RepositorioPartida.class);
+    this.servicioHistorial = mock(ServicioHistorial.class);
+    this.servicioCombate = new ServicioCombateImpl(this.repositorioPartida, this.servicioHistorial);
   }
 
   @Test
