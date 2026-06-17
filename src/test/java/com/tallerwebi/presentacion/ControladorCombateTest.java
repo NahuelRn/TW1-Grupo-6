@@ -4,18 +4,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.tallerwebi.dominio.Partida;
-import com.tallerwebi.dominio.RepositorioPartida;
-import com.tallerwebi.dominio.ServicioCombate;
-import com.tallerwebi.dominio.ServicioCombateImpl;
+import com.tallerwebi.dominio.*;
 import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.servlet.ModelAndView;
 
 public class ControladorCombateTest {
 
+  ServicioHistorial servicioHistorial = mock(ServicioHistorial.class);
   RepositorioPartida repositorioPartida = mock(RepositorioPartida.class);
-  ServicioCombate servicioCombate = new ServicioCombateImpl(repositorioPartida);
+  ServicioCombate servicioCombate = new ServicioCombateImpl(repositorioPartida, servicioHistorial);
 
   @Test
   public void deberiaMostrarVistaCombate() {
