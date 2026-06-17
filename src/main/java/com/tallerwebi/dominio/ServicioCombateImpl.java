@@ -16,10 +16,15 @@ public class ServicioCombateImpl implements ServicioCombate {
   private static final int TURNO_ENEMIGO = 2;
 
   private RepositorioPartida repositorioPartida;
+  private ServicioHistorial servicioHistorial;
 
   @Autowired
-  public ServicioCombateImpl(RepositorioPartida repositorioPartida) {
+  public ServicioCombateImpl(
+    RepositorioPartida repositorioPartida,
+    ServicioHistorial servicioHistorial
+  ) {
     this.repositorioPartida = repositorioPartida;
+    this.servicioHistorial = servicioHistorial;
   }
 
   @Override
@@ -90,9 +95,21 @@ public class ServicioCombateImpl implements ServicioCombate {
   private void cambiarEstado(Partida partida) {
     if (partida.getHpEnemigo() <= 0) {
       partida.setEnumEstadoPartida(EnumEstadoPartida.GANADOR_JUGADOR);
+      guardarHistorial(partida, "Victoria");
     } else if (partida.getHpJugador() <= 0) {
       partida.setEnumEstadoPartida(EnumEstadoPartida.GANADOR_ENEMIGO);
+      guardarHistorial(partida, "Derrota");
     }
+  }
+
+  private void guardarHistorial(Partida partida, String resultado) {
+    HistorialPartida historialPartida = new HistorialPartida();
+    historialPartida.setUsuario(partida.getUsuario());
+    historialPartida.setResultado(resultado);
+    historialPartida.setOroGanado(50);
+    historialPartida.setExperienciaGanada(100);
+
+    this.servicioHistorial.guardarHistorialPartidaServicio(historialPartida);
   }
 
   @Override
