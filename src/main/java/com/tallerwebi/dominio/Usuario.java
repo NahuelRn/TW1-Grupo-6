@@ -80,4 +80,12 @@ public class Usuario {
   public void activar() {
     activo = true;
   }
+
+  // Método helper para conectar con el inventario de su Jugador sin romper la estructura
+  public java.util.Set<ItemInventario> getInventario() {
+    if (this.jugador != null) {
+      return this.jugador.getInventario();
+    }
+    return new java.util.HashSet<>();
+  }
 }

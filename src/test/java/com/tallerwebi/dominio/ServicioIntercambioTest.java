@@ -35,10 +35,7 @@ public class ServicioIntercambioTest {
     when(repoItemMock.buscarItemDeJugador(anyLong(), anyLong())).thenReturn(itemMock);
   }
 
-  // =========================================================================
   //  Validación de cantidad
-  // =========================================================================
-
   @Test
   public void siSeEntreganMenosDe4CartasDebeLanzarError() {
     List<Long> ids = List.of(1L, 2L, 3L);
@@ -66,10 +63,7 @@ public class ServicioIntercambioTest {
     assertThrows(Exception.class, () -> servicio.realizarMejora(1L, List.of(1L, 2L, 3L, 4L)));
   }
 
-  // =========================================================================
   //  Validación de rareza uniforme
-  // =========================================================================
-
   @Test
   public void siLasCartasSonDeDistintaRarezaDebeLanzarError() {
     Carta comun = cartaConRareza(RAREZA_COMUN);
@@ -99,10 +93,7 @@ public class ServicioIntercambioTest {
     assertThat(ex.getMessage(), containsString("No se puede mejorar una carta Legendaria"));
   }
 
-  // =========================================================================
   //  Casos felices
-  // =========================================================================
-
   @Test
   public void siSeEntreganCuatroCartasComunesDebeRetornarUnaPocoComon() throws Exception {
     Carta comun = cartaConRareza(RAREZA_COMUN);
@@ -163,10 +154,7 @@ public class ServicioIntercambioTest {
     assertThat(resultado.getRareza(), is(RAREZA_LEGENDARIA));
   }
 
-  // =========================================================================
   //  Sin premios disponibles
-  // =========================================================================
-
   @Test
   public void siNoHayCartasDelSiguienteNivelDebeLanzarError() {
     Carta comun = cartaConRareza(RAREZA_COMUN);
@@ -181,10 +169,7 @@ public class ServicioIntercambioTest {
     assertThat(ex.getMessage(), containsString("No hay cartas disponibles"));
   }
 
-  // =========================================================================
   //  obtenerInventario
-  // =========================================================================
-
   @Test
   public void obtenerInventarioDebeRetornarItemsDelJugador() {
     ItemInventario item = new ItemInventario();
@@ -205,10 +190,6 @@ public class ServicioIntercambioTest {
 
     assertThat(resultado, is(empty()));
   }
-
-  // =========================================================================
-  //  Nuevos Tests para Cobertura Estricta (JaCoCo)
-  // =========================================================================
 
   @Test
   public void siElJugadorNoTieneLaCartaEnSuInventarioDebeLanzarError() {
