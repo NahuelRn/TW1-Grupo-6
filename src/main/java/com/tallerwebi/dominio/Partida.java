@@ -35,7 +35,6 @@ public class Partida {
   // --- CONSTRUCTORES ---
   public Partida() {}
 
-  // 2. Constructor que armó Mika para su lógica
   public Partida(Integer hpJugador, Integer hpEnemigo, Integer turno) {
     this.hpJugador = hpJugador;
     this.hpEnemigo = hpEnemigo;

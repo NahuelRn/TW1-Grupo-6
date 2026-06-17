@@ -60,16 +60,16 @@ public class ControladorContratoMejora {
     }
 
     try {
-      // LLAMADA AL SERVICIO (quita las 4 viejas, genera la nueva)
+      // LLAMADA AL SERVICIO: Ejecuta la lógica (quita las 4 viejas, genera la nueva)
       Carta cartaGanada = servicioIntercambio.realizarMejora(jugadorId, ids);
 
-      // Envío del premio
+      // Enviamos el premio de forma segura (FlashAttribute sobrevive a la redirección)
       redirectAttributes.addFlashAttribute("cartaPremio", cartaGanada);
 
       // Redirige al flujo de éxito
       return new ModelAndView("redirect:/contrato-mejora/resultado");
     } catch (Exception e) {
-      // Si el servicio tira error (ej: menos de 4 cartas o raras mezcladas), vuelve atrás mostrando el porqué
+      // Si el servicio tira error (ej: menos de 4 cartas o raras mezcladas), volvemos atrás mostrando el porqué
       redirectAttributes.addFlashAttribute("error", e.getMessage());
       return new ModelAndView("redirect:/contrato-mejora");
     }

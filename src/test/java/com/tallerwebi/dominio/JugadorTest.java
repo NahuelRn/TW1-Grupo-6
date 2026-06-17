@@ -12,7 +12,7 @@ public class JugadorTest {
     // Ejecución
     Jugador jugador = new Jugador();
 
-    // Validación: Comprobamos que asigne nivel 1 y 0 de oro al crearse
+    // Validación
     assertThat(jugador.getNivel(), is(1));
     assertThat(jugador.getOro(), is(0));
   }
@@ -41,7 +41,7 @@ public class JugadorTest {
 
     Jugador jugador = new Jugador();
 
-    // Ejecución: Armamos la relación de los dos lados
+    // Ejecución
     jugador.setUsuario(usuario);
     usuario.setJugador(jugador);
 

@@ -47,7 +47,7 @@ public class RepositorioUsuarioImpl implements RepositorioUsuario {
       .getCurrentSession()
       .createCriteria(Usuario.class)
       .add(Restrictions.eq("email", email))
-      .uniqueResult(); // Esto devuelve null si no encuentra nada, perfecto para tu lógica
+      .uniqueResult();
   }
 
   @Override

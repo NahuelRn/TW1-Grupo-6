@@ -16,7 +16,6 @@ public class ServicioMazoImpl implements ServicioMazo {
   private final RepositorioCarta repositorioCarta;
   private final RepositorioInventario repositorioInventario;
 
-  // Inyectamos todos los repositorios necesarios
   public ServicioMazoImpl(
     RepositorioMazo repositorioMazo,
     RepositorioCarta repositorioCarta,

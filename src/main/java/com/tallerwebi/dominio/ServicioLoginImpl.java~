@@ -65,6 +65,7 @@ public class ServicioLoginImpl implements ServicioLogin {
       "Afilador de Armas",
     };
 
+    // 3. Buscamos cada carta por nombre y se la damos al jugador
     for (String nombreCarta : mazoInicial) {
       Carta cartaFisica = repositorioCarta.buscarPorNombre(nombreCarta);
 
@@ -72,7 +73,7 @@ public class ServicioLoginImpl implements ServicioLogin {
         ItemInventario item = new ItemInventario();
         item.setCarta(cartaFisica);
         item.setJugador(jugador);
-        item.setCantidad(5);
+        item.setCantidad(1); // Arrancan con x1 de cada carta básica
         repositorioInventario.guardar(item);
       }
     }

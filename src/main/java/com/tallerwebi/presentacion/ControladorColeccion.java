@@ -1,6 +1,6 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.ColeccionDTO;
+import com.tallerwebi.dominio.ColeccionDto;
 import com.tallerwebi.dominio.ServicioCarta;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +28,7 @@ public class ControladorColeccion {
       return new ModelAndView("redirect:/login");
     }
 
-    // El controlador pide los datos ya procesados al servicio
-    ColeccionDTO miColeccion = servicioCarta.obtenerColeccionAgrupada(jugadorId);
+    ColeccionDto miColeccion = servicioCarta.obtenerColeccionAgrupada(jugadorId);
 
     ModelMap modelo = new ModelMap();
     modelo.put("todasLasCartas", miColeccion.getCartasUnicas());

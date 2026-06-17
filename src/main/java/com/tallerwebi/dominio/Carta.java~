@@ -2,7 +2,7 @@ package com.tallerwebi.dominio;
 
 import javax.persistence.*;
 
-
+@SuppressWarnings("PMD.TooManyFields")
 @Entity
 public class Carta {
 

@@ -11,16 +11,14 @@ public class Jugador {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  // Estadísticas básicas del jugador
   private Integer nivel = 1;
   private Integer oro = 0;
 
-  // Relación 1 a 1: El Jugador es el "dueño" de la relación y guarda la foreign key
-  @OneToOne
+  @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "usuario_id")
   private Usuario usuario;
 
-  @OneToMany(mappedBy = "jugador", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  @OneToMany(mappedBy = "jugador", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   private Set<ItemInventario> inventario = new HashSet<>();
 
   public Set<ItemInventario> getInventario() {
