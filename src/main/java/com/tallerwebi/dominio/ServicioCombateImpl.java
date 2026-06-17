@@ -8,15 +8,23 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class ServicioCombateImpl implements ServicioCombate {
 
-  private static final int TURNO_JUGADOR = 1;
-  private static final int TURNO_ENEMIGO = 2;
   private static final int MAX_CARTAS_REPETIDAS = 3;
 
+  private int contadorCartasRepetidas = 0;
+
+  private static final int TURNO_JUGADOR = 1;
+  private static final int TURNO_ENEMIGO = 2;
+
   private RepositorioPartida repositorioPartida;
+  private ServicioHistorial servicioHistorial;
 
   @Autowired
-  public ServicioCombateImpl(RepositorioPartida repositorioPartida) {
+  public ServicioCombateImpl(
+    RepositorioPartida repositorioPartida,
+    ServicioHistorial servicioHistorial
+  ) {
     this.repositorioPartida = repositorioPartida;
+    this.servicioHistorial = servicioHistorial;
   }
 
   @Override
@@ -68,13 +76,9 @@ public class ServicioCombateImpl implements ServicioCombate {
   private Integer calcularEfectoCarta() {
     int valorBaseCarta = 10;
     int multiplicador = 5;
-    int factorSuerte = 5;
-    return valorBaseCarta * multiplicador + factorSuerte;
-  }
+    int factorSuerte = (int) (Math.random() * 6);
 
-  @Override
-  public Partida obtenerPartidaPorIdentificador(Long identificadorPartida) {
-    return this.repositorioPartida.buscarPartidaPorIdentificador(identificadorPartida);
+    return valorBaseCarta * multiplicador + factorSuerte;
   }
 
   private void actualizarEstadoPartida(Partida partida) {
@@ -93,8 +97,25 @@ public class ServicioCombateImpl implements ServicioCombate {
   private void cambiarEstado(Partida partida) {
     if (partida.getHpEnemigo() <= 0) {
       partida.setEnumEstadoPartida(EnumEstadoPartida.GANADOR_JUGADOR);
+      guardarHistorial(partida, "Victoria");
     } else if (partida.getHpJugador() <= 0) {
       partida.setEnumEstadoPartida(EnumEstadoPartida.GANADOR_ENEMIGO);
+      guardarHistorial(partida, "Derrota");
     }
+  }
+
+  private void guardarHistorial(Partida partida, String resultado) {
+    HistorialPartida historialPartida = new HistorialPartida();
+    historialPartida.setUsuario(partida.getUsuario());
+    historialPartida.setResultado(resultado);
+    historialPartida.setOroGanado(50);
+    historialPartida.setExperienciaGanada(100);
+
+    this.servicioHistorial.guardarHistorialPartidaServicio(historialPartida);
+  }
+
+  @Override
+  public Partida obtenerPartidaPorIdentificador(Long identificadorPartida) {
+    return this.repositorioPartida.buscarPartidaPorIdentificador(identificadorPartida);
   }
 }
