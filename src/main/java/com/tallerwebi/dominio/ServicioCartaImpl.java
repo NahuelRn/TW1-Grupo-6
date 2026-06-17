@@ -54,7 +54,6 @@ public class ServicioCartaImpl implements ServicioCarta {
     Map<Long, Carta> albumCompleto = new TreeMap<>();
 
     if (miInventario != null && !miInventario.isEmpty()) {
-      // SOLUCIÓN PMD: Declaramos idsQueTengo estrictamente adentro del if donde se usa
       List<Long> idsQueTengo = new ArrayList<>();
 
       for (ItemInventario item : miInventario) {
