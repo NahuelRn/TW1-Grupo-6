@@ -18,17 +18,13 @@ public class ServicioPartidaTest {
 
   @BeforeEach
   public void init() {
-    // Simula la base de datos de enemigos
     repositorioEnemigoMock = mock(RepositorioEnemigo.class);
-    // Instanciamos el servicio pasándole el repositorio falso
     servicioPartida = new ServicioPartidaImpl(repositorioEnemigoMock);
-
-    // Preparamos un usuario de prueba con un mazo de 10 cartas
     usuarioMock = new Usuario();
     mazoActivo = new Mazo();
     List<Carta> cartasMazo = new ArrayList<>();
     for (int i = 0; i < 15; i++) {
-      cartasMazo.add(new Carta()); // Cartas genéricas para el test
+      cartasMazo.add(new Carta());
     }
     mazoActivo.setCartas(cartasMazo);
     usuarioMock.setMazoActivo(mazoActivo);
@@ -36,7 +32,7 @@ public class ServicioPartidaTest {
 
   @Test
   public void alIniciarPartidaElJugadorDebeTenerExactamente5CartasEnLaMano() {
-    // Preparación: Le decimos al mock que cuando busque un enemigo, devuelva uno genérico
+    // Preparación
     Enemigo enemigoGenerico = new Enemigo();
     enemigoGenerico.setHpBase(100);
 

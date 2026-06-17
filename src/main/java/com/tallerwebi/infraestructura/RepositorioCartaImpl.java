@@ -3,6 +3,7 @@ package com.tallerwebi.infraestructura;
 import com.tallerwebi.dominio.Carta;
 import com.tallerwebi.dominio.RepositorioCarta;
 import java.util.List;
+import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,26 @@ public class RepositorioCartaImpl implements RepositorioCarta {
       .createCriteria(Carta.class)
       .add(Restrictions.eq("rareza", rareza))
       .list();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<Carta> listarCartasFaltantes(List<Long> idsCartasPoseidas) {
+    Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Carta.class);
+
+    // Si la lista de IDs tiene algo, le decimos a Hibernate que excluya esos IDs (NOT IN)
+    if (idsCartasPoseidas != null && !idsCartasPoseidas.isEmpty()) {
+      criteria.add(Restrictions.not(Restrictions.in("id", idsCartasPoseidas)));
+    }
+
+    return criteria.list();
+  }
+
+  @Override
+  public Carta buscarPorNombre(String nombre) {
+    Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Carta.class);
+    criteria.add(Restrictions.eq("nombre", nombre));
+    return (Carta) criteria.uniqueResult();
   }
 
   @Override

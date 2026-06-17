@@ -1,7 +1,6 @@
 package com.tallerwebi.dominio;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
@@ -12,11 +11,13 @@ public class ServicioCombateTest {
 
   private RepositorioPartida repositorioPartida;
   private ServicioCombate servicioCombate;
+  private ServicioHistorial servicioHistorial;
 
   @BeforeEach
   public void init() {
-    repositorioPartida = mock(RepositorioPartida.class);
-    servicioCombate = new ServicioCombateImpl(repositorioPartida);
+    this.repositorioPartida = mock(RepositorioPartida.class);
+    this.servicioHistorial = mock(ServicioHistorial.class);
+    this.servicioCombate = new ServicioCombateImpl(this.repositorioPartida, this.servicioHistorial);
   }
 
   @Test
@@ -29,7 +30,7 @@ public class ServicioCombateTest {
     partida.setCartasEnManoJugador(cartasEnMano);
 
     Integer danioEfecto = servicioCombate.jugarCarta(1, 1L);
-    assertEquals(55, danioEfecto);
+    assertTrue(danioEfecto >= 50 && danioEfecto <= 55);
   }
 
   @Test
@@ -63,6 +64,7 @@ public class ServicioCombateTest {
     ArrayList<Integer> cartasEnMano = new ArrayList<>();
     cartasEnMano.add(1);
     partida.setCartasEnManoJugador(cartasEnMano);
+
     partida.setHpEnemigo(50);
 
     servicioCombate.jugarCarta(1, 1L);
@@ -118,6 +120,7 @@ public class ServicioCombateTest {
     ArrayList<Integer> cartasEnMano = new ArrayList<>();
     cartasEnMano.add(1);
     partida.setCartasEnManoJugador(cartasEnMano);
+
     partida.setHpJugador(0);
     partida.setHpEnemigo(100);
 

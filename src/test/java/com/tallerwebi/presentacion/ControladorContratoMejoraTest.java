@@ -29,8 +29,6 @@ public class ControladorContratoMejoraTest {
     controlador = new ControladorContratoMejora(servicioIntercambioMock);
   }
 
-  // GET /contrato-mejora
-
   @Test
   public void siNoHayJugadorEnSesionElGetDebeRedirigirALogin() {
     when(sessionMock.getAttribute("jugadorId")).thenReturn(null);
@@ -53,8 +51,6 @@ public class ControladorContratoMejoraTest {
     assertThat(mav.getViewName(), equalTo("contrato-mejora"));
     assertThat(mav.getModel().get("inventario"), equalTo(inventario));
   }
-
-  // ─── POST /contrato-mejora/intercambiar ───────────────────────────────────
 
   @Test
   public void siNoHayJugadorEnSesionElPostDebeRedirigirALogin() {
@@ -134,8 +130,6 @@ public class ControladorContratoMejoraTest {
         "Debes seleccionar exactamente 4 cartas para firmar el contrato."
       );
   }
-
-  // GET /contrato-mejora/resultado
 
   @Test
   public void siNoHayJugadorEnSesionAlVerResultadoDebeRedirigirALogin() {

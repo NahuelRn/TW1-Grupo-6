@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MythicStack - Historial</title>
+
+    <style>
+        body {
+            background-color: #0c0c0e;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+            max-width: 1000px;
+            margin: auto;
+            zoom: 1.1;
+        }
+
+        h2 {
+            color: #e63946;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(230, 57, 70, 0.4);
+            font-size: 40px;
+        }
+
+        .div_panel {
+            background-color: #131316;
+            border: 2px solid #e5a93b;
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 500px;
+            margin: auto;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .div_panel:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 0 20px rgba(229, 169, 59, 0.25);
+        }
+
+        .info {
+            color: #a1a1aa;
+            margin: 10px 0;
+            font-size: 15px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body>
+<h2>HISTORIAL DE PARTIDAS</h2>
+
+<div th:each="partida : ${historialPartidas}" class="div_panel">
+    <p class="info">Resultado: <span th:text="${partida.resultado}"></span></p>
+    <p class="info">Oro ganado: <span th:text="${partida.oroGanado}"></span></p>
+    <p class="info">Experiencia: <span th:text="${partida.experienciaGanada}"></span></p>
+    <p class="info">Fecha: <span th:text="${partida.fecha}"></span></p>
+</div>
+</body>
+</html>

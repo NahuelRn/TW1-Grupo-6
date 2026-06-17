@@ -47,28 +47,39 @@ public class ServicioCartaImpl implements ServicioCarta {
   }
 
   @Override
-  public ColeccionDTO obtenerColeccionAgrupada(Long jugadorId) {
-    // 1. Obtenemos TODAS las cartas del juego (Para mantener el efecto "Álbum")
-    List<Carta> todasLasCartasBruto = this.obtenerTodas();
-    Map<Long, Carta> cartasUnicas = new TreeMap<>();
-    for (Carta c : todasLasCartasBruto) {
-      cartasUnicas.put(c.getId(), c);
-    }
-
-    // 2. Mapeamos el inventario real: id de la Carta -> Cantidad
-    Map<Long, Integer> misCantidades = new HashMap<>();
+  public ColeccionDto obtenerColeccionAgrupada(Long jugadorId) {
     List<ItemInventario> miInventario = this.obtenerInventario(jugadorId);
 
-    for (ItemInventario item : miInventario) {
-      if (item.getCantidad() < CANTIDAD_MINIMA) {
-        continue;
+    Map<Long, Integer> misCantidades = new HashMap<>();
+    Map<Long, Carta> albumCompleto = new TreeMap<>();
+
+    if (miInventario != null && !miInventario.isEmpty()) {
+      List<Long> idsQueTengo = new ArrayList<>();
+
+      for (ItemInventario item : miInventario) {
+        Carta carta = item.getCarta();
+        Long idCarta = carta.getId();
+
+        Integer cantidadActual = misCantidades.getOrDefault(idCarta, 0);
+        misCantidades.put(idCarta, cantidadActual + item.getCantidad());
+
+        if (!idsQueTengo.contains(idCarta)) {
+          idsQueTengo.add(idCarta);
+          albumCompleto.put(idCarta, carta);
+        }
       }
-      Long idCarta = item.getCarta().getId();
-      Integer cantidadActual = misCantidades.getOrDefault(idCarta, 0);
-      misCantidades.put(idCarta, cantidadActual + item.getCantidad());
+
+      List<Carta> cartasQueFaltan = repositorioCarta.listarCartasFaltantes(idsQueTengo);
+      for (Carta cartaFaltante : cartasQueFaltan) {
+        albumCompleto.put(cartaFaltante.getId(), cartaFaltante);
+      }
+    } else {
+      List<Carta> todasLasCartas = this.obtenerTodas();
+      for (Carta c : todasLasCartas) {
+        albumCompleto.put(c.getId(), c);
+      }
     }
 
-    // 3. Servimos todo en la "bandeja" (DTO): TODAS las cartas y SOLO las cantidades que posee
-    return new ColeccionDTO(new ArrayList<>(cartasUnicas.values()), misCantidades);
+    return new ColeccionDto(new ArrayList<>(albumCompleto.values()), misCantidades);
   }
 }

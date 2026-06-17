@@ -4,7 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.*;
 
-import com.tallerwebi.dominio.ColeccionDTO;
+import com.tallerwebi.dominio.ColeccionDto;
 import com.tallerwebi.dominio.ServicioCarta;
 import java.util.Collections;
 import javax.servlet.http.HttpServletRequest;
@@ -18,7 +18,7 @@ public class ControladorColeccionTest {
   private HttpServletRequest request;
   private HttpSession session;
   private ServicioCarta servicioCarta;
-  private ColeccionDTO coleccionDTOMock;
+  private ColeccionDto coleccionDtoMock;
   private ControladorColeccion controladorColeccion;
 
   @BeforeEach
@@ -26,7 +26,7 @@ public class ControladorColeccionTest {
     servicioCarta = mock(ServicioCarta.class);
     request = mock(HttpServletRequest.class);
     session = mock(HttpSession.class);
-    coleccionDTOMock = mock(ColeccionDTO.class);
+    coleccionDtoMock = mock(ColeccionDto.class);
 
     controladorColeccion = new ControladorColeccion(servicioCarta);
   }
@@ -38,9 +38,9 @@ public class ControladorColeccionTest {
     when(request.getSession(anyBoolean())).thenReturn(session);
     when(session.getAttribute("jugadorId")).thenReturn(1L);
 
-    when(servicioCarta.obtenerColeccionAgrupada(1L)).thenReturn(coleccionDTOMock);
-    when(coleccionDTOMock.getCartasUnicas()).thenReturn(Collections.emptyList());
-    when(coleccionDTOMock.getCantidades()).thenReturn(Collections.emptyMap());
+    when(servicioCarta.obtenerColeccionAgrupada(1L)).thenReturn(coleccionDtoMock);
+    when(coleccionDtoMock.getCartasUnicas()).thenReturn(Collections.emptyList());
+    when(coleccionDtoMock.getCantidades()).thenReturn(Collections.emptyMap());
 
     // Ejecución
     ModelAndView mav = controladorColeccion.verColeccion(request);
@@ -65,7 +65,6 @@ public class ControladorColeccionTest {
     assertThat(mav.getViewName(), equalTo("redirect:/login"));
   }
 
-  // TEST NUEVO PARA ARRANCARLE PUNTOS A JACOCO: Cubre el flujo de datos nulos/vacíos del DTO
   @Test
   public void alIrAColeccionSiLaColeccionVieneNulaDebeCargarseIgualSinRomper() {
     // Preparación
@@ -73,10 +72,9 @@ public class ControladorColeccionTest {
     when(request.getSession(anyBoolean())).thenReturn(session);
     when(session.getAttribute("jugadorId")).thenReturn(1L);
 
-    // Simulamos que el servicio devuelve un DTO vacío que responde null
-    when(servicioCarta.obtenerColeccionAgrupada(1L)).thenReturn(coleccionDTOMock);
-    when(coleccionDTOMock.getCartasUnicas()).thenReturn(null);
-    when(coleccionDTOMock.getCantidades()).thenReturn(null);
+    when(servicioCarta.obtenerColeccionAgrupada(1L)).thenReturn(coleccionDtoMock);
+    when(coleccionDtoMock.getCartasUnicas()).thenReturn(null);
+    when(coleccionDtoMock.getCantidades()).thenReturn(null);
 
     // Ejecución
     ModelAndView mav = controladorColeccion.verColeccion(request);

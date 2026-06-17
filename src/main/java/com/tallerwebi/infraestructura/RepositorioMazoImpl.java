@@ -18,7 +18,6 @@ public class RepositorioMazoImpl implements RepositorioMazo {
 
   @Override
   public void guardar(Mazo mazo) {
-    // Guarda/actualiza el mazo en la base de datos
     sessionFactory.getCurrentSession().saveOrUpdate(mazo);
   }
 }

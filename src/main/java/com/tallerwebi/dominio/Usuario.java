@@ -14,6 +14,9 @@ public class Usuario {
   private String rol;
   private Boolean activo = false;
 
+  private Integer oro = 0;
+  private Integer experiencia = 0;
+
   @ManyToOne
   @JoinColumn(name = "mazo_activo_id")
   private Mazo mazoActivo;
@@ -79,6 +82,30 @@ public class Usuario {
 
   public void activar() {
     activo = true;
+  }
+
+  public Integer getOro() {
+    return this.oro;
+  }
+
+  public void setOro(Integer oro) {
+    this.oro = oro;
+  }
+
+  public void sumarOro(Integer oro) {
+    this.oro += oro;
+  }
+
+  public Integer getExperiencia() {
+    return this.experiencia;
+  }
+
+  public void setExperiencia(Integer experiencia) {
+    this.experiencia = experiencia;
+  }
+
+  public void sumarExperiencia(Integer experiencia) {
+    this.experiencia += experiencia;
   }
 
   // Método helper para conectar con el inventario de su Jugador sin romper la estructura

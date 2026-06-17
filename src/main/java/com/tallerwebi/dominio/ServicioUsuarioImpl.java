@@ -1,0 +1,57 @@
+package com.tallerwebi.dominio;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class ServicioUsuarioImpl implements ServicioUsuario {
+
+  private final RepositorioUsuario REPOSITORIO_USUARIO;
+  private final RepositorioCarta REPOSITORIO_CARTA;
+  private final RepositorioInventario REPOSITORIO_INVENTARIO;
+
+  public ServicioUsuarioImpl(
+    RepositorioUsuario REPOSITORIO_USUARIO,
+    RepositorioCarta REPOSITORIO_CARTA,
+    RepositorioInventario REPOSITORIO_INVENTARIO
+  ) {
+    this.REPOSITORIO_USUARIO = REPOSITORIO_USUARIO;
+    this.REPOSITORIO_CARTA = REPOSITORIO_CARTA;
+    this.REPOSITORIO_INVENTARIO = REPOSITORIO_INVENTARIO;
+  }
+
+  @Override
+  public void aplicarRecompensa(String email, String password, RecompensaDTO recompensaDTO) {
+    Usuario usuario = this.REPOSITORIO_USUARIO.buscarUsuario(email, password);
+
+    if (usuario == null) {
+      throw new RuntimeException("Error, usuario no encontrado.");
+    }
+
+    usuario.sumarOro(recompensaDTO.getOro());
+    usuario.sumarExperiencia(recompensaDTO.getExperiencia());
+
+    this.REPOSITORIO_USUARIO.modificar(usuario);
+
+    if (recompensaDTO.getIdCarta() != null) {
+      Carta carta = this.REPOSITORIO_CARTA.buscarPorId(recompensaDTO.getIdCarta());
+
+      if (carta == null) {
+        throw new RuntimeException("Error, carta no encontrada.");
+      }
+
+      ItemInventario itemInventario =
+        this.REPOSITORIO_INVENTARIO.buscarItemDeJugador(usuario.getId(), carta.getId());
+
+      if (itemInventario != null) {
+        itemInventario.setCantidad(itemInventario.getCantidad() + 1);
+        this.REPOSITORIO_INVENTARIO.actualizar(itemInventario);
+      } else if (itemInventario == null) {
+        ItemInventario itemInventarioNuevo = new ItemInventario();
+        itemInventarioNuevo.setCarta(carta);
+        itemInventarioNuevo.setCantidad(1);
+
+        this.REPOSITORIO_INVENTARIO.guardar(itemInventarioNuevo);
+      }
+    }
+  }
+}

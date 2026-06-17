@@ -1,0 +1,85 @@
+package com.tallerwebi.presentacion;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Mockito.*;
+
+import com.tallerwebi.dominio.ColeccionDto;
+import com.tallerwebi.dominio.ServicioCarta;
+import java.util.Collections;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.web.servlet.ModelAndView;
+
+public class ControladorColeccionTest {
+
+  private HttpServletRequest request;
+  private HttpSession session;
+  private ServicioCarta servicioCarta;
+  private ColeccionDto coleccionDtoMock;
+  private ControladorColeccion controladorColeccion;
+
+  @BeforeEach
+  public void init() {
+    servicioCarta = mock(ServicioCarta.class);
+    request = mock(HttpServletRequest.class);
+    session = mock(HttpSession.class);
+    coleccionDtoMock = mock(ColeccionDto.class);
+
+    controladorColeccion = new ControladorColeccion(servicioCarta);
+  }
+
+  @Test
+  public void alIrAColeccionMuestraLaVistaColeccion() {
+    // Preparación
+    when(request.getSession()).thenReturn(session);
+    when(request.getSession(anyBoolean())).thenReturn(session);
+    when(session.getAttribute("jugadorId")).thenReturn(1L);
+
+    when(servicioCarta.obtenerColeccionAgrupada(1L)).thenReturn(coleccionDtoMock);
+    when(coleccionDtoMock.getCartasUnicas()).thenReturn(Collections.emptyList());
+    when(coleccionDtoMock.getCantidades()).thenReturn(Collections.emptyMap());
+
+    // Ejecución
+    ModelAndView mav = controladorColeccion.verColeccion(request);
+
+    // Validación
+    assertThat(mav.getViewName(), equalTo("coleccion"));
+    assertThat(mav.getModel().containsKey("todasLasCartas"), equalTo(true));
+    assertThat(mav.getModel().containsKey("misCantidades"), equalTo(true));
+  }
+
+  @Test
+  public void alIrAColeccionSinSesionDebeRedirigirALogin() {
+    // Preparación
+    when(request.getSession()).thenReturn(session);
+    when(request.getSession(anyBoolean())).thenReturn(session);
+    when(session.getAttribute("jugadorId")).thenReturn(null);
+
+    // Ejecución
+    ModelAndView mav = controladorColeccion.verColeccion(request);
+
+    // Validación
+    assertThat(mav.getViewName(), equalTo("redirect:/login"));
+  }
+
+  @Test
+  public void alIrAColeccionSiLaColeccionVieneNulaDebeCargarseIgualSinRomper() {
+    // Preparación
+    when(request.getSession()).thenReturn(session);
+    when(request.getSession(anyBoolean())).thenReturn(session);
+    when(session.getAttribute("jugadorId")).thenReturn(1L);
+    
+    when(servicioCarta.obtenerColeccionAgrupada(1L)).thenReturn(coleccionDtoMock);
+    when(coleccionDtoMock.getCartasUnicas()).thenReturn(null);
+    when(coleccionDtoMock.getCantidades()).thenReturn(null);
+
+    // Ejecución
+    ModelAndView mav = controladorColeccion.verColeccion(request);
+
+    // Validación
+    assertThat(mav.getViewName(), equalTo("coleccion"));
+  }
+}
