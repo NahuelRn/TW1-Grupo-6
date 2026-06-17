@@ -43,39 +43,45 @@ public class ServicioCartaImpl implements ServicioCarta {
 
   @Override
   public ColeccionDto obtenerColeccionAgrupada(Long jugadorId) {
+    // 1. Ir al inventario y buscar las cartas
     List<ItemInventario> miInventario = this.obtenerInventario(jugadorId);
 
     Map<Long, Integer> misCantidades = new HashMap<>();
-    Map<Long, Carta> albumCompleto = new TreeMap<>();
+    List<Long> idsQueTengo = new ArrayList<>();
+    Map<Long, Carta> albumCompleto = new TreeMap<>(); // TreeMap para ordenarlas por ID en la pantalla
 
+    // 2. Hacer el agrupamiento de las cartas que TIENE el jugador 1
     if (miInventario != null && !miInventario.isEmpty()) {
-      // SOLUCIÓN PMD: Declaramos idsQueTengo estrictamente adentro del if donde se usa
-      List<Long> idsQueTengo = new ArrayList<>();
-
       for (ItemInventario item : miInventario) {
         Carta carta = item.getCarta();
         Long idCarta = carta.getId();
 
+        // Sorteamos el bug temporalmente sumando las filas repetidas de "cantidad = 1"
         Integer cantidadActual = misCantidades.getOrDefault(idCarta, 0);
         misCantidades.put(idCarta, cantidadActual + item.getCantidad());
 
+        // Agrupamos la carta para el álbum y guardamos su ID para la query
         if (!idsQueTengo.contains(idCarta)) {
           idsQueTengo.add(idCarta);
           albumCompleto.put(idCarta, carta);
         }
       }
 
+      // 3. Pasar la lista de IDs a la query para obtener las cartas que NO TIENE
       List<Carta> cartasQueFaltan = repositorioCarta.listarCartasFaltantes(idsQueTengo);
       for (Carta cartaFaltante : cartasQueFaltan) {
         albumCompleto.put(cartaFaltante.getId(), cartaFaltante);
       }
+
     } else {
+      // Si no tiene inventario, mostramos todas directo (y se verán grises en la vista)
       List<Carta> todasLasCartas = this.obtenerTodas();
       for (Carta c : todasLasCartas) {
         albumCompleto.put(c.getId(), c);
       }
     }
 
+    // 4. Retornamos la bandeja lista al controlador
     return new ColeccionDto(new ArrayList<>(albumCompleto.values()), misCantidades);
   }
 }

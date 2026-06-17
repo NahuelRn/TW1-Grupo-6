@@ -55,7 +55,7 @@ public class ServicioMazoTest {
     servicio.validarYGuardarMazo(mazo);
     verify(repoMazoMock, times(1)).guardar(mazo);
   }
-  
+
   private MazoCarta crearNexo(Mazo mazo, Long idCarta, String nombreCarta) {
     Carta carta = new Carta();
     carta.setId(idCarta);

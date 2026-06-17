@@ -57,7 +57,6 @@ public class ServicioCartaTest {
     assertThat(resultado, nullValue());
   }
 
-
   @Test
   public void obtenerColeccionAgrupadaDebeRetornarTodasLasCartasYLasCantidadesCorrectas() {
     Long jugadorId = 1L;

@@ -4,6 +4,7 @@ import com.tallerwebi.dominio.ItemInventario;
 import com.tallerwebi.dominio.RepositorioInventario;
 import java.util.List;
 import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,9 @@ public class RepositorioInventarioImpl implements RepositorioInventario {
 
     criteria.createAlias("jugador", "j");
     criteria.add(Restrictions.eq("j.id", jugadorId));
+
+    criteria.setFetchMode("carta", FetchMode.JOIN);
+
     criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 
     return criteria.list();

@@ -67,7 +67,6 @@ public class ServicioCombateImpl implements ServicioCombate {
   }
 
   private Integer calcularEfectoCarta() {
-
     int valorBaseCarta = 10;
     int multiplicador = 5;
     int factorSuerte = 5;

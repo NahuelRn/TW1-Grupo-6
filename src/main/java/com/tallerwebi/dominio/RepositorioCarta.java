@@ -8,5 +8,8 @@ public interface RepositorioCarta {
 
   List<Carta> buscarPorRareza(String rareza);
 
+  List<Carta> listarCartasFaltantes(List<Long> idsCartasPoseidas);
+  Carta buscarPorNombre(String nombre);
+
   void guardar(Carta carta);
 }

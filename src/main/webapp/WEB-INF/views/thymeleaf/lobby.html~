@@ -19,7 +19,7 @@
 
             <a th:href="@{/deckbuilding.html}" class="btn btn-danger btn-lg" style="background-color: #8b0000; border-color: #8b0000;">Comenzar</a>
 
-            <a th:href="@{/coleccion.html}" class="btn btn-danger btn-lg" style="background-color: #8b0000; border-color: #8b0000;">Ver Inventario</a>
+            <a th:href="@{/coleccion}" class="btn btn-danger btn-lg" style="background-color: #8b0000; border-color: #8b0000;">Ver Inventario</a>
 
             <div class="dropdown">
                 <button class="btn btn-outline-warning btn-lg dropdown-toggle w-100" type="button" id="dropdownIntercambio" data-bs-toggle="dropdown" aria-expanded="false" style="color: #d4af37; border-color: #d4af37;">

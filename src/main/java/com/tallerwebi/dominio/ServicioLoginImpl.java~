@@ -1,7 +1,6 @@
 package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
-import java.util.List;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,22 +39,43 @@ public class ServicioLoginImpl implements ServicioLogin {
       throw new UsuarioExistente();
     }
 
-    // 1. Crear el Jugador asociado
     Jugador jugador = new Jugador();
     jugador.setUsuario(usuario);
     usuario.setJugador(jugador);
 
-    // 2. Guardar el usuario (jugador se persiste por CascadeType.ALL)
+    // 1. Guardamos al usuario y al jugador en la BD
     repositorioUsuario.guardar(usuario);
 
-    // 3. Asignar todas las cartas al inventario del nuevo jugador
-    List<Carta> todasLasCartas = repositorioCarta.listarTodas();
-    for (Carta carta : todasLasCartas) {
-      ItemInventario item = new ItemInventario();
-      item.setCarta(carta);
-      item.setJugador(jugador);
-      item.setCantidad(1);
-      repositorioInventario.guardar(item);
+    // 2. Definimos las 15 cartas exactas del Mazo Inicial (las que tienen arte en data.sql)
+    String[] mazoInicial = {
+      "Patada Voladora",
+      "Tajo Basico",
+      "Puntazo",
+      "Golpe Pesado",
+      "Tajo Cruzado",
+      "Cuchillo Arrojadizo",
+      "Escudo de Madera",
+      "Bloqueo Perfecto",
+      "Postura Defensiva",
+      "Anticipacion",
+      "Sacrificio de Sangre",
+      "Muro de Piedra",
+      "Pocion Curativa",
+      "Preparacion",
+      "Afilador de Armas",
+    };
+
+    // 3. Buscamos cada carta por nombre y se la damos al jugador
+    for (String nombreCarta : mazoInicial) {
+      Carta cartaFisica = repositorioCarta.buscarPorNombre(nombreCarta);
+
+      if (cartaFisica != null) {
+        ItemInventario item = new ItemInventario();
+        item.setCarta(cartaFisica);
+        item.setJugador(jugador);
+        item.setCantidad(1); // Arrancan con x1 de cada carta básica
+        repositorioInventario.guardar(item);
+      }
     }
   }
 }

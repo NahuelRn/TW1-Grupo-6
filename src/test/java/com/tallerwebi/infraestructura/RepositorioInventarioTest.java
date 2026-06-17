@@ -29,6 +29,7 @@ public class RepositorioInventarioTest {
   private SessionFactory sessionFactory;
 
   private RepositorioInventario repositorioInventario;
+
   @BeforeEach
   public void init() {
     this.repositorioInventario = new RepositorioInventarioImpl(sessionFactory);

@@ -14,11 +14,11 @@ public class Jugador {
   private Integer nivel = 1;
   private Integer oro = 0;
 
-  @OneToOne
+  @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "usuario_id")
   private Usuario usuario;
 
-  @OneToMany(mappedBy = "jugador", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  @OneToMany(mappedBy = "jugador", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   private Set<ItemInventario> inventario = new HashSet<>();
 
   public Set<ItemInventario> getInventario() {

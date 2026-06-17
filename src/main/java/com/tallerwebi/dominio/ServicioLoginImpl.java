@@ -1,7 +1,6 @@
 package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
-import java.util.List;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,15 +43,38 @@ public class ServicioLoginImpl implements ServicioLogin {
     jugador.setUsuario(usuario);
     usuario.setJugador(jugador);
 
+    // 1. Guardamos al usuario y al jugador en la BD
     repositorioUsuario.guardar(usuario);
 
-    List<Carta> todasLasCartas = repositorioCarta.listarTodas();
-    for (Carta carta : todasLasCartas) {
-      ItemInventario item = new ItemInventario();
-      item.setCarta(carta);
-      item.setJugador(jugador);
-      item.setCantidad(1);
-      repositorioInventario.guardar(item);
+    // 2. Definimos las 15 cartas exactas del Mazo Inicial (las que tienen arte en data.sql)
+    String[] mazoInicial = {
+      "Patada Voladora",
+      "Tajo Basico",
+      "Puntazo",
+      "Golpe Pesado",
+      "Tajo Cruzado",
+      "Cuchillo Arrojadizo",
+      "Escudo de Madera",
+      "Bloqueo Perfecto",
+      "Postura Defensiva",
+      "Anticipacion",
+      "Sacrificio de Sangre",
+      "Muro de Piedra",
+      "Pocion Curativa",
+      "Preparacion",
+      "Afilador de Armas",
+    };
+
+    for (String nombreCarta : mazoInicial) {
+      Carta cartaFisica = repositorioCarta.buscarPorNombre(nombreCarta);
+
+      if (cartaFisica != null) {
+        ItemInventario item = new ItemInventario();
+        item.setCarta(cartaFisica);
+        item.setJugador(jugador);
+        item.setCantidad(5);
+        repositorioInventario.guardar(item);
+      }
     }
   }
 }
