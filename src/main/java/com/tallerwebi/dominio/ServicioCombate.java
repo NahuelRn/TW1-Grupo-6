@@ -1,7 +1,6 @@
 package com.tallerwebi.dominio;
 
 public interface ServicioCombate {
-  Integer jugarCarta(Long identificadorCarta, Long identificadorPartida);
-
+  String jugarTurno(Partida partidaActual, Long idCarta);
   Partida obtenerPartidaPorIdentificador(Long identificadorPartida);
 }

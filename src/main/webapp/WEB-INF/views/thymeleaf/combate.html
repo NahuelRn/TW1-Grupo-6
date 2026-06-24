@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,83 +7,25 @@
     <style>
         body {
             background-color: #0c0c0e;
-            font-family: 'Courier New', Courier, monospace; /* Fuente retro */
+            font-family: 'Courier New', Courier, monospace;
             color: #ffffff;
             padding: 20px;
             text-align: center;
         }
-
-        .arena {
-            display: flex;
-            justify-content: space-around;
-            margin: 40px auto;
-            max-width: 800px;
-        }
-
-        .personaje {
-            background-color: #1a1a1f;
-            border: 2px solid #555;
-            border-radius: 8px;
-            padding: 20px;
-            width: 300px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
-        }
-
+        .arena { display: flex; justify-content: space-around; margin: 40px auto; max-width: 800px; }
+        .personaje { background-color: #1a1a1f; border: 2px solid #555; border-radius: 8px; padding: 20px; width: 300px; box-shadow: 0 0 15px rgba(0, 0, 0, 0.8); }
         .jugador { border-color: #4CAF50; }
         .enemigo { border-color: #e63946; }
-
-        .hp-bar {
-            font-size: 24px;
-            font-weight: bold;
-            margin: 15px 0;
-        }
-
+        .hp-bar { font-size: 24px; font-weight: bold; margin: 15px 0; }
         .hp-jugador { color: #4CAF50; }
         .hp-enemigo { color: #e63946; }
-
-        .log-box {
-            background-color: #000;
-            border: 1px solid #e5a93b;
-            color: #e5a93b;
-            padding: 15px;
-            margin: 20px auto;
-            max-width: 600px;
-            font-size: 18px;
-            min-height: 50px;
-        }
-
-        .mano {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .carta-btn {
-            background: #27272a;
-            border: 1px solid #555;
-            color: white;
-            padding: 15px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-family: 'Courier New', Courier, monospace;
-            font-weight: bold;
-            transition: 0.2s;
-        }
-
-        .carta-btn:hover {
-            background: #e5a93b;
-            color: #000;
-            border-color: #e5a93b;
-        }
-
-        /* Oculta los botones si alguien muere */
+        .log-box { background-color: #000; border: 1px solid #e5a93b; color: #e5a93b; padding: 15px; margin: 20px auto; max-width: 600px; font-size: 18px; min-height: 50px; }
+        .mano { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; max-width: 800px; margin: 0 auto; }
+        .carta-btn { background: #27272a; border: 1px solid #555; color: white; padding: 15px; border-radius: 6px; cursor: pointer; font-family: 'Courier New', Courier, monospace; font-weight: bold; transition: 0.2s; }
+        .carta-btn:hover { background: #e5a93b; color: #000; border-color: #e5a93b; }
         .muerto { display: none; }
     </style>
 </head>
-
 <body>
 <h2 style="color: #e5a93b;">>>> ARENA DE COMBATE <<<</h2>
 
@@ -97,25 +38,35 @@
     </div>
 
     <div class="personaje enemigo">
-        <h3>ZOMBI INFECTADO</h3>
+        <h3>INFECTADO</h3>
         <div class="hp-bar hp-enemigo">HP: <span th:text="${partida.hpEnemigo}"></span></div>
     </div>
 </div>
 
 <hr style="border-color: #333; margin: 30px 0;">
+
+<p style="color: #a1a1aa; font-weight: bold; font-size: 18px;">
+    [ MAZO ] Cartas restantes: <span th:text="${cartasEnMazo}"></span>
+</p>
+
 <h3>TU MANO (Elige una carta)</h3>
 
 <div class="mano" th:classappend="${partida.hpJugador <= 0 or partida.hpEnemigo <= 0} ? 'muerto' : ''">
+
     <form th:action="@{/jugar-carta}" method="POST" th:each="carta : ${mano}">
-        <input type="hidden" name="identificadorPartida" th:value="${partida.id}">
-        <input type="hidden" name="identificadorCarta" th:value="${carta.id}">
+
+        <input type="hidden" name="hpJugador" th:value="${partida.hpJugador}">
+        <input type="hidden" name="hpEnemigo" th:value="${partida.hpEnemigo}">
+        <input type="hidden" name="idCarta" th:value="${carta.id}">
 
         <button type="submit" class="carta-btn">
             [<span th:text="${carta.nombre}"></span>]<br>
-            Daño: <span th:text="${carta.dano != null ? carta.dano : 10}"></span>
+
+            <span th:if="${carta.tipo == 'ATAQUE'}" th:text="'Daño: ' + ${carta.dano != null ? carta.dano : 0}"></span>
+            <span th:if="${carta.tipo == 'DEFENSA'}" th:text="'Defensa: ' + ${carta.defensa != null ? carta.defensa : 0}"></span>
+            <span th:if="${carta.tipo == 'HECHIZO'}" style="color: #a1a1aa;">Utilidad</span>
         </button>
     </form>
 </div>
-
 </body>
 </html>

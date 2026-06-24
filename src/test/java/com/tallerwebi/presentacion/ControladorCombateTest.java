@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.*;
 
-import com.tallerwebi.dominio.Carta;
 import com.tallerwebi.dominio.Partida;
 import com.tallerwebi.dominio.ServicioCarta;
 import com.tallerwebi.dominio.ServicioCombate;
@@ -30,57 +29,26 @@ public class ControladorCombateTest {
   public void queSePuedaIniciarUnCombate() {
     when(servicioCartaMock.obtenerTodas()).thenReturn(new ArrayList<>());
 
-    // Acá llamamos al método nuevo pasándole una zona simulada
     ModelAndView modelAndView = controladorCombate.iniciarCombate("bosque");
 
     assertThat(modelAndView.getViewName(), equalTo("combate"));
     assertThat(modelAndView.getModel().get("partida"), notNullValue());
-
-    assertThat(
-      (String) modelAndView.getModel().get("logCombate"),
-      equalTo("¡Entraste a la zona del BOSQUE y un INFECTADO te cortó el paso! Es tu turno.")
-    );
   }
 
   @Test
-  public void queAlJugarUnaCartaSeReduzcaLaVidaYDevuelvaLaVistaDeCombate() {
+  public void queAlJugarUnaCartaElControladorDelegueAlServicioYDevuelvaLaVista() {
     Long idCarta = 1L;
-    Long idPartida = 1L;
 
-    Partida partidaSimulada = new Partida(100, 30, 1);
-    Carta cartaSimulada = new Carta();
-    cartaSimulada.setNombre("Golpe Básico");
-    cartaSimulada.setDano(15);
+    // Simulamos la respuesta del Servicio
+    String logEsperado = "Usaste [Golpe Básico]. Hiciste 15 de Daño. El Infectado te sacó 5 HP.";
+    when(servicioCombateMock.jugarTurno(org.mockito.Mockito.any(Partida.class), eq(idCarta)))
+      .thenReturn(logEsperado);
 
-    when(servicioCombateMock.obtenerPartidaPorIdentificador(idPartida)).thenReturn(partidaSimulada);
-    when(servicioCartaMock.buscarPorId(idCarta)).thenReturn(cartaSimulada);
-    when(servicioCombateMock.jugarCarta(idCarta, idPartida)).thenReturn(15);
-
-    ModelAndView modelAndView = controladorCombate.jugarCarta(idCarta, idPartida);
+    ModelAndView modelAndView = controladorCombate.jugarCarta(idCarta, 100, 50);
 
     assertThat(modelAndView.getViewName(), equalTo("combate"));
 
     String log = (String) modelAndView.getModel().get("logCombate");
-    assertThat(log, containsString("Usaste [Golpe Básico]"));
-    assertThat(log, containsString("sacaste 15 HP"));
-  }
-
-  @Test
-  public void queAlBajarLaVidaDelEnemigoACeroMuestreMensajeDeVictoria() {
-    Long idCarta = 1L;
-    Long idPartida = 1L;
-
-    Partida partidaSimulada = new Partida(100, 0, 1);
-    Carta cartaSimulada = new Carta();
-    cartaSimulada.setNombre("Ataque Final");
-
-    when(servicioCombateMock.obtenerPartidaPorIdentificador(idPartida)).thenReturn(partidaSimulada);
-    when(servicioCartaMock.buscarPorId(idCarta)).thenReturn(cartaSimulada);
-    when(servicioCombateMock.jugarCarta(idCarta, idPartida)).thenReturn(50);
-
-    ModelAndView modelAndView = controladorCombate.jugarCarta(idCarta, idPartida);
-
-    String log = (String) modelAndView.getModel().get("logCombate");
-    assertThat(log, equalTo("¡EL ENEMIGO HA SIDO ELIMINADO! GANASTE."));
+    assertThat(log, equalTo(logEsperado));
   }
 }

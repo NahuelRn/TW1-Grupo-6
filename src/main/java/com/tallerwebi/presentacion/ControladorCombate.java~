@@ -4,6 +4,8 @@ import com.tallerwebi.dominio.Carta;
 import com.tallerwebi.dominio.Partida;
 import com.tallerwebi.dominio.ServicioCarta;
 import com.tallerwebi.dominio.ServicioCombate;
+import java.util.Collections;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -24,8 +26,6 @@ public class ControladorCombate {
     this.servicioCarta = servicioCarta;
   }
 
-  // --- ACÁ ARREGLAMOS EL 404 ---
-  // Ahora el botón de tu mapa que manda "?zona=bosque" va a caer acá perfecto
   @RequestMapping(path = "/combate", method = RequestMethod.GET)
   public ModelAndView iniciarCombate(@RequestParam(value = "zona", required = false) String zona) {
     ModelMap modelo = new ModelMap();
@@ -33,43 +33,85 @@ public class ControladorCombate {
     Partida partida = new Partida(100, 50, 1);
     partida.setId(1L);
 
-    String nombreZona = (zona != null) ? zona.toUpperCase() : "DESCONOCIDA";
-    String logCombate = "¡Entraste a la zona " + nombreZona + " y un ZOMBI INFECTADO te cortó el paso! Es tu turno.";
+    String nombreZona = (zona != null) ? zona.toUpperCase(java.util.Locale.ROOT) : "DESCONOCIDA";
+    String logCombate =
+      "¡Entraste a la zona " + nombreZona + " y un ZOMBI INFECTADO te cortó el paso! Es tu turno.";
+
+    // Llamamos al método mágico que mezcla y nos da 5 cartas
+    cargarManoEnModelo(modelo);
 
     modelo.put("partida", partida);
-    modelo.put("mano", servicioCarta.obtenerTodas());
     modelo.put("logCombate", logCombate);
 
     return new ModelAndView("combate", modelo);
   }
 
   @RequestMapping(path = "/jugar-carta", method = RequestMethod.POST)
-  public ModelAndView jugarCarta(@RequestParam Long identificadorCarta, @RequestParam Long identificadorPartida) {
+  public ModelAndView jugarCarta(
+    @RequestParam Long identificadorCarta,
+    @RequestParam Long identificadorPartida
+  ) {
     ModelMap modelo = new ModelMap();
 
     Partida partida = servicioCombate.obtenerPartidaPorIdentificador(identificadorPartida);
-    if(partida == null) {
+    if (partida == null) {
       partida = new Partida(100, 50, 1);
       partida.setId(identificadorPartida);
     }
 
     Carta cartaJugada = servicioCarta.buscarPorId(identificadorCarta);
-    Integer danioRealizado = this.servicioCombate.jugarCarta(identificadorCarta, identificadorPartida);
+    Integer danioRealizado =
+      this.servicioCombate.jugarCarta(identificadorCarta, identificadorPartida);
 
     String logCombate;
 
     if (partida.getHpEnemigo() <= 0) {
-      logCombate = "¡EL ZOMBI HA SIDO DESTRUIDO! HAS GANADO. Tu golpe final con [" + cartaJugada.getNombre() + "] hizo " + danioRealizado + " de daño.";
+      logCombate =
+        "¡EL ZOMBI HA SIDO DESTRUIDO! HAS GANADO. Tu golpe final con [" +
+        cartaJugada.getNombre() +
+        "] hizo " +
+        danioRealizado +
+        " de daño.";
     } else if (partida.getHpJugador() <= 0) {
-      logCombate = "HAS MUERTO. FIN DE LA PARTIDA. Tu último intento con [" + cartaJugada.getNombre() + "] hizo " + danioRealizado + " de daño.";
+      logCombate =
+        "HAS MUERTO. FIN DE LA PARTIDA. Tu último intento con [" +
+        cartaJugada.getNombre() +
+        "] hizo " +
+        danioRealizado +
+        " de daño.";
     } else {
-      logCombate = "Usaste [" + cartaJugada.getNombre() + "] y sacaste " + danioRealizado + " HP. El Zombi te contraatacó quitando 5 HP.";
+      logCombate =
+        "Usaste [" +
+        cartaJugada.getNombre() +
+        "] y sacaste " +
+        danioRealizado +
+        " HP. El Zombi te contraatacó quitando 5 HP.";
     }
 
+    // Llamamos al método de nuevo para que te dé 5 cartas aleatorias en el siguiente turno
+    cargarManoEnModelo(modelo);
+
     modelo.put("partida", partida);
-    modelo.put("mano", servicioCarta.obtenerTodas());
     modelo.put("logCombate", logCombate);
 
     return new ModelAndView("combate", modelo);
+  }
+
+  // --- HELPER PRIVADO PARA EVITAR REPETIR CÓDIGO (y que Java no explote) ---
+  private void cargarManoEnModelo(ModelMap modelo) {
+    List<Carta> mazoCompleto = servicioCarta.obtenerTodas();
+
+    // 1. Las mezclamos aleatoriamente
+    Collections.shuffle(mazoCompleto);
+
+    // 2. Cortamos la lista para agarrar solo las primeras 5 (o el máximo que haya)
+    List<Carta> mano = mazoCompleto.subList(0, Math.min(5, mazoCompleto.size()));
+
+    // 3. Calculamos cuántas quedaron
+    int cartasEnMazo = mazoCompleto.size() - mano.size();
+
+    // 4. Se las pasamos a la vista
+    modelo.put("mano", mano);
+    modelo.put("cartasEnMazo", cartasEnMazo);
   }
 }

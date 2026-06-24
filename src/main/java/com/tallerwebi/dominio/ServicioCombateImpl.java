@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 public class ServicioCombateImpl implements ServicioCombate {
 
   private RepositorioPartida repositorioPartida;
-  private RepositorioCarta repositorioCarta; // Lo inyectamos para leer el daño de la carta
+  private RepositorioCarta repositorioCarta;
 
   @Autowired
   public ServicioCombateImpl(
@@ -20,33 +20,66 @@ public class ServicioCombateImpl implements ServicioCombate {
     this.repositorioCarta = repositorioCarta;
   }
 
-  // OJO: Cambié Integer por Long en identificadorCarta para que matchee con Carta.getId()
   @Override
-  public Integer jugarCarta(Long identificadorCarta, Long identificadorPartida) {
-    Partida partida = obtenerPartidaPorIdentificador(identificadorPartida);
-    Carta cartaJugada = repositorioCarta.buscarPorId(identificadorCarta);
+  public String jugarTurno(Partida partida, Long idCarta) {
+    Carta cartaJugada = repositorioCarta.buscarPorId(idCarta);
 
-    // 1. Turno Jugador: Calculamos el daño de la carta (Si es null, pega 0)
-    int danoJugador = (cartaJugada.getDano() != null) ? cartaJugada.getDano() : 0;
-    partida.setHpEnemigo(partida.getHpEnemigo() - danoJugador);
+    // Stats base
+    int dano = (cartaJugada.getDano() != null) ? cartaJugada.getDano() : 0;
+    int defensa = (cartaJugada.getDefensa() != null) ? cartaJugada.getDefensa() : 0;
 
-    // Chequeo de victoria
+    // Fase de Ataque
+    partida.setHpEnemigo(partida.getHpEnemigo() - dano);
+
+    // Fase de Defensa (Cálculo sin re-asignar variables para evitar la DD-anomaly)
+    int danoRecibido;
+    if (partida.getHpEnemigo() > 0) {
+      int calculo = 5 - defensa;
+      danoRecibido = (calculo < 0) ? 0 : calculo;
+      partida.setHpJugador(partida.getHpJugador() - danoRecibido);
+    } else {
+      danoRecibido = 0; // Si murió, no nos puede pegar
+    }
+
+    // Armado del log (Incluimos SIEMPRE dano, defensa y danoRecibido para evitar la DU-anomaly)
+    String logCombate;
     if (partida.getHpEnemigo() <= 0) {
       partida.setEnumEstadoPartida(EnumEstadoPartida.GANADOR_JUGADOR);
-      return danoJugador; // Retornamos para avisarle al log
-    }
-
-    // 2. Turno Zombi (Automático): Pega 5 de daño fijo por turno
-    int danoZombi = 5;
-    partida.setHpJugador(partida.getHpJugador() - danoZombi);
-
-    // Chequeo de derrota
-    if (partida.getHpJugador() <= 0) {
+      logCombate =
+        "¡EL INFECTADO HA SIDO DESTRUIDO! HAS GANADO. Tu golpe con [" +
+        cartaJugada.getNombre() +
+        "] hizo " +
+        dano +
+        " de Daño. (Defensa inútil: " +
+        defensa +
+        ", Recibiste: " +
+        danoRecibido +
+        ").";
+    } else if (partida.getHpJugador() <= 0) {
       partida.setEnumEstadoPartida(EnumEstadoPartida.GANADOR_ENEMIGO);
+      logCombate =
+        "HAS MUERTO. FIN DE LA PARTIDA. Usaste [" +
+        cartaJugada.getNombre() +
+        "], Daño: " +
+        dano +
+        ", Defensa: " +
+        defensa +
+        ", Recibiste: " +
+        danoRecibido +
+        " HP.";
+    } else {
+      logCombate =
+        "Usaste [" +
+        cartaJugada.getNombre() +
+        "]. " +
+        (dano > 0 ? "Hiciste " + dano + " de Daño. " : "") +
+        (defensa > 0 ? "Levantaste " + defensa + " de Escudo. " : "") +
+        "El Infectado te sacó " +
+        danoRecibido +
+        " HP.";
     }
 
-    repositorioPartida.modificar(partida); // Guardamos el estado actual
-    return danoJugador;
+    return logCombate;
   }
 
   @Override

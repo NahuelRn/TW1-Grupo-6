@@ -4,6 +4,8 @@ import com.tallerwebi.dominio.Carta;
 import com.tallerwebi.dominio.Partida;
 import com.tallerwebi.dominio.ServicioCarta;
 import com.tallerwebi.dominio.ServicioCombate;
+import java.util.Collections;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -24,21 +26,19 @@ public class ControladorCombate {
     this.servicioCarta = servicioCarta;
   }
 
-  // --- ACÁ ARREGLAMOS EL 404 ---
-  // Ahora el botón de tu mapa que manda "?zona=bosque" va a caer acá perfecto
   @RequestMapping(path = "/combate", method = RequestMethod.GET)
   public ModelAndView iniciarCombate(@RequestParam(value = "zona", required = false) String zona) {
     ModelMap modelo = new ModelMap();
 
     Partida partida = new Partida(100, 50, 1);
-    partida.setId(1L);
 
     String nombreZona = (zona != null) ? zona.toUpperCase(java.util.Locale.ROOT) : "DESCONOCIDA";
     String logCombate =
-      "¡Entraste a la zona " + nombreZona + " y un ZOMBI INFECTADO te cortó el paso! Es tu turno.";
+      "¡Entraste a la zona " + nombreZona + " y un INFECTADO te cortó el paso! Es tu turno.";
+
+    cargarManoEnModelo(modelo);
 
     modelo.put("partida", partida);
-    modelo.put("mano", servicioCarta.obtenerTodas());
     modelo.put("logCombate", logCombate);
 
     return new ModelAndView("combate", modelo);
@@ -46,50 +46,36 @@ public class ControladorCombate {
 
   @RequestMapping(path = "/jugar-carta", method = RequestMethod.POST)
   public ModelAndView jugarCarta(
-    @RequestParam Long identificadorCarta,
-    @RequestParam Long identificadorPartida
+    @RequestParam Long idCarta,
+    @RequestParam Integer hpJugador,
+    @RequestParam Integer hpEnemigo
   ) {
     ModelMap modelo = new ModelMap();
 
-    Partida partida = servicioCombate.obtenerPartidaPorIdentificador(identificadorPartida);
-    if (partida == null) {
-      partida = new Partida(100, 50, 1);
-      partida.setId(identificadorPartida);
-    }
+    // 1. Reconstruimos el estado actual
+    Partida partidaActual = new Partida(hpJugador, hpEnemigo, 1);
 
-    Carta cartaJugada = servicioCarta.buscarPorId(identificadorCarta);
-    Integer danioRealizado =
-      this.servicioCombate.jugarCarta(identificadorCarta, identificadorPartida);
+    // 2. Le pasamos la pelota al Servicio para que haga las cuentas
+    String logCombate = servicioCombate.jugarTurno(partidaActual, idCarta);
 
-    String logCombate;
-
-    if (partida.getHpEnemigo() <= 0) {
-      logCombate =
-        "¡EL ZOMBI HA SIDO DESTRUIDO! HAS GANADO. Tu golpe final con [" +
-        cartaJugada.getNombre() +
-        "] hizo " +
-        danioRealizado +
-        " de daño.";
-    } else if (partida.getHpJugador() <= 0) {
-      logCombate =
-        "HAS MUERTO. FIN DE LA PARTIDA. Tu último intento con [" +
-        cartaJugada.getNombre() +
-        "] hizo " +
-        danioRealizado +
-        " de daño.";
-    } else {
-      logCombate =
-        "Usaste [" +
-        cartaJugada.getNombre() +
-        "] y sacaste " +
-        danioRealizado +
-        " HP. El Zombi te contraatacó quitando 5 HP.";
-    }
-
-    modelo.put("partida", partida);
-    modelo.put("mano", servicioCarta.obtenerTodas());
+    // 3. Devolvemos los datos actualizados a la vista
+    cargarManoEnModelo(modelo);
+    modelo.put("partida", partidaActual); // El servicio ya le modificó el HP por referencia
     modelo.put("logCombate", logCombate);
 
     return new ModelAndView("combate", modelo);
+  }
+
+  private void cargarManoEnModelo(ModelMap modelo) {
+    List<Carta> catalogo = servicioCarta.obtenerTodas();
+    Collections.shuffle(catalogo);
+
+    List<Carta> mazoSimulado = catalogo.subList(0, Math.min(15, catalogo.size()));
+    List<Carta> mano = mazoSimulado.subList(0, Math.min(5, mazoSimulado.size()));
+
+    int cartasEnMazo = mazoSimulado.size() - mano.size();
+
+    modelo.put("mano", mano);
+    modelo.put("cartasEnMazo", cartasEnMazo);
   }
 }
