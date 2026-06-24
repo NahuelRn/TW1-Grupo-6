@@ -33,7 +33,7 @@ public class ServicioCartaImpl implements ServicioCarta {
 
   @Override
   public Carta obtenerCartaPorId(Long id) {
-    return repositorioCarta.buscarPorId(id);
+    return this.repositorioCarta.buscarPorId(id);
   }
 
   @Override
@@ -81,5 +81,10 @@ public class ServicioCartaImpl implements ServicioCarta {
     }
 
     return new ColeccionDto(new ArrayList<>(albumCompleto.values()), misCantidades);
+  }
+
+  @Override
+  public Carta buscarPorId(Long id) {
+    return this.repositorioCarta.buscarPorId(id);
   }
 }

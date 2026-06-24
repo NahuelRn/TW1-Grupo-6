@@ -1,43 +1,54 @@
 package com.tallerwebi.presentacion;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.Mockito.*;
 
-import com.tallerwebi.dominio.*;
+import com.tallerwebi.dominio.Partida;
+import com.tallerwebi.dominio.ServicioCarta;
+import com.tallerwebi.dominio.ServicioCombate;
 import java.util.ArrayList;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.servlet.ModelAndView;
 
 public class ControladorCombateTest {
 
-  ServicioHistorial servicioHistorial = mock(ServicioHistorial.class);
-  RepositorioPartida repositorioPartida = mock(RepositorioPartida.class);
-  ServicioCombate servicioCombate = new ServicioCombateImpl(repositorioPartida, servicioHistorial);
+  private ServicioCombate servicioCombateMock;
+  private ServicioCarta servicioCartaMock;
+  private ControladorCombate controladorCombate;
 
-  @Test
-  public void deberiaMostrarVistaCombate() {
-    ControladorCombate controladorCombate = new ControladorCombate(this.servicioCombate);
-
-    ModelAndView modelAndView = controladorCombate.combate();
-
-    assertEquals("combate", modelAndView.getViewName());
+  @BeforeEach
+  public void init() {
+    servicioCombateMock = mock(ServicioCombate.class);
+    servicioCartaMock = mock(ServicioCarta.class);
+    controladorCombate = new ControladorCombate(servicioCombateMock, servicioCartaMock);
   }
 
   @Test
-  public void deberiaJugarCartaYMostrarDatosEnVista() {
-    ControladorCombate controladorCombate = new ControladorCombate(this.servicioCombate);
+  public void queSePuedaIniciarUnCombate() {
+    when(servicioCartaMock.obtenerTodas()).thenReturn(new ArrayList<>());
 
-    Partida partida = new Partida(100, 100, 1);
-    when(this.repositorioPartida.buscarPartidaPorIdentificador(1L)).thenReturn(partida);
+    ModelAndView modelAndView = controladorCombate.iniciarCombate("bosque");
 
-    ArrayList<Integer> cartasEnMano = new ArrayList<>();
-    cartasEnMano.add(1);
+    assertThat(modelAndView.getViewName(), equalTo("combate"));
+    assertThat(modelAndView.getModel().get("partida"), notNullValue());
+  }
 
-    partida.setCartasEnManoJugador(cartasEnMano);
+  @Test
+  public void queAlJugarUnaCartaElControladorDelegueAlServicioYDevuelvaLaVista() {
+    Long idCarta = 1L;
 
-    ModelAndView modelAndView = controladorCombate.jugarCarta(1, 1L);
+    // Simulamos la respuesta del Servicio
+    String logEsperado = "Usaste [Golpe Básico]. Hiciste 15 de Daño. El Infectado te sacó 5 HP.";
+    when(servicioCombateMock.jugarTurno(org.mockito.Mockito.any(Partida.class), eq(idCarta)))
+      .thenReturn(logEsperado);
 
-    assertEquals("combate", modelAndView.getViewName());
+    ModelAndView modelAndView = controladorCombate.jugarCarta(idCarta, 100, 50);
+
+    assertThat(modelAndView.getViewName(), equalTo("combate"));
+
+    String log = (String) modelAndView.getModel().get("logCombate");
+    assertThat(log, equalTo(logEsperado));
   }
 }

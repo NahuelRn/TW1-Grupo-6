@@ -21,6 +21,10 @@ public class Carta {
   private String descripcion;
   private String imagen;
 
+  // --- NUEVOS ATRIBUTOS PARA EL MVP ---
+  private Integer dano;
+  private Integer defensa;
+
   public Long getId() {
     return id;
   }
@@ -107,5 +111,21 @@ public class Carta {
 
   public void setImagen(String imagen) {
     this.imagen = imagen;
+  }
+
+  public Integer getDano() {
+    return dano;
+  }
+
+  public void setDano(Integer dano) {
+    this.dano = dano;
+  }
+
+  public Integer getDefensa() {
+    return defensa;
+  }
+
+  public void setDefensa(Integer defensa) {
+    this.defensa = defensa;
   }
 }
