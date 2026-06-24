@@ -29,7 +29,6 @@ public class ServicioIntercambioImpl implements ServicioIntercambio {
     this.repositorioInventario = repositorioInventario;
   }
 
-  // Modificado: Ahora el servicio puede recibir una rareza para filtrar nativamente
   @Override
   public List<ItemInventario> obtenerInventario(Long jugadorId) {
     List<ItemInventario> inventarioCompleto = repositorioInventario.listarInventarioDeJugador(
@@ -39,24 +38,25 @@ public class ServicioIntercambioImpl implements ServicioIntercambio {
       return java.util.Collections.emptyList();
     }
 
-    // Mantenemos el filtro básico de cantidad > 0 para no arrastrar fantasmas
     return inventarioCompleto
       .stream()
       .filter(item -> item.getCantidad() > 0)
       .collect(java.util.stream.Collectors.toList());
   }
 
-  // Sobrecarga opcional por si tu controlador necesita filtrar directamente por Rareza desde Java
+  @Override
   public List<ItemInventario> obtenerInventarioFiltrado(Long jugadorId, String rareza) {
     List<ItemInventario> inventario = obtenerInventario(jugadorId);
-    if (rareza == null || rareza.equalsIgnoreCase("all") || rareza.isEmpty()) {
+    if (rareza == null || rareza.equalsIgnoreCase("all") || rareza.trim().isEmpty()) {
       return inventario;
     }
 
     return inventario
       .stream()
       .filter(item ->
-        item.getCarta().getRareza() != null && item.getCarta().getRareza().equalsIgnoreCase(rareza)
+        item.getCarta() != null &&
+        item.getCarta().getRareza() != null &&
+        item.getCarta().getRareza().trim().equalsIgnoreCase(rareza.trim())
       )
       .collect(java.util.stream.Collectors.toList());
   }
@@ -132,12 +132,15 @@ public class ServicioIntercambioImpl implements ServicioIntercambio {
   }
 
   private void validarRarezaUniforme(List<Long> ids, String rareza) throws Exception {
+    if (rareza == null) {
+      throw new Exception("La rareza de las cartas no puede ser nula");
+    }
     for (int i = 1; i < ids.size(); i++) {
       Carta carta = repositorioCarta.buscarPorId(ids.get(i));
       if (carta == null) {
         throw new Exception("Una de las cartas no existe");
       }
-      if (!carta.getRareza().equals(rareza)) {
+      if (carta.getRareza() == null || !carta.getRareza().trim().equalsIgnoreCase(rareza.trim())) {
         throw new Exception("Todas las cartas deben ser de la misma rareza");
       }
     }
@@ -150,17 +153,24 @@ public class ServicioIntercambioImpl implements ServicioIntercambio {
   }
 
   private String obtenerSiguienteRareza(String actual) throws Exception {
-    switch (actual.trim()) {
-      case RAREZA_COMUN:
-        return RAREZA_POCO_COMUN;
-      case RAREZA_POCO_COMUN:
-        return RAREZA_RARA;
-      case RAREZA_RARA:
-        return RAREZA_EXOTICA;
-      case RAREZA_EXOTICA:
-        return RAREZA_LEGENDARIA;
-      default:
-        throw new Exception("No se puede mejorar una carta Legendaria");
+    if (actual == null) {
+      throw new Exception("La rareza actual no puede ser nula");
+    }
+
+    // Limpiamos espacios alrededor del string recibido
+    String rarezaNormalizada = actual.trim();
+
+    // Colocamos las constantes primero y comparamos ignorando mayúsculas/minúsculas
+    if (RAREZA_COMUN.equalsIgnoreCase(rarezaNormalizada)) {
+      return RAREZA_POCO_COMUN;
+    } else if (RAREZA_POCO_COMUN.equalsIgnoreCase(rarezaNormalizada)) {
+      return RAREZA_RARA;
+    } else if (RAREZA_RARA.equalsIgnoreCase(rarezaNormalizada)) {
+      return RAREZA_EXOTICA;
+    } else if (RAREZA_EXOTICA.equalsIgnoreCase(rarezaNormalizada)) {
+      return RAREZA_LEGENDARIA;
+    } else {
+      throw new Exception("No se puede mejorar una carta Legendaria o de tipo desconocido");
     }
   }
 }

@@ -29,17 +29,14 @@ public class ServicioIntercambioTest {
     repoItemMock = mock(RepositorioInventario.class);
     servicio = new ServicioIntercambioImpl(repoCartaMock, repoItemMock);
 
-    // Mock por defecto para descontarCartasEntregadas — item con cantidad suficiente
     ItemInventario itemMock = new ItemInventario();
     itemMock.setCantidad(5);
     when(repoItemMock.buscarItemDeJugador(anyLong(), anyLong())).thenReturn(itemMock);
   }
 
-  //  Validación de cantidad
   @Test
   public void siSeEntreganMenosDe4CartasDebeLanzarError() {
     List<Long> ids = List.of(1L, 2L, 3L);
-
     Exception ex = assertThrows(Exception.class, () -> servicio.realizarMejora(1L, ids));
     assertThat(ex.getMessage(), containsString("exactamente 4 cartas"));
   }
@@ -47,7 +44,6 @@ public class ServicioIntercambioTest {
   @Test
   public void siSeEntreganMasDe4CartasDebeLanzarError() {
     List<Long> ids = List.of(1L, 2L, 3L, 4L, 5L);
-
     Exception ex = assertThrows(Exception.class, () -> servicio.realizarMejora(1L, ids));
     assertThat(ex.getMessage(), containsString("exactamente 4 cartas"));
   }
@@ -63,7 +59,6 @@ public class ServicioIntercambioTest {
     assertThrows(Exception.class, () -> servicio.realizarMejora(1L, List.of(1L, 2L, 3L, 4L)));
   }
 
-  //  Validación de rareza uniforme
   @Test
   public void siLasCartasSonDeDistintaRarezaDebeLanzarError() {
     Carta comun = cartaConRareza(RAREZA_COMUN);
@@ -93,7 +88,6 @@ public class ServicioIntercambioTest {
     assertThat(ex.getMessage(), containsString("No se puede mejorar una carta Legendaria"));
   }
 
-  //  Casos felices
   @Test
   public void siSeEntreganCuatroCartasComunesDebeRetornarUnaPocoComon() throws Exception {
     Carta comun = cartaConRareza(RAREZA_COMUN);
@@ -154,7 +148,6 @@ public class ServicioIntercambioTest {
     assertThat(resultado.getRareza(), is(RAREZA_LEGENDARIA));
   }
 
-  //  Sin premios disponibles
   @Test
   public void siNoHayCartasDelSiguienteNivelDebeLanzarError() {
     Carta comun = cartaConRareza(RAREZA_COMUN);
@@ -169,7 +162,6 @@ public class ServicioIntercambioTest {
     assertThat(ex.getMessage(), containsString("No hay cartas disponibles"));
   }
 
-  //  obtenerInventario
   @Test
   public void obtenerInventarioDebeRetornarItemsDelJugador() {
     ItemInventario item = new ItemInventario();
@@ -258,11 +250,121 @@ public class ServicioIntercambioTest {
     assertThat(resultado, is(50.0));
   }
 
-  // Helper
+  /* --- NUEVOS TESTS: OBTENER INVENTARIO FILTRADO (JACOCO) --- */
+
+  @Test
+  public void obtenerInventarioFiltradoConFiltroAllRetornaTodoElInventario() {
+    ItemInventario item = new ItemInventario();
+    item.setCantidad(2);
+    item.setCarta(cartaConRareza(RAREZA_COMUN));
+    when(repoItemMock.listarInventarioDeJugador(1L)).thenReturn(List.of(item));
+
+    List<ItemInventario> resultado = servicio.obtenerInventarioFiltrado(1L, "all");
+    assertThat(resultado, hasSize(1));
+  }
+
+  @Test
+  public void obtenerInventarioFiltradoConRarezaEspecificaFiltraCorrectamente() {
+    ItemInventario item1 = new ItemInventario();
+    item1.setCantidad(1);
+    item1.setCarta(cartaConRareza(RAREZA_COMUN));
+
+    ItemInventario item2 = new ItemInventario();
+    item2.setCantidad(3);
+    item2.setCarta(cartaConRareza(RAREZA_RARA));
+
+    when(repoItemMock.listarInventarioDeJugador(1L)).thenReturn(List.of(item1, item2));
+
+    List<ItemInventario> resultado = servicio.obtenerInventarioFiltrado(1L, "Rara");
+    assertThat(resultado, hasSize(1));
+    assertThat(resultado.get(0).getCarta().getRareza(), is(RAREZA_RARA));
+  }
+
+  @Test
+  public void obtenerInventarioFiltradoRetornaListaVaciaSiNoSeEncuentraLaRareza() {
+    ItemInventario item = new ItemInventario();
+    item.setCantidad(2);
+    item.setCarta(cartaConRareza(RAREZA_COMUN));
+    when(repoItemMock.listarInventarioDeJugador(1L)).thenReturn(List.of(item));
+
+    List<ItemInventario> resultado = servicio.obtenerInventarioFiltrado(1L, "Legendaria");
+    assertThat(resultado, is(empty()));
+  }
 
   private Carta cartaConRareza(String rareza) {
     Carta carta = new Carta();
     carta.setRareza(rareza);
     return carta;
+  }
+
+  /* --- NUEVOS TESTS INCREMENTALES PARA COBERTURA JACOCO (MÍNIMO 80%) --- */
+
+  @Test
+  public void obtenerInventarioFiltradoConRarezaNulaRetornaTodoElInventario() {
+    ItemInventario item = new ItemInventario();
+    item.setCantidad(2);
+    item.setCarta(cartaConRareza(RAREZA_COMUN));
+    when(repoItemMock.listarInventarioDeJugador(1L)).thenReturn(List.of(item));
+
+    List<ItemInventario> resultado = servicio.obtenerInventarioFiltrado(1L, null);
+
+    assertThat(resultado, hasSize(1));
+  }
+
+  @Test
+  public void obtenerInventarioFiltradoConRarezaVaciaRetornaTodoElInventario() {
+    ItemInventario item = new ItemInventario();
+    item.setCantidad(2);
+    item.setCarta(cartaConRareza(RAREZA_COMUN));
+    when(repoItemMock.listarInventarioDeJugador(1L)).thenReturn(List.of(item));
+
+    List<ItemInventario> resultado = servicio.obtenerInventarioFiltrado(1L, "   ");
+
+    assertThat(resultado, hasSize(1));
+  }
+
+  @Test
+  public void siSeIntentaObtenerSiguienteRarezaDeUnParametroNuloDebeLanzarExcepcion() {
+    // Forzamos el flujo indirectamente a través de realizarMejora mandando una carta sin rareza
+    Carta cartaSinRareza = new Carta();
+    cartaSinRareza.setRareza(null);
+
+    when(repoCartaMock.buscarPorId(anyLong())).thenReturn(cartaSinRareza);
+
+    Exception ex = assertThrows(
+      Exception.class,
+      () -> servicio.realizarMejora(1L, List.of(1L, 2L, 3L, 4L))
+    );
+    assertThat(ex.getMessage(), containsString("La rareza de las cartas no puede ser nula"));
+  }
+
+  @Test
+  public void siLaListaDeIdsEnviadaAIntercambiarEsNulaDebeLanzarExcepcion() {
+    Exception ex = assertThrows(Exception.class, () -> servicio.realizarMejora(1L, null));
+    assertThat(ex.getMessage(), containsString("Debes entregar exactamente 4 cartas"));
+  }
+
+  @Test
+  public void siUnaCartaSecundariaTieneRarezaNulaDebeLanzarExcepcionEnLaValidacionUniforme() {
+    Carta primera = cartaConRareza(RAREZA_COMUN);
+    Carta segundaSinRareza = new Carta(); // rareza = null
+
+    when(repoCartaMock.buscarPorId(1L)).thenReturn(primera);
+    when(repoCartaMock.buscarPorId(2L)).thenReturn(segundaSinRareza);
+
+    Exception ex = assertThrows(
+      Exception.class,
+      () -> servicio.realizarMejora(1L, List.of(1L, 2L, 1L, 1L))
+    );
+    assertThat(ex.getMessage(), containsString("Todas las cartas deben ser de la misma rareza"));
+  }
+
+  @Test
+  public void siElRepositorioDeInventarioRetornaNuloAlListarDebeRetornarListaVacia() {
+    when(repoItemMock.listarInventarioDeJugador(99L)).thenReturn(null);
+
+    List<ItemInventario> resultado = servicio.obtenerInventario(99L);
+
+    assertThat(resultado, is(empty()));
   }
 }

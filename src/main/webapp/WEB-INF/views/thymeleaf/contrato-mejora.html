@@ -192,7 +192,7 @@
                         <p class="card-desc-mythic" th:text="${item.carta.descripcion != null} ? ${item.carta.descripcion} : 'Sin descripción.'">Efecto de la carta</p>
 
                         <div class="form-check d-flex justify-content-center mt-2">
-                            <input class="form-check-input mythic-checkbox" type="checkbox" name="ids" th:value="${item.id}">
+                            <input class="form-check-input mythic-checkbox" type="checkbox" name="ids" th:value="${item.carta.id}">
                         </div>
                     </div>
 
