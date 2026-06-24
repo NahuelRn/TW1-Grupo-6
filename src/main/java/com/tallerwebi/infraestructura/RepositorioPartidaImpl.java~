@@ -22,9 +22,4 @@ public class RepositorioPartidaImpl implements RepositorioPartida {
       .add(Restrictions.eq("id", identificador))
       .uniqueResult();
   }
-
-  @Override
-  public void modificar(Partida partida) {
-    this.sessionFactory.getCurrentSession().update(partida);
-  }
 }

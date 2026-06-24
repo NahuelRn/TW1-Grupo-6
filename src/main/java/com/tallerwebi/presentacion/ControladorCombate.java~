@@ -33,9 +33,8 @@ public class ControladorCombate {
     Partida partida = new Partida(100, 50, 1);
     partida.setId(1L);
 
-    String nombreZona = (zona != null) ? zona.toUpperCase(java.util.Locale.ROOT) : "DESCONOCIDA";
-    String logCombate =
-      "¡Entraste a la zona " + nombreZona + " y un ZOMBI INFECTADO te cortó el paso! Es tu turno.";
+    String nombreZona = (zona != null) ? zona.toUpperCase() : "DESCONOCIDA";
+    String logCombate = "¡Entraste a la zona " + nombreZona + " y un ZOMBI INFECTADO te cortó el paso! Es tu turno.";
 
     modelo.put("partida", partida);
     modelo.put("mano", servicioCarta.obtenerTodas());
@@ -45,45 +44,26 @@ public class ControladorCombate {
   }
 
   @RequestMapping(path = "/jugar-carta", method = RequestMethod.POST)
-  public ModelAndView jugarCarta(
-    @RequestParam Long identificadorCarta,
-    @RequestParam Long identificadorPartida
-  ) {
+  public ModelAndView jugarCarta(@RequestParam Long identificadorCarta, @RequestParam Long identificadorPartida) {
     ModelMap modelo = new ModelMap();
 
     Partida partida = servicioCombate.obtenerPartidaPorIdentificador(identificadorPartida);
-    if (partida == null) {
+    if(partida == null) {
       partida = new Partida(100, 50, 1);
       partida.setId(identificadorPartida);
     }
 
     Carta cartaJugada = servicioCarta.buscarPorId(identificadorCarta);
-    Integer danioRealizado =
-      this.servicioCombate.jugarCarta(identificadorCarta, identificadorPartida);
+    Integer danioRealizado = this.servicioCombate.jugarCarta(identificadorCarta, identificadorPartida);
 
     String logCombate;
 
     if (partida.getHpEnemigo() <= 0) {
-      logCombate =
-        "¡EL ZOMBI HA SIDO DESTRUIDO! HAS GANADO. Tu golpe final con [" +
-        cartaJugada.getNombre() +
-        "] hizo " +
-        danioRealizado +
-        " de daño.";
+      logCombate = "¡EL ZOMBI HA SIDO DESTRUIDO! HAS GANADO. Tu golpe final con [" + cartaJugada.getNombre() + "] hizo " + danioRealizado + " de daño.";
     } else if (partida.getHpJugador() <= 0) {
-      logCombate =
-        "HAS MUERTO. FIN DE LA PARTIDA. Tu último intento con [" +
-        cartaJugada.getNombre() +
-        "] hizo " +
-        danioRealizado +
-        " de daño.";
+      logCombate = "HAS MUERTO. FIN DE LA PARTIDA. Tu último intento con [" + cartaJugada.getNombre() + "] hizo " + danioRealizado + " de daño.";
     } else {
-      logCombate =
-        "Usaste [" +
-        cartaJugada.getNombre() +
-        "] y sacaste " +
-        danioRealizado +
-        " HP. El Zombi te contraatacó quitando 5 HP.";
+      logCombate = "Usaste [" + cartaJugada.getNombre() + "] y sacaste " + danioRealizado + " HP. El Zombi te contraatacó quitando 5 HP.";
     }
 
     modelo.put("partida", partida);

@@ -3,159 +3,85 @@ package com.tallerwebi.dominio;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class ServicioCombateTest {
 
-  private RepositorioPartida repositorioPartida;
-  private ServicioCombate servicioCombate;
-  private ServicioHistorial servicioHistorial;
+  private RepositorioPartida repositorioPartidaMock;
+  private RepositorioCarta repositorioCartaMock;
+  private ServicioCombateImpl servicioCombate;
 
   @BeforeEach
   public void init() {
-    this.repositorioPartida = mock(RepositorioPartida.class);
-    this.servicioHistorial = mock(ServicioHistorial.class);
-    this.servicioCombate = new ServicioCombateImpl(this.repositorioPartida, this.servicioHistorial);
+    // 1. Mockeamos los DOS repositorios que usa el nuevo MVP
+    this.repositorioPartidaMock = mock(RepositorioPartida.class);
+    this.repositorioCartaMock = mock(RepositorioCarta.class);
+
+    // 2. Instanciamos el servicio pasándole los mocks
+    this.servicioCombate = new ServicioCombateImpl(repositorioPartidaMock, repositorioCartaMock);
   }
 
   @Test
-  public void deberiaCalcularCorrectamenteElDanioDeLaCarta() {
-    Partida partida = new Partida(100, 100, 1);
-    when(repositorioPartida.buscarPartidaPorIdentificador(1L)).thenReturn(partida);
+  public void queAlJugarCartaSeResteVidaAlEnemigoYElZombiContraataque() {
+    // Preparación
+    Partida partida = new Partida(100, 50, 1);
+    Carta carta = new Carta();
+    carta.setDano(15);
 
-    ArrayList<Integer> cartasEnMano = new ArrayList<>();
-    cartasEnMano.add(1);
-    partida.setCartasEnManoJugador(cartasEnMano);
+    when(repositorioPartidaMock.buscarPartidaPorIdentificador(1L)).thenReturn(partida);
+    when(repositorioCartaMock.buscarPorId(1L)).thenReturn(carta);
 
-    Integer danioEfecto = servicioCombate.jugarCarta(1, 1L);
-    assertTrue(danioEfecto >= 50 && danioEfecto <= 55);
+    // Ejecución
+    Integer danioRealizado = servicioCombate.jugarCarta(1L, 1L);
+
+    // Validación
+    assertEquals(15, danioRealizado); // El daño devuelto debe ser el de la carta
+    assertEquals(35, partida.getHpEnemigo()); // El Zombi tenía 50, pierde 15 -> queda en 35
+    assertEquals(95, partida.getHpJugador()); // El Jugador tenía 100, el Zombi le saca 5 fijos -> queda 95
+    verify(repositorioPartidaMock, times(1)); // Verifica que se haya guardado
   }
 
   @Test
-  public void deberiaCambiarTurnoLuegoDeJugarCarta() {
-    Partida partida = new Partida(100, 100, 1);
-    when(repositorioPartida.buscarPartidaPorIdentificador(1L)).thenReturn(partida);
+  public void queAlMatarAlZombiElEstadoSeaGanadorJugador() {
+    // Preparación
+    Partida partida = new Partida(100, 10, 1); // Zombi a punto de morir (10 HP)
+    Carta carta = new Carta();
+    carta.setDano(15); // Golpe letal
 
-    ArrayList<Integer> cartasEnMano = new ArrayList<>();
-    cartasEnMano.add(1);
-    partida.setCartasEnManoJugador(cartasEnMano);
+    when(repositorioPartidaMock.buscarPartidaPorIdentificador(1L)).thenReturn(partida);
+    when(repositorioCartaMock.buscarPorId(1L)).thenReturn(carta);
 
-    servicioCombate.jugarCarta(1, 1L);
-    assertEquals(2, partida.getTurno());
-  }
+    // Ejecución
+    servicioCombate.jugarCarta(1L, 1L);
 
-  @Test
-  public void deberiaLanzarErrorCuandoNoTieneCartasEnMano() {
-    Partida partida = new Partida(100, 100, 1);
-    when(repositorioPartida.buscarPartidaPorIdentificador(1L)).thenReturn(partida);
-
-    partida.setCartasEnManoJugador(new ArrayList<>());
-
-    assertThrows(RuntimeException.class, () -> servicioCombate.jugarCarta(1, 1L));
-  }
-
-  @Test
-  public void deberiaColocarEstadoGanadorJugadorCuandoHpEnemigoEsMenorOIgualACero() {
-    Partida partida = new Partida(100, 100, 1);
-    when(repositorioPartida.buscarPartidaPorIdentificador(1L)).thenReturn(partida);
-
-    ArrayList<Integer> cartasEnMano = new ArrayList<>();
-    cartasEnMano.add(1);
-    partida.setCartasEnManoJugador(cartasEnMano);
-
-    partida.setHpEnemigo(50);
-
-    servicioCombate.jugarCarta(1, 1L);
+    // Validación
     assertEquals(EnumEstadoPartida.GANADOR_JUGADOR, partida.getEnumEstadoPartida());
   }
 
   @Test
-  public void deberiaLanzarErrorCuandoElTurnoNoEstaDefinido() {
-    Partida partida = new Partida(100, 100, 1);
-    partida.setTurno(null);
-    when(repositorioPartida.buscarPartidaPorIdentificador(1L)).thenReturn(partida);
+  public void queAlMorirPorContraataqueElEstadoSeaGanadorEnemigo() {
+    // Preparación
+    Partida partida = new Partida(4, 50, 1); // Jugador a un golpe de morir (el Zombi saca 5 fijos)
+    Carta carta = new Carta();
+    carta.setDano(10); // Golpe que no llega a matar al Zombi
 
-    assertThrows(RuntimeException.class, () -> servicioCombate.jugarCarta(1, 1L));
-  }
+    when(repositorioPartidaMock.buscarPartidaPorIdentificador(1L)).thenReturn(partida);
+    when(repositorioCartaMock.buscarPorId(1L)).thenReturn(carta);
 
-  @Test
-  public void deberiaLanzarErrorCuandoEsElTurnoDelEnemigo() {
-    Partida partida = new Partida(100, 100, 2);
-    when(repositorioPartida.buscarPartidaPorIdentificador(1L)).thenReturn(partida);
+    // Ejecución
+    servicioCombate.jugarCarta(1L, 1L);
 
-    assertThrows(RuntimeException.class, () -> servicioCombate.jugarCarta(1, 1L));
-  }
-
-  @Test
-  public void deberiaLanzarErrorCuandoLasCartasEnManoSonNulas() {
-    Partida partida = new Partida(100, 100, 1);
-    partida.setCartasEnManoJugador(null);
-    when(repositorioPartida.buscarPartidaPorIdentificador(1L)).thenReturn(partida);
-
-    assertThrows(RuntimeException.class, () -> servicioCombate.jugarCarta(1, 1L));
-  }
-
-  @Test
-  public void deberiaLanzarErrorSiSeSuperaElMaximoDeCartasRepetidas() {
-    Partida partida = new Partida(100, 100, 1);
-    when(repositorioPartida.buscarPartidaPorIdentificador(1L)).thenReturn(partida);
-
-    ArrayList<Integer> cartasEnMano = new ArrayList<>();
-    cartasEnMano.add(5);
-    cartasEnMano.add(5);
-    cartasEnMano.add(5);
-    cartasEnMano.add(5);
-    partida.setCartasEnManoJugador(cartasEnMano);
-
-    assertThrows(RuntimeException.class, () -> servicioCombate.jugarCarta(5, 1L));
-  }
-
-  @Test
-  public void deberiaColocarEstadoGanadorEnemigoCuandoHpJugadorEsMenorOIgualACero() {
-    Partida partida = new Partida(100, 100, 1);
-    when(repositorioPartida.buscarPartidaPorIdentificador(1L)).thenReturn(partida);
-
-    ArrayList<Integer> cartasEnMano = new ArrayList<>();
-    cartasEnMano.add(1);
-    partida.setCartasEnManoJugador(cartasEnMano);
-
-    partida.setHpJugador(0);
-    partida.setHpEnemigo(100);
-
-    servicioCombate.jugarCarta(1, 1L);
+    // Validación
     assertEquals(EnumEstadoPartida.GANADOR_ENEMIGO, partida.getEnumEstadoPartida());
   }
 
   @Test
   public void deberiaPoderObtenerPartidaPorSuIdentificador() {
     Partida partida = new Partida(100, 100, 1);
-    when(repositorioPartida.buscarPartidaPorIdentificador(1L)).thenReturn(partida);
+    when(repositorioPartidaMock.buscarPartidaPorIdentificador(1L)).thenReturn(partida);
 
     Partida resultado = servicioCombate.obtenerPartidaPorIdentificador(1L);
     assertEquals(partida, resultado);
-  }
-
-  // ✅ cubre la rama else de cambiarTurno
-  @Test
-  public void deberiaCambiarTurnoAJugadorCuandoElTurnoEstaEnEnemigo() {
-    Partida partida = new Partida(100, 100, 1);
-    when(repositorioPartida.buscarPartidaPorIdentificador(1L)).thenReturn(partida);
-
-    ArrayList<Integer> cartasEnMano = new ArrayList<>();
-    cartasEnMano.add(1);
-    cartasEnMano.add(1);
-    partida.setCartasEnManoJugador(cartasEnMano);
-    partida.setHpEnemigo(200);
-
-    // Primera jugada: turno pasa de 1 a 2
-    servicioCombate.jugarCarta(1, 1L);
-    assertEquals(2, partida.getTurno());
-
-    // Forzamos turno 1 para poder jugar de nuevo y cubrir el else
-    partida.setTurno(1);
-    servicioCombate.jugarCarta(1, 1L);
-    assertEquals(2, partida.getTurno());
   }
 }

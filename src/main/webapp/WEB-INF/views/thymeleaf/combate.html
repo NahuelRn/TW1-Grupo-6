@@ -5,102 +5,115 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MythicStack - Combate</title>
-
     <style>
         body {
             background-color: #0c0c0e;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Courier New', Courier, monospace; /* Fuente retro */
             color: #ffffff;
             padding: 20px;
             text-align: center;
-            max-width: 1000px;
-            margin: auto;
-            zoom: 1.1;
         }
 
-        h2 {
-            color: #e63946;
-            font-weight: 800;
-            letter-spacing: 2px;
-            text-shadow: 0 0 10px rgba(230, 57, 70, 0.4);
-            font-size: 40px;
+        .arena {
+            display: flex;
+            justify-content: space-around;
+            margin: 40px auto;
+            max-width: 800px;
         }
 
-        .div_panel {
-            background-color: #131316;
-            border: 2px solid #e5a93b;
-            border-radius: 12px;
+        .personaje {
+            background-color: #1a1a1f;
+            border: 2px solid #555;
+            border-radius: 8px;
             padding: 20px;
-            max-width: 500px;
-            margin: auto;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+            width: 300px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
         }
 
-        .info {
-            color: #a1a1aa;
-            margin: 10px 0;
-            font-size: 15px;
-            font-weight: 500;
-        }
+        .jugador { border-color: #4CAF50; }
+        .enemigo { border-color: #e63946; }
 
-        input {
-            background: #09090b;
-            border: 1px solid #27272a;
-            color: white;
-            padding: 8px;
-            margin: 5px;
-            border-radius: 6px;
-            width: 90%;
-        }
-
-        button {
-            margin-top: 10px;
-            background: #e63946;
-            border: none;
-            padding: 10px 16px;
-            color: white;
+        .hp-bar {
+            font-size: 24px;
             font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .hp-jugador { color: #4CAF50; }
+        .hp-enemigo { color: #e63946; }
+
+        .log-box {
+            background-color: #000;
+            border: 1px solid #e5a93b;
+            color: #e5a93b;
+            padding: 15px;
+            margin: 20px auto;
+            max-width: 600px;
+            font-size: 18px;
+            min-height: 50px;
+        }
+
+        .mano {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .carta-btn {
+            background: #27272a;
+            border: 1px solid #555;
+            color: white;
+            padding: 15px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            transition: 0.2s;
         }
 
-        button:hover {
-            box-shadow: 0 0 10px rgba(230, 57, 70, 0.4);
+        .carta-btn:hover {
+            background: #e5a93b;
+            color: #000;
+            border-color: #e5a93b;
         }
 
-        input[type="number"]::placeholder {
-            color: #a1a1aa;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            font-weight: 500;
-        }
-
-        .div_panel {
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .div_panel:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 0 20px rgba(229, 169, 59, 0.25);
-        }
+        /* Oculta los botones si alguien muere */
+        .muerto { display: none; }
     </style>
 </head>
 
 <body>
-<h2>COMBATE</h2>
+<h2 style="color: #e5a93b;">>>> ARENA DE COMBATE <<<</h2>
 
-<div class="div_panel">
-    <p class="info">Daño realizado: <span th:text="${danioCartaHaciaEnemigo}"></span></p>
+<div class="log-box" th:text="${logCombate}">Preparando combate...</div>
 
-    <p class="info">Hp enemigo: <span th:text="${hpEnemigo}"></span></p>
+<div class="arena">
+    <div class="personaje jugador">
+        <h3>TU PERSONAJE</h3>
+        <div class="hp-bar hp-jugador">HP: <span th:text="${partida.hpJugador}"></span></div>
+    </div>
 
-    <p class="info">Turno actual: <span th:text="${turno}"></span></p>
+    <div class="personaje enemigo">
+        <h3>ZOMBI INFECTADO</h3>
+        <div class="hp-bar hp-enemigo">HP: <span th:text="${partida.hpEnemigo}"></span></div>
+    </div>
+</div>
 
-    <form th:action="@{/jugar-carta}" method="POST">
-        <input type="number" name="identificadorCarta" placeholder="ID carta">
-        <input type="number" name="identificadorPartida" placeholder="ID partida">
+<hr style="border-color: #333; margin: 30px 0;">
+<h3>TU MANO (Elige una carta)</h3>
 
-        <button type="submit">JUGAR CARTA</button>
+<div class="mano" th:classappend="${partida.hpJugador <= 0 or partida.hpEnemigo <= 0} ? 'muerto' : ''">
+    <form th:action="@{/jugar-carta}" method="POST" th:each="carta : ${mano}">
+        <input type="hidden" name="identificadorPartida" th:value="${partida.id}">
+        <input type="hidden" name="identificadorCarta" th:value="${carta.id}">
+
+        <button type="submit" class="carta-btn">
+            [<span th:text="${carta.nombre}"></span>]<br>
+            Daño: <span th:text="${carta.dano != null ? carta.dano : 10}"></span>
+        </button>
     </form>
 </div>
 

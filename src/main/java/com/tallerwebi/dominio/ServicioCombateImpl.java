@@ -8,110 +8,45 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class ServicioCombateImpl implements ServicioCombate {
 
-  private static final int MAX_CARTAS_REPETIDAS = 3;
-
-  private int contadorCartasRepetidas = 0;
-
-  private static final int TURNO_JUGADOR = 1;
-  private static final int TURNO_ENEMIGO = 2;
-
   private RepositorioPartida repositorioPartida;
-  private ServicioHistorial servicioHistorial;
+  private RepositorioCarta repositorioCarta; // Lo inyectamos para leer el daño de la carta
 
   @Autowired
   public ServicioCombateImpl(
     RepositorioPartida repositorioPartida,
-    ServicioHistorial servicioHistorial
+    RepositorioCarta repositorioCarta
   ) {
     this.repositorioPartida = repositorioPartida;
-    this.servicioHistorial = servicioHistorial;
+    this.repositorioCarta = repositorioCarta;
   }
 
+  // OJO: Cambié Integer por Long en identificadorCarta para que matchee con Carta.getId()
   @Override
-  public Integer jugarCarta(Integer identificadorCarta, Long identificadorPartida) {
-    validarTurno(identificadorPartida);
-    validarCartaEnMano(identificadorCarta, identificadorPartida);
-
-    Integer danioCartaHaciaEnemigo = calcularEfectoCarta();
-
+  public Integer jugarCarta(Long identificadorCarta, Long identificadorPartida) {
     Partida partida = obtenerPartidaPorIdentificador(identificadorPartida);
-    partida.setHpEnemigo(partida.getHpEnemigo() - danioCartaHaciaEnemigo);
-    actualizarEstadoPartida(partida);
+    Carta cartaJugada = repositorioCarta.buscarPorId(identificadorCarta);
 
-    return danioCartaHaciaEnemigo;
-  }
+    // 1. Turno Jugador: Calculamos el daño de la carta (Si es null, pega 0)
+    int danoJugador = (cartaJugada.getDano() != null) ? cartaJugada.getDano() : 0;
+    partida.setHpEnemigo(partida.getHpEnemigo() - danoJugador);
 
-  private void validarTurno(Long identificadorPartida) {
-    Partida partida = obtenerPartidaPorIdentificador(identificadorPartida);
-
-    if (partida.getTurno() == null) {
-      throw new RuntimeException("Error, turno no definido.");
-    }
-
-    if (partida.getTurno() != TURNO_JUGADOR) {
-      throw new RuntimeException("Turno del enemigo.");
-    }
-  }
-
-  private void validarCartaEnMano(Integer identificadorCarta, Long identificadorPartida) {
-    Partida partida = obtenerPartidaPorIdentificador(identificadorPartida);
-
-    if (partida.getCartasEnManoJugador() == null || partida.getCartasEnManoJugador().isEmpty()) {
-      throw new RuntimeException("Error, el jugador no tiene cartas en mano.");
-    }
-
-    contarYValidarRepetidas(identificadorCarta, partida);
-  }
-
-  private void contarYValidarRepetidas(Integer identificadorCarta, Partida partida) {
-    int repetidas = java.util.Collections.frequency(
-      partida.getCartasEnManoJugador(),
-      identificadorCarta
-    );
-    if (repetidas > MAX_CARTAS_REPETIDAS) {
-      throw new RuntimeException("Error, máximo 3 cartas del mismo tipo.");
-    }
-  }
-
-  private Integer calcularEfectoCarta() {
-    int valorBaseCarta = 10;
-    int multiplicador = 5;
-    int factorSuerte = (int) (Math.random() * 6);
-
-    return valorBaseCarta * multiplicador + factorSuerte;
-  }
-
-  private void actualizarEstadoPartida(Partida partida) {
-    cambiarTurno(partida);
-    cambiarEstado(partida);
-  }
-
-  private void cambiarTurno(Partida partida) {
-    if (partida.getTurno() == TURNO_JUGADOR) {
-      partida.setTurno(TURNO_ENEMIGO);
-    } else {
-      partida.setTurno(TURNO_JUGADOR);
-    }
-  }
-
-  private void cambiarEstado(Partida partida) {
+    // Chequeo de victoria
     if (partida.getHpEnemigo() <= 0) {
       partida.setEnumEstadoPartida(EnumEstadoPartida.GANADOR_JUGADOR);
-      guardarHistorial(partida, "Victoria");
-    } else if (partida.getHpJugador() <= 0) {
-      partida.setEnumEstadoPartida(EnumEstadoPartida.GANADOR_ENEMIGO);
-      guardarHistorial(partida, "Derrota");
+      return danoJugador; // Retornamos para avisarle al log
     }
-  }
 
-  private void guardarHistorial(Partida partida, String resultado) {
-    HistorialPartida historialPartida = new HistorialPartida();
-    historialPartida.setUsuario(partida.getUsuario());
-    historialPartida.setResultado(resultado);
-    historialPartida.setOroGanado(50);
-    historialPartida.setExperienciaGanada(100);
+    // 2. Turno Zombi (Automático): Pega 5 de daño fijo por turno
+    int danoZombi = 5;
+    partida.setHpJugador(partida.getHpJugador() - danoZombi);
 
-    this.servicioHistorial.guardarHistorialPartidaServicio(historialPartida);
+    // Chequeo de derrota
+    if (partida.getHpJugador() <= 0) {
+      partida.setEnumEstadoPartida(EnumEstadoPartida.GANADOR_ENEMIGO);
+    }
+
+    repositorioPartida.modificar(partida); // Guardamos el estado actual
+    return danoJugador;
   }
 
   @Override

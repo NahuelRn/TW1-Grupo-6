@@ -38,7 +38,7 @@ public class ControladorCombateTest {
 
     assertThat(
       (String) modelAndView.getModel().get("logCombate"),
-      equalTo("¡Entraste a la zona del BOSQUE y un INFECTADO te cortó el paso! Es tu turno.")
+      equalTo("¡Entraste a la zona BOSQUE y un ZOMBI INFECTADO te cortó el paso! Es tu turno.")
     );
   }
 
