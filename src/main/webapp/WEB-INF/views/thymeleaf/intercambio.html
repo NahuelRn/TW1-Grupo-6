@@ -72,6 +72,37 @@
             color: #f0ead6;
             border-bottom: 3px solid rgba(212, 175, 55, 0.4);
         }
+
+        /* Botonera de Filtros Horizontales */
+        .btn-filter {
+            border: 1px solid #4a1212;
+            background-color: #1a1111;
+            color: #a1a1aa;
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            padding: 6px 16px;
+            transition: all 0.2s ease;
+            font-family: 'Cinzel', serif;
+        }
+        .btn-filter:hover {
+            border-color: #d4af37;
+            color: #d4af37;
+        }
+        .btn-filter.active {
+            background-color: #8b0000 !important;
+            border-color: #8b0000 !important;
+            color: white !important;
+            box-shadow: 0 0 10px rgba(139, 0, 0, 0.4);
+        }
+        .badge-rarity {
+            background-color: transparent !important;
+            border: 1px solid #d4af37 !important;
+            color: #d4af37 !important;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 8px;
+        }
     </style>
 </head>
 <body>
@@ -118,7 +149,7 @@
                         <p class="small text-muted mb-1">El jugador <strong th:text="${oferta.usuarioEmisor.email}">Usuario</strong> solicita:</p>
                         <h3 class="titulo-mercado" style="font-size: 1.5rem;" th:text="${oferta.cartaBuscada.nombre}">Carta</h3>
                         <div class="mb-3">
-                            <span class="badge" style="background-color: #4a1212; color: #d4af37;" th:text="${oferta.cartaBuscada.rareza}">RAREZA</span>
+                            <span class="badge badge-rarity" th:text="${oferta.cartaBuscada.rareza}">RAREZA</span>
                         </div>
                         <hr style="border-color: var(--game-border, #4a1212);">
                         <p class="small text-white-50">Tienes esta carta repetida. Haz clic abajo para elegir tu recompensa de su inventario.</p>
@@ -141,9 +172,20 @@
         </div>
 
         <div class="tab-pane fade" id="tab-publicar" role="tabpanel">
-            <h3 class="text-center h4 mb-4" style="color: #d4af37; font-family: 'Cinzel', serif;">Cartas que te faltan... (Elige una para pedirla)</h3>
-            <div class="row w-100 justify-content-center m-0">
-                <div th:each="carta : ${cartasFaltantes}" class="col-md-3 mb-4">
+            <h3 class="text-center h4 mb-3" style="color: #d4af37; font-family: 'Cinzel', serif;">Cartas que te faltan... (Elige una para pedirla)</h3>
+
+            <div class="d-flex justify-content-center gap-2 mb-4 flex-wrap">
+                <button type="button" class="btn btn-filter active" data-filter="all">TODAS</button>
+                <button type="button" class="btn btn-filter" data-filter="poco-comun">POCO COMUN</button>
+                <button type="button" class="btn btn-filter" data-filter="comun">COMUN</button>
+                <button type="button" class="btn btn-filter" data-filter="raro">RARO</button>
+                <button type="button" class="btn btn-filter" data-filter="epico">EPICO</button>
+                <button type="button" class="btn btn-filter" data-filter="exotico">EXOTICO</button>
+                <button type="button" class="btn btn-filter" data-filter="legendario">LEGENDARIO</button>
+            </div>
+
+            <div class="row w-100 justify-content-center m-0" id="contenedorFaltantes">
+                <div th:each="carta : ${cartasFaltantes}" class="col-md-3 mb-4 carta-faltante-item">
                     <div class="card card-trade p-3 text-center h-100 d-flex flex-column">
                         <img th:if="${carta.imagen != null and not #strings.isEmpty(carta.imagen)}"
                              th:src="@{/img/{img}(img=${carta.imagen})}"
@@ -154,14 +196,16 @@
                         </div>
 
                         <h5 th:text="${carta.nombre}" style="font-family: 'Cinzel', serif;">Nombre</h5>
+
                         <div class="mb-2">
-                            <span class="badge bg-dark text-info" th:text="${carta.rareza}">RAREZA</span>
+                            <span class="badge badge-rarity" th:text="${carta.rareza}">RAREZA</span>
                         </div>
+
                         <p class="small text-muted flex-grow-1" th:text="${carta.descripcion}"></p>
 
                         <div th:if="${misTrades != null and #lists.contains(misTrades.?[estado != null and estado.toString() == 'ACTIVA'].![cartaBuscada.id], carta.id)}">
                             <button type="button" class="btn btn-secondary w-100 py-2 btn-sm text-uppercase" disabled style="background-color: #332222; border-color: #443333; color: #a09090;">
-                                Ya solicitada
+                                Ya solicitada ⏳
                             </button>
                         </div>
 
@@ -173,7 +217,7 @@
                     </div>
                 </div>
 
-                <div th:if="${#lists.isEmpty(cartasFaltantes)}" class="col-12 text-center my-2">
+                <div th:if="${#lists.isEmpty(cartasFaltantes)}" class="col-12 text-center my-2" id="msg-vacio">
                     <p class="text-success lead">Ya posees todas las cartas existentes de MythicStack.</p>
                 </div>
             </div>
@@ -193,19 +237,76 @@
         crossorigin="anonymous"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // Leemos los parámetros de la URL
         const urlParams = new URLSearchParams(window.location.search);
         const tabParam = urlParams.get('tab');
 
         if (tabParam === 'publicar') {
-            // Buscamos el botón de la pestaña "Publicar mi Trade"
             const publicarTab = document.getElementById('publicar-tab');
             if (publicarTab) {
-                // Usamos el cargador nativo de Bootstrap para activar la pestaña
                 const tab = new bootstrap.Tab(publicarTab);
                 tab.show();
             }
         }
+
+        // --- MANIPULACIÓN DEL DOM ---
+        const contenedor = document.getElementById('contenedorFaltantes');
+        if (!contenedor) return;
+
+        const cartasNodes = Array.from(contenedor.querySelectorAll('.carta-faltante-item'));
+
+        // Función de mapeo robusta y a prueba de tildes/strings de BD
+        function mapearRarezaSegura(elemento) {
+            const badge = elemento.querySelector(".badge-rarity");
+            if (!badge) return "comun";
+            const texto = badge.textContent.toLowerCase().trim();
+
+            if (texto.includes("poco")) return "poco-comun";
+            if (texto.includes("com")) return "comun";
+            if (texto.includes("rar")) return "raro";
+            if (texto.includes("ep") || texto.includes("ê") || texto.includes("é")) return "epico";
+            if (texto.includes("exot") || texto.includes("exót")) return "exotico";
+            if (texto.includes("leg")) return "legendario";
+            return "comun";
+        }
+
+        // NUEVO MAPA DE PESOS: Orden estricto de menor a mayor rareza
+        const pesosRareza = {
+            "poco-comun": 1,
+            "comun": 2,
+            "raro": 3,
+            "epico": 4,
+            "exotico": 5,
+            "legendario": 6
+        };
+
+        // Forzamos el ordenamiento inicial correcto
+        cartasNodes.sort((a, b) => {
+            const pesoA = pesosRareza[mapearRarezaSegura(a)] || 99;
+            const pesoB = pesosRareza[mapearRarezaSegura(b)] || 99;
+            return pesoA - pesoB;
+        });
+
+        // Inyectamos las tarjetas ordenadas al contenedor
+        cartasNodes.forEach(nodo => contenedor.appendChild(nodo));
+
+        // Lógica de los botones de filtrado
+        document.querySelectorAll('.btn-filter').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.btn-filter').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+
+                const filtroSeleccionado = this.getAttribute('data-filter');
+
+                cartasNodes.forEach(carta => {
+                    const rarezaCarta = mapearRarezaSegura(carta);
+                    if (filtroSeleccionado === 'all' || rarezaCarta === filtroSeleccionado) {
+                        carta.classList.remove('d-none');
+                    } else {
+                        carta.classList.add('d-none');
+                    }
+                });
+            });
+        });
     });
 </script>
 </body>
