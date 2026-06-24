@@ -23,11 +23,19 @@ public class ServicioMercadoImpl implements ServicioMercado {
   }
 
   @Override
-  public void publicarSolicitud(Usuario usuario, Long idCartaBuscada) throws Exception {
+  public void publicarSolicitud(Long idUsuario, Long idCartaBuscada) throws Exception {
+    // Buscamos el usuario persistido real de la base de datos
+    Usuario usuario = repoMercado.buscarUsuarioPorId(idUsuario);
+    if (usuario == null) {
+      throw new Exception("El usuario no existe en el sistema");
+    }
+
+    // El inventario ahora está sincronizado dentro de la transacción activa
     boolean yaLaTiene = usuario
       .getInventario()
       .stream()
       .anyMatch(item -> item.getCarta().getId().equals(idCartaBuscada));
+
     if (yaLaTiene) {
       throw new Exception("No puedes solicitar una carta que ya posees");
     }
@@ -38,20 +46,26 @@ public class ServicioMercadoImpl implements ServicioMercado {
       .anyMatch(t ->
         ESTADO_ACTIVA.equals(t.getEstado()) && t.getCartaBuscada().getId().equals(idCartaBuscada)
       );
+
     if (yaSolicitada) {
       throw new Exception("Ya tienes una solicitud activa para esta carta");
     }
 
     Carta cartaBuscada = repoCarta.buscarPorId(idCartaBuscada);
+
     PropuestaIntercambio nueva = new PropuestaIntercambio();
     nueva.setUsuarioEmisor(usuario);
     nueva.setCartaBuscada(cartaBuscada);
     nueva.setEstado(ESTADO_ACTIVA);
+
     repoMercado.guardar(nueva);
   }
 
   @Override
-  public List<PropuestaIntercambio> obtenerOfertasCompatibles(Usuario usuario) {
+  public List<PropuestaIntercambio> obtenerOfertasCompatibles(Long idUsuario) {
+    Usuario usuario = repoMercado.buscarUsuarioPorId(idUsuario);
+    if (usuario == null) return new ArrayList<>();
+
     List<PropuestaIntercambio> activas = repoMercado.listarTodasLasActivas();
     List<PropuestaIntercambio> compatibles = new ArrayList<>();
 
@@ -78,7 +92,10 @@ public class ServicioMercadoImpl implements ServicioMercado {
   }
 
   @Override
-  public List<Carta> obtenerCartasFaltantes(Usuario usuario) {
+  public List<Carta> obtenerCartasFaltantes(Long idUsuario) {
+    Usuario usuario = repoMercado.buscarUsuarioPorId(idUsuario);
+    if (usuario == null) return new ArrayList<>();
+
     List<Long> idsPoseidas = new ArrayList<>();
     for (ItemInventario item : usuario.getInventario()) {
       idsPoseidas.add(item.getCarta().getId());
@@ -87,7 +104,9 @@ public class ServicioMercadoImpl implements ServicioMercado {
   }
 
   @Override
-  public List<PropuestaIntercambio> obtenerMisTrades(Usuario usuario) {
+  public List<PropuestaIntercambio> obtenerMisTrades(Long idUsuario) {
+    Usuario usuario = repoMercado.buscarUsuarioPorId(idUsuario);
+    if (usuario == null) return new ArrayList<>();
     return repoMercado.listarMisTrades(usuario);
   }
 
@@ -109,11 +128,17 @@ public class ServicioMercadoImpl implements ServicioMercado {
   }
 
   @Override
-  public void finalizarIntercambio(Usuario receptor, Long idPropuesta, Long idCartaRecompensa)
+  public void finalizarIntercambio(Long idReceptor, Long idPropuesta, Long idCartaRecompensa)
     throws Exception {
+    Usuario receptor = repoMercado.buscarUsuarioPorId(idReceptor);
+    if (receptor == null) {
+      throw new Exception("El usuario receptor no existe");
+    }
+
     PropuestaIntercambio propuesta = repoMercado.buscarPorId(idPropuesta);
     validarPropuestaBasica(propuesta);
 
+    // Primero se valida el RECEPTOR (Como estaba originalmente)
     ItemInventario itemReceptorEntrega = buscarItemEnInventario(
       receptor,
       propuesta.getCartaBuscada().getId()
@@ -124,6 +149,7 @@ public class ServicioMercadoImpl implements ServicioMercado {
       throw new Exception("No tienes la carta solicitada repetida");
     }
 
+    // Después se valida el EMISOR usando la propuesta directamente
     ItemInventario itemEmisorOfrece = buscarItemEnInventario(
       propuesta.getUsuarioEmisor(),
       idCartaRecompensa
@@ -201,12 +227,12 @@ public class ServicioMercadoImpl implements ServicioMercado {
   }
 
   @Override
-  public void eliminarMiTrade(Usuario usuario, Long idPropuesta) throws Exception {
+  public void eliminarMiTrade(Long idUsuario, Long idPropuesta) throws Exception {
     PropuestaIntercambio propuesta = repoMercado.buscarPorId(idPropuesta);
     if (
       propuesta != null &&
       ESTADO_ACTIVA.equals(propuesta.getEstado()) &&
-      propuesta.getUsuarioEmisor().getId().equals(usuario.getId())
+      propuesta.getUsuarioEmisor().getId().equals(idUsuario)
     ) {
       repoMercado.eliminar(propuesta);
     } else {
@@ -227,6 +253,7 @@ public class ServicioMercadoImpl implements ServicioMercado {
   }
 
   private int obtenerValorRareza(String rareza) {
+    if (rareza == null) return 1;
     switch (rareza.toUpperCase(Locale.ROOT)) {
       case "LEGENDARIA":
         return 4;
