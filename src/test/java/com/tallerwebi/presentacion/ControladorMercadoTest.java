@@ -14,21 +14,15 @@ import org.springframework.web.servlet.ModelAndView;
 public class ControladorMercadoTest {
 
   private ServicioMercado servicioMercadoMock;
-  private RepositorioMercado repositorioMercadoMock;
   private ControladorMercado controlador;
   private HttpSession sessionMock;
-  private Usuario usuarioFake;
 
   @BeforeEach
   public void setUp() {
     servicioMercadoMock = mock(ServicioMercado.class);
-    repositorioMercadoMock = mock(RepositorioMercado.class);
-    controlador = new ControladorMercado(servicioMercadoMock, repositorioMercadoMock);
+    // Cambiado para coincidir con el constructor real de producción que solo usa el Servicio
+    controlador = new ControladorMercado(servicioMercadoMock);
     sessionMock = mock(HttpSession.class);
-
-    usuarioFake = new Usuario();
-    usuarioFake.setId(1L);
-    usuarioFake.setEmail("alpha@mythicstack.com");
   }
 
   @Test
@@ -41,8 +35,9 @@ public class ControladorMercadoTest {
   @Test
   public void siElUsuarioEstaLogueadoDebeCargarOfertasCompatiblesEnVistaMercadoComunidad() {
     when(sessionMock.getAttribute("jugadorId")).thenReturn(1L);
-    when(repositorioMercadoMock.buscarUsuarioPorId(1L)).thenReturn(usuarioFake);
-    when(servicioMercadoMock.obtenerOfertasCompatibles(usuarioFake)).thenReturn(new ArrayList<>());
+    when(servicioMercadoMock.obtenerOfertasCompatibles(1L)).thenReturn(new ArrayList<>());
+    when(servicioMercadoMock.obtenerCartasFaltantes(1L)).thenReturn(new ArrayList<>());
+    when(servicioMercadoMock.obtenerMisTrades(1L)).thenReturn(new ArrayList<>());
 
     ModelAndView mav = controlador.verMercadoComunidad(sessionMock);
 
@@ -53,26 +48,24 @@ public class ControladorMercadoTest {
   @Test
   public void publicarTradeExitosoRedirecciona() throws Exception {
     when(sessionMock.getAttribute("jugadorId")).thenReturn(1L);
-    when(repositorioMercadoMock.buscarUsuarioPorId(1L)).thenReturn(usuarioFake);
 
     ModelAndView mav = controlador.procesarPublicarTrade(5L, sessionMock);
 
     assertThat(mav.getViewName(), is("redirect:/mercado/mis-trades"));
-    verify(servicioMercadoMock, times(1)).publicarSolicitud(usuarioFake, 5L);
+    verify(servicioMercadoMock, times(1)).publicarSolicitud(1L, 5L);
   }
 
   @Test
   public void fallaPublicacionRecargaVistaConError() throws Exception {
     when(sessionMock.getAttribute("jugadorId")).thenReturn(1L);
-    when(repositorioMercadoMock.buscarUsuarioPorId(1L)).thenReturn(usuarioFake);
 
     doThrow(new Exception("Ya tienes una solicitud activa"))
       .when(servicioMercadoMock)
-      .publicarSolicitud(usuarioFake, 5L);
+      .publicarSolicitud(1L, 5L);
 
     ModelAndView mav = controlador.procesarPublicarTrade(5L, sessionMock);
 
-    assertThat(mav.getViewName(), is("publicar-trade"));
+    assertThat(mav.getViewName(), is("intercambio")); // Nombre de vista real actualizado
     assertThat(mav.getModel().get("error"), is("Ya tienes una solicitud activa"));
   }
 
