@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 import com.tallerwebi.dominio.Carta;
 import com.tallerwebi.dominio.ItemInventario;
 import com.tallerwebi.dominio.ServicioIntercambio;
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpSession;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,6 +29,10 @@ public class ControladorContratoMejoraTest {
     redirectAttributesMock = mock(RedirectAttributes.class);
     controlador = new ControladorContratoMejora(servicioIntercambioMock);
   }
+
+  // ==========================================
+  // TESTS: GET /contrato-mejora
+  // ==========================================
 
   @Test
   public void siNoHayJugadorEnSesionElGetDebeRedirigirALogin() {
@@ -51,6 +56,10 @@ public class ControladorContratoMejoraTest {
     assertThat(mav.getViewName(), equalTo("contrato-mejora"));
     assertThat(mav.getModel().get("inventario"), equalTo(inventario));
   }
+
+  // ==========================================
+  // TESTS: POST /contrato-mejora/intercambiar
+  // ==========================================
 
   @Test
   public void siNoHayJugadorEnSesionElPostDebeRedirigirALogin() {
@@ -117,8 +126,11 @@ public class ControladorContratoMejoraTest {
     Long jugadorId = 1L;
     when(sessionMock.getAttribute("jugadorId")).thenReturn(jugadorId);
 
+    // Usamos una lista vacía instanciada de forma tradicional para asegurar la evaluación limpia del isEmpty()
+    List<Long> idsVacios = new ArrayList<>();
+
     ModelAndView mav = controlador.intercambiarCartas(
-      List.of(),
+      idsVacios,
       sessionMock,
       redirectAttributesMock
     );
@@ -130,6 +142,32 @@ public class ControladorContratoMejoraTest {
         "Debes seleccionar exactamente 4 cartas para firmar el contrato."
       );
   }
+
+  // Evalúa un número de cartas inválido (pero no nulo ni vacío)
+  @Test
+  public void siSeSeleccionaUnaCantidadDeCartasDistintaDeCuatroDebeFallarSegunLaLogicaDelServicio()
+    throws Exception {
+    Long jugadorId = 1L;
+    List<Long> idsInsuficientes = List.of(1L, 2L); // Solo 2 cartas de las 4 requeridas
+
+    when(sessionMock.getAttribute("jugadorId")).thenReturn(jugadorId);
+    when(servicioIntercambioMock.realizarMejora(jugadorId, idsInsuficientes))
+      .thenThrow(new Exception("Cantidad incorrecta de cartas."));
+
+    ModelAndView mav = controlador.intercambiarCartas(
+      idsInsuficientes,
+      sessionMock,
+      redirectAttributesMock
+    );
+
+    assertThat(mav.getViewName(), equalTo("redirect:/contrato-mejora"));
+    verify(redirectAttributesMock, times(1))
+      .addFlashAttribute("error", "Cantidad incorrecta de cartas.");
+  }
+
+  // ==========================================
+  // TESTS: GET /contrato-mejora/resultado
+  // ==========================================
 
   @Test
   public void siNoHayJugadorEnSesionAlVerResultadoDebeRedirigirALogin() {

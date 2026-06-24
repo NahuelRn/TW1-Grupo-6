@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio;
 
+import java.time.LocalDateTime;
 import javax.persistence.*;
 
 @Entity
@@ -9,13 +10,17 @@ public class PropuestaIntercambio {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @ManyToOne
-  private Usuario usuarioEmisor; // Quien ofrece la carta
+  @ManyToOne(fetch = FetchType.LAZY)
+  private Usuario usuarioEmisor; // El que crea la solicitud (busca la carta)
 
-  @ManyToOne
-  private Carta cartaOfrecida; // La carta repetida
+  @ManyToOne(fetch = FetchType.LAZY)
+  private Carta cartaBuscada; // La carta específica que desea obtener
 
-  private String rarezaBuscada; // Lo que pide a cambio
+  @ManyToOne(fetch = FetchType.LAZY)
+  private Carta cartaOfrecida; // La carta que el receptor le elegirá como pago (se define en Paso 3)
+
+  private String estado = "ACTIVA"; // "ACTIVA" o "FINALIZADA"
+  private LocalDateTime fechaCreacion = LocalDateTime.now();
 
   public Long getId() {
     return id;
@@ -33,6 +38,14 @@ public class PropuestaIntercambio {
     this.usuarioEmisor = usuarioEmisor;
   }
 
+  public Carta getCartaBuscada() {
+    return cartaBuscada;
+  }
+
+  public void setCartaBuscada(Carta cartaBuscada) {
+    this.cartaBuscada = cartaBuscada;
+  }
+
   public Carta getCartaOfrecida() {
     return cartaOfrecida;
   }
@@ -41,11 +54,19 @@ public class PropuestaIntercambio {
     this.cartaOfrecida = cartaOfrecida;
   }
 
-  public String getRarezaBuscada() {
-    return rarezaBuscada;
+  public String getEstado() {
+    return estado;
   }
 
-  public void setRarezaBuscada(String rarezaBuscada) {
-    this.rarezaBuscada = rarezaBuscada;
+  public void setEstado(String estado) {
+    this.estado = estado;
+  }
+
+  public LocalDateTime getFechaCreacion() {
+    return fechaCreacion;
+  }
+
+  public void setFechaCreacion(LocalDateTime fechaCreacion) {
+    this.fechaCreacion = fechaCreacion;
   }
 }

@@ -3,9 +3,13 @@ package com.tallerwebi.dominio;
 import java.util.List;
 
 public interface ServicioMercado {
-  void publicarOferta(Usuario usuario, Carta carta, String rarezaBuscada) throws Exception;
-  List<PropuestaIntercambio> obtenerMercado(Usuario usuario);
-  void aceptarOferta(Usuario usuarioReceptor, Long idOferta) throws Exception;
-  List<ItemInventario> obtenerCartasRepetidas(Usuario usuario);
-  void crearPropuesta(Usuario usuario, Long idCarta, String rarezaBuscada) throws Exception;
+  void publicarSolicitud(Usuario usuario, Long idCartaBuscada) throws Exception;
+  List<PropuestaIntercambio> obtenerOfertasCompatibles(Usuario usuarioActual);
+  List<PropuestaIntercambio> obtenerMisTrades(Usuario usuarioActual);
+  List<Carta> obtenerCartasFaltantes(Usuario usuarioActual);
+  PropuestaIntercambio buscarPorId(Long id) throws Exception;
+  List<Carta> obtenerOpcionesRecompensa(PropuestaIntercambio propuesta);
+  void finalizarIntercambio(Usuario usuarioReceptor, Long idOferta, Long idCartaRecompensa)
+    throws Exception;
+  void eliminarMiTrade(Usuario usuarioActual, Long idOferta) throws Exception;
 }

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Mis Trades</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-dark text-light">
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-warning">Mis Publicaciones de Intercambio</h1>
+        <div>
+            <!-- th:href para navegar limpiamente sin perder prefijos del servidor -->
+            <div>
+                <a th:href="@{/mercado}" class="btn btn-outline-info me-2">Ofertas Comunidad</a>
+
+                <a th:href="@{/mercado(tab='publicar')}" class="btn btn-warning">Nueva Solicitud</a>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+    <table class="table table-dark table-striped align-middle border border-secondary">
+        <thead>
+        <tr>
+            <th>Carta Buscada</th>
+            <th>Rareza</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="trade : ${misTrades}">
+            <td th:text="${trade.cartaBuscada.nombre}">Nombre</td>
+            <td><span class="badge bg-info" th:text="${trade.cartaBuscada.rareza}">RAREZA</span></td>
+            <td>
+                <span th:classappend="${trade.estado == 'ACTIVA'} ? 'badge bg-success' : 'badge bg-secondary'"
+                      th:text="${trade.estado}">ESTADO</span>
+            </td>
+            <td>
+                <!-- th:action dinámico para ejecutar la baja sin 404 -->
+                <form th:if="${trade.estado == 'ACTIVA'}" th:action="@{/mercado/eliminar}" method="POST" onsubmit="return confirm('Estas seguro de cancelar esta oferta?');">
+                    <input type="hidden" name="idPropuesta" th:value="${trade.id}">
+                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                </form>
+                <span th:if="${trade.estado != 'ACTIVA'}" class="text-muted small">Inmutable</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

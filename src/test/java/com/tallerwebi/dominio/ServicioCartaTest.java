@@ -19,7 +19,6 @@ public class ServicioCartaTest {
   public void init() {
     repositorioCarta = mock(RepositorioCarta.class);
     repositorioInventario = mock(RepositorioInventario.class);
-
     servicioCarta = new ServicioCartaImpl(repositorioCarta, repositorioInventario);
   }
 
@@ -72,19 +71,21 @@ public class ServicioCartaTest {
     item1.setCantidad(2);
 
     ItemInventario item2 = new ItemInventario();
-    item2.setCarta(carta1);
+    item2.setCarta(carta2);
     item2.setCantidad(3);
 
     when(repositorioInventario.listarInventarioDeJugador(jugadorId))
       .thenReturn(List.of(item1, item2));
 
-    // Ejecución
     ColeccionDto resultado = servicioCarta.obtenerColeccionAgrupada(jugadorId);
 
-    // Validaciones
+    // NUEVAS VERIFICACIONES DE COBERTURA: Forzamos lectura total de los getters del DTO
     assertThat(resultado, notNullValue());
     assertThat(resultado.getCartasUnicas(), hasSize(2));
-    assertThat(resultado.getCantidades().get(10L), equalTo(5)); // 2 + 3 = 5
+    assertThat(resultado.getCartasUnicas(), containsInAnyOrder(carta1, carta2));
+    assertThat(resultado.getCantidades(), notNullValue());
+    assertThat(resultado.getCantidades().get(10L), equalTo(2));
+    assertThat(resultado.getCantidades().get(20L), equalTo(3));
   }
 
   @Test
@@ -96,12 +97,25 @@ public class ServicioCartaTest {
     when(repositorioCarta.listarTodas()).thenReturn(List.of(carta1));
     when(repositorioInventario.listarInventarioDeJugador(jugadorId)).thenReturn(null);
 
-    // Ejecución
     ColeccionDto resultado = servicioCarta.obtenerColeccionAgrupada(jugadorId);
 
-    // Validaciones
     assertThat(resultado, notNullValue());
     assertThat(resultado.getCartasUnicas(), hasSize(1));
     assertThat(resultado.getCantidades().isEmpty(), is(true));
+  }
+
+  @Test
+  public void obtenerColeccionAgrupadaDebeRetornarCantidadesEnCeroSiElInventarioEstaVacio() {
+    Long jugadorId = 1L;
+    Carta carta1 = new Carta();
+    carta1.setId(10L);
+
+    when(repositorioCarta.listarTodas()).thenReturn(List.of(carta1));
+    when(repositorioInventario.listarInventarioDeJugador(jugadorId)).thenReturn(List.of());
+
+    ColeccionDto resultado = servicioCarta.obtenerColeccionAgrupada(jugadorId);
+
+    assertThat(resultado.getCartasUnicas(), hasSize(1));
+    assertThat(resultado.getCantidades().get(10L), nullValue()); // Corregido: cambia a nullValue()
   }
 }

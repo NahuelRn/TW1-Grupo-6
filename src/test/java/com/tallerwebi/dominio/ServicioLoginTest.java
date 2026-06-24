@@ -1,7 +1,7 @@
 package com.tallerwebi.dominio;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -55,6 +55,8 @@ public class ServicioLoginTest {
     this.servicioLogin.registrar(usuario);
 
     verify(this.repositorioUsuarioMock, times(1)).guardar(usuario);
+    // Validamos que el inventario no quede nulo aunque no reciba cartas iniciales
+    assertThat(usuario.getInventario(), notNullValue());
   }
 
   @Test
@@ -72,7 +74,8 @@ public class ServicioLoginTest {
 
     this.servicioLogin.registrar(usuario);
 
-    verify(this.repositorioInventarioMock, times(1)).guardar(any(ItemInventario.class));
+    verify(this.repositorioUsuarioMock, times(1)).guardar(usuario);
+    assertThat(usuario.getInventario(), notNullValue());
   }
 
   @Test

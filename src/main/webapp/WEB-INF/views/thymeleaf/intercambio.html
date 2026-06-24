@@ -54,7 +54,6 @@
             background-color: rgba(212, 175, 55, 0.15) !important;
             box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
         }
-        /* Estilos específicos para las Tabs Medievales */
         .nav-tabs .nav-link {
             color: var(--game-muted, #a09090);
             font-family: 'Cinzel', serif;
@@ -73,25 +72,20 @@
             color: #f0ead6;
             border-bottom: 3px solid rgba(212, 175, 55, 0.4);
         }
-        .form-select, .form-control {
-            background-color: #0b0707 !important;
-            border: 1px solid var(--game-border, #4a1212) !important;
-            color: #f0ead6 !important;
-        }
-        .form-select:focus {
-            border-color: #d4af37 !important;
-            box-shadow: 0 0 8px rgba(212, 175, 55, 0.3) !important;
-        }
     </style>
 </head>
 <body>
 <div class="container d-flex flex-column align-items-center py-5" style="min-height: 90vh;">
 
     <h1 class="titulo-mercado display-4 text-center">Mercado de Intercambio</h1>
-    <p class="mb-5 text-center" style="color: var(--game-muted, #a09090); font-size: 1.1rem;">Intercambia tus cartas repetidas con la comunidad de MythicStack.</p>
+    <p class="mb-4 text-center" style="color: var(--game-muted, #a09090); font-size: 1.1rem;">Intercambia tus cartas duplicadas.</p>
+
+    <div class="mb-4 text-center">
+        <a th:href="@{/mercado/mis-trades}" class="btn btn-outline-warning btn-sm">Ver Historial de Mis Trades</a>
+    </div>
 
     <div th:if="${error != null}" class="alert alert-danger bg-dark border-danger text-danger w-100 text-center mb-4" style="max-width: 600px;">
-        ⚠️ <span th:text="${error}">Error</span>
+        Error: <span th:text="${error}">Error</span>
     </div>
 
     <ul class="nav nav-tabs justify-content-center mb-5 w-100 border-bottom border-secondary" id="mercadoTabs" role="tablist" style="--bs-border-opacity: 0.2;">
@@ -102,7 +96,7 @@
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="publicar-tab" data-bs-toggle="tab" data-bs-target="#tab-publicar" type="button" role="tab">
-                Publicar mi Trade
+                Publicar mi Trade (Solicitar Carta Faltante)
             </button>
         </li>
     </ul>
@@ -113,17 +107,25 @@
             <div class="row w-100 justify-content-center m-0">
                 <div th:each="oferta : ${ofertas}" class="col-md-4 mb-4">
                     <div class="card card-trade p-4 text-center">
-                        <h3 class="titulo-mercado" style="font-size: 1.5rem;" th:text="${oferta.cartaOfrecida.nombre}">Carta</h3>
-                        <div class="mb-3">
-                            <span class="badge" style="background-color: #4a1212; color: #d4af37;" th:text="${oferta.cartaOfrecida.rareza}">RAREZA</span>
+                        <img th:if="${oferta.cartaBuscada.imagen != null and not #strings.isEmpty(oferta.cartaBuscada.imagen)}"
+                             th:src="@{/img/{img}(img=${oferta.cartaBuscada.imagen})}"
+                             class="img-fluid mx-auto mb-3" style="max-height: 150px; object-fit: contain;" alt="Carta Buscada"/>
+                        <div th:unless="${oferta.cartaBuscada.imagen != null and not #strings.isEmpty(oferta.cartaBuscada.imagen)}"
+                             class="mb-3 d-flex align-items-center justify-content-center" style="height: 150px; background-color: #222; color: #777; border-radius: 6px;">
+                            <small>Arte no disponible</small>
                         </div>
-                        <p class="small text-muted">Ofrecido por: <span th:text="${oferta.usuarioEmisor.email}">Usuario</span></p>
-                        <hr style="border-color: var(--game-border, #4a1212);">
-                        <p>Busca a cambio: <strong th:text="${oferta.rarezaBuscada}">Cualquier Rareza</strong></p>
 
-                        <form th:action="@{/mercado/aceptar}" method="POST">
-                            <input type="hidden" name="idOferta" th:value="${oferta.id}">
-                            <button type="submit" class="btn btn-trade w-100 py-2">ACEPTAR TRADE</button>
+                        <p class="small text-muted mb-1">El jugador <strong th:text="${oferta.usuarioEmisor.email}">Usuario</strong> solicita:</p>
+                        <h3 class="titulo-mercado" style="font-size: 1.5rem;" th:text="${oferta.cartaBuscada.nombre}">Carta</h3>
+                        <div class="mb-3">
+                            <span class="badge" style="background-color: #4a1212; color: #d4af37;" th:text="${oferta.cartaBuscada.rareza}">RAREZA</span>
+                        </div>
+                        <hr style="border-color: var(--game-border, #4a1212);">
+                        <p class="small text-white-50">Tienes esta carta repetida. Haz clic abajo para elegir tu recompensa de su inventario.</p>
+
+                        <form th:action="@{/mercado/aceptar-paso-1}" method="POST">
+                            <input type="hidden" name="idPropuesta" th:value="${oferta.id}">
+                            <button type="submit" class="btn btn-trade w-100 py-2">ACEPTAR Y ELEGIR PAGO</button>
                         </form>
                     </div>
                 </div>
@@ -131,7 +133,7 @@
                 <div th:if="${#lists.isEmpty(ofertas)}" class="col-12 text-center my-2">
                     <div class="p-4 rounded" style="background-color: rgba(26, 17, 17, 0.6); border: 1px dashed var(--game-border, #4a1212); max-width: 600px; margin: 0 auto;">
                         <p class="lead mb-0" style="color: var(--game-muted, #a09090); font-style: italic;">
-                            No hay propuestas de intercambio disponibles de otros jugadores en este momento. Se el primero en publicar una!
+                            No hay propuestas del mercado compatibles con tus cartas duplicadas actualmente.
                         </p>
                     </div>
                 </div>
@@ -139,39 +141,41 @@
         </div>
 
         <div class="tab-pane fade" id="tab-publicar" role="tabpanel">
-            <div class="card card-trade p-5 mx-auto text-start" style="max-width: 550px;">
-                <h3 class="titulo-mercado text-center h4 mb-4" style="color: #d4af37;">Crear Nueva Oferta</h3>
-
-                <form th:action="@{/mercado/publicar}" method="POST">
-
-                    <div class="mb-4">
-                        <label for="idCarta" class="form-label" style="color: #f0ead6; font-weight: 500;">1. Elige una de tus cartas repetidas:</label>
-                        <select id="idCarta" name="idCarta" class="form-select py-2" required>
-                            <option value="" disabled selected hidden>Selecciona una carta...</option>
-                            <div th:each="item : ${misRepetidas}">
-                                <option th:value="${item.carta.id}" th:text="${item.carta.nombre + ' (' + item.carta.rareza + ') - Repetidas: ' + (item.cantidad - 1)}"></option>
-                            </div>
-                        </select>
-                        <div th:if="${#lists.isEmpty(misRepetidas)}" class="form-text text-danger mt-1">
-                            No tienes cartas repetidas en tu inventario actualmente para poder ofrecer.
+            <h3 class="text-center h4 mb-4" style="color: #d4af37; font-family: 'Cinzel', serif;">Cartas que te faltan... (Elige una para pedirla)</h3>
+            <div class="row w-100 justify-content-center m-0">
+                <div th:each="carta : ${cartasFaltantes}" class="col-md-3 mb-4">
+                    <div class="card card-trade p-3 text-center h-100 d-flex flex-column">
+                        <img th:if="${carta.imagen != null and not #strings.isEmpty(carta.imagen)}"
+                             th:src="@{/img/{img}(img=${carta.imagen})}"
+                             class="img-fluid mx-auto mb-2" style="max-height: 140px; object-fit: contain;" alt="Faltante"/>
+                        <div th:unless="${carta.imagen != null and not #strings.isEmpty(carta.imagen)}"
+                             class="mb-2 d-flex align-items-center justify-content-center" style="height: 140px; background-color: #222; color: #777;">
+                            <small>Arte no disponible</small>
                         </div>
-                    </div>
 
-                    <div class="mb-5">
-                        <label for="rarezaBuscada" class="form-label" style="color: #f0ead6; font-weight: 500;">2. Que pides a cambio de este trade?</label>
-                        <select id="rarezaBuscada" name="rarezaBuscada" class="form-select py-2" required>
-                            <option value="CUALQUIERA">Cualquier Rareza (Le sirve todo)</option>
-                            <option value="COMUN">Una carta Comun</option>
-                            <option value="RARA">Una carta Rara</option>
-                            <option value="EPICA">Una carta Epica</option>
-                            <option value="LEGENDARIA">Una carta Legendaria</option>
-                        </select>
-                    </div>
+                        <h5 th:text="${carta.nombre}" style="font-family: 'Cinzel', serif;">Nombre</h5>
+                        <div class="mb-2">
+                            <span class="badge bg-dark text-info" th:text="${carta.rareza}">RAREZA</span>
+                        </div>
+                        <p class="small text-muted flex-grow-1" th:text="${carta.descripcion}"></p>
 
-                    <button type="submit" class="btn btn-trade w-100 py-3 text-uppercase" th:disabled="${#lists.isEmpty(misRepetidas)}">
-                        Publicar Propuesta
-                    </button>
-                </form>
+                        <div th:if="${misTrades != null and #lists.contains(misTrades.?[estado != null and estado.toString() == 'ACTIVA'].![cartaBuscada.id], carta.id)}">
+                            <button type="button" class="btn btn-secondary w-100 py-2 btn-sm text-uppercase" disabled style="background-color: #332222; border-color: #443333; color: #a09090;">
+                                Ya solicitada
+                            </button>
+                        </div>
+
+                        <form th:unless="${misTrades != null and #lists.contains(misTrades.?[estado != null and estado.toString() == 'ACTIVA'].![cartaBuscada.id], carta.id)}"
+                              th:action="@{/mercado/publicar}" method="POST" class="mt-auto">
+                            <input type="hidden" name="idCartaBuscada" th:value="${carta.id}">
+                            <button type="submit" class="btn btn-trade w-100 py-2 btn-sm text-uppercase">Pedir esta carta</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div th:if="${#lists.isEmpty(cartasFaltantes)}" class="col-12 text-center my-2">
+                    <p class="text-success lead">Ya posees todas las cartas existentes de MythicStack.</p>
+                </div>
             </div>
         </div>
 
@@ -187,5 +191,22 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
         crossorigin="anonymous"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Leemos los parámetros de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const tabParam = urlParams.get('tab');
+
+        if (tabParam === 'publicar') {
+            // Buscamos el botón de la pestaña "Publicar mi Trade"
+            const publicarTab = document.getElementById('publicar-tab');
+            if (publicarTab) {
+                // Usamos el cargador nativo de Bootstrap para activar la pestaña
+                const tab = new bootstrap.Tab(publicarTab);
+                tab.show();
+            }
+        }
+    });
+</script>
 </body>
 </html>
