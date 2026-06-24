@@ -67,13 +67,12 @@ public class ServicioLoginTest {
     carta.setId(1L);
 
     when(this.repositorioUsuarioMock.buscarUsuario(usuario.getEmail(), usuario.getPassword()))
-            .thenReturn(null);
-
-    when(this.repositorioCartaMock.buscarPorNombre(anyString())).thenReturn(carta);
+      .thenReturn(null);
+    when(this.repositorioCartaMock.listarTodas()).thenReturn(List.of(carta));
 
     this.servicioLogin.registrar(usuario);
 
-    verify(this.repositorioInventarioMock, times(15)).guardar(any(ItemInventario.class));
+    verify(this.repositorioInventarioMock, times(1)).guardar(any(ItemInventario.class));
   }
 
   @Test

@@ -33,6 +33,7 @@ public class ServicioCombateTest {
 
     assertEquals(35, partida.getHpEnemigo());
     assertEquals(95, partida.getHpJugador());
+    // ACÁ ESTABA EL ERROR: Ahora busca el texto con el formato nuevo
     assertTrue(resultado.contains("Daño tuyo: 15"));
   }
 

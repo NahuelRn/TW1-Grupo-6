@@ -24,57 +24,41 @@ public class ServicioCombateImpl implements ServicioCombate {
   public String jugarTurno(Partida partida, Long idCarta) {
     Carta cartaJugada = repositorioCarta.buscarPorId(idCarta);
 
-    int daño = (cartaJugada.getDano() != null) ? cartaJugada.getDano() : 0;
+    int dano = (cartaJugada.getDano() != null) ? cartaJugada.getDano() : 0;
     int defensa = (cartaJugada.getDefensa() != null) ? cartaJugada.getDefensa() : 0;
 
-    partida.setHpEnemigo(partida.getHpEnemigo() - daño);
+    partida.setHpEnemigo(partida.getHpEnemigo() - dano);
 
-    int danoRecibido;
+    int danoRecibido = (partida.getHpEnemigo() > 0) ? Math.max(0, 5 - defensa) : 0;
+
     if (partida.getHpEnemigo() > 0) {
-      int calculo = 5 - defensa;
-      danoRecibido = (calculo < 0) ? 0 : calculo;
       partida.setHpJugador(partida.getHpJugador() - danoRecibido);
-    } else {
-      danoRecibido = 0;
     }
 
-    String logCombate;
+    String detalleStats =
+      " [Estadísticas -> Daño tuyo: " +
+      dano +
+      " | Defensa tuya: " +
+      defensa +
+      " | Daño sufrido: " +
+      danoRecibido +
+      "]";
+
+    // Retornos directos
     if (partida.getHpEnemigo() <= 0) {
       partida.setEnumEstadoPartida(EnumEstadoPartida.GANADOR_JUGADOR);
-      logCombate =
-        "¡EL INFECTADO HA SIDO DESTRUIDO! HAS GANADO. Tu golpe con [" +
-        cartaJugada.getNombre() +
-        "] hizo " +
-        daño;
-    } else if (partida.getHpJugador() <= 0) {
-      partida.setEnumEstadoPartida(EnumEstadoPartida.GANADOR_ENEMIGO);
-      logCombate =
-        "HAS MUERTO. FIN DE LA PARTIDA. Usaste [" +
-        cartaJugada.getNombre() +
-        "], Daño: " +
-        daño +
-        ", Defensa: " +
-        defensa +
-        ", Recibiste: " +
-        danoRecibido +
-        " HP.";
-    } else {
-      logCombate =
-        "Usaste [" +
-        cartaJugada.getNombre() +
-        "]. " +
-        (daño > 0 ? "Hiciste " + daño + " de Daño. " : "") +
-        (defensa > 0 ? "Levantaste " + defensa + " de Escudo. " : "") +
-        "El Infectado te sacó " +
-        danoRecibido +
-        " HP.";
+      return "¡EL INFECTADO HA SIDO DESTRUIDO! HAS GANADO." + detalleStats;
     }
 
-    return logCombate;
-  }
+    if (partida.getHpJugador() <= 0) {
+      partida.setEnumEstadoPartida(EnumEstadoPartida.GANADOR_ENEMIGO);
+      return "HAS MUERTO. FIN DE LA PARTIDA." + detalleStats;
+    }
 
-  @Override
-  public Partida obtenerPartidaPorIdentificador(Long identificadorPartida) {
-    return this.repositorioPartida.buscarPartidaPorIdentificador(identificadorPartida);
+    return "Usaste [" + cartaJugada.getNombre() + "]." + detalleStats;
   }
+  // @Override
+  // public Partida obtenerPartidaPorIdentificador(Long identificadorPartida) {
+  //   return this.repositorioPartida.buscarPartidaPorIdentificador(identificadorPartida);
+  // }
 }

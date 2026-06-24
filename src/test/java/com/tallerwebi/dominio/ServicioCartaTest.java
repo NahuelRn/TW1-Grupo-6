@@ -65,7 +65,6 @@ public class ServicioCartaTest {
     carta1.setId(10L);
     Carta carta2 = new Carta();
     carta2.setId(20L);
-    when(repositorioCarta.listarTodas()).thenReturn(List.of(carta1, carta2));
 
     ItemInventario item1 = new ItemInventario();
     item1.setCarta(carta1);
@@ -76,7 +75,9 @@ public class ServicioCartaTest {
     item2.setCantidad(3);
 
     when(repositorioInventario.listarInventarioDeJugador(jugadorId))
-      .thenReturn(List.of(item1, item2));
+            .thenReturn(List.of(item1, item2));
+
+    when(repositorioCarta.listarCartasFaltantes(List.of(10L))).thenReturn(List.of(carta2));
 
     // Ejecución
     ColeccionDto resultado = servicioCarta.obtenerColeccionAgrupada(jugadorId);
