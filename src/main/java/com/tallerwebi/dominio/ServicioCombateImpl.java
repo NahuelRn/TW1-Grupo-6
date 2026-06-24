@@ -24,24 +24,20 @@ public class ServicioCombateImpl implements ServicioCombate {
   public String jugarTurno(Partida partida, Long idCarta) {
     Carta cartaJugada = repositorioCarta.buscarPorId(idCarta);
 
-    // Stats base
-    int dano = (cartaJugada.getDano() != null) ? cartaJugada.getDano() : 0;
+    int daño = (cartaJugada.getDano() != null) ? cartaJugada.getDano() : 0;
     int defensa = (cartaJugada.getDefensa() != null) ? cartaJugada.getDefensa() : 0;
 
-    // Fase de Ataque
-    partida.setHpEnemigo(partida.getHpEnemigo() - dano);
+    partida.setHpEnemigo(partida.getHpEnemigo() - daño);
 
-    // Fase de Defensa (Cálculo sin re-asignar variables para evitar la DD-anomaly)
     int danoRecibido;
     if (partida.getHpEnemigo() > 0) {
       int calculo = 5 - defensa;
       danoRecibido = (calculo < 0) ? 0 : calculo;
       partida.setHpJugador(partida.getHpJugador() - danoRecibido);
     } else {
-      danoRecibido = 0; // Si murió, no nos puede pegar
+      danoRecibido = 0;
     }
 
-    // Armado del log (Incluimos SIEMPRE dano, defensa y danoRecibido para evitar la DU-anomaly)
     String logCombate;
     if (partida.getHpEnemigo() <= 0) {
       partida.setEnumEstadoPartida(EnumEstadoPartida.GANADOR_JUGADOR);
@@ -49,19 +45,14 @@ public class ServicioCombateImpl implements ServicioCombate {
         "¡EL INFECTADO HA SIDO DESTRUIDO! HAS GANADO. Tu golpe con [" +
         cartaJugada.getNombre() +
         "] hizo " +
-        dano +
-        " de Daño. (Defensa inútil: " +
-        defensa +
-        ", Recibiste: " +
-        danoRecibido +
-        ").";
+        daño;
     } else if (partida.getHpJugador() <= 0) {
       partida.setEnumEstadoPartida(EnumEstadoPartida.GANADOR_ENEMIGO);
       logCombate =
         "HAS MUERTO. FIN DE LA PARTIDA. Usaste [" +
         cartaJugada.getNombre() +
         "], Daño: " +
-        dano +
+        daño +
         ", Defensa: " +
         defensa +
         ", Recibiste: " +
@@ -72,7 +63,7 @@ public class ServicioCombateImpl implements ServicioCombate {
         "Usaste [" +
         cartaJugada.getNombre() +
         "]. " +
-        (dano > 0 ? "Hiciste " + dano + " de Daño. " : "") +
+        (daño > 0 ? "Hiciste " + daño + " de Daño. " : "") +
         (defensa > 0 ? "Levantaste " + defensa + " de Escudo. " : "") +
         "El Infectado te sacó " +
         danoRecibido +

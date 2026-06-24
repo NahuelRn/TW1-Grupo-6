@@ -12,7 +12,10 @@ public class ServicioCombateImpl implements ServicioCombate {
   private RepositorioCarta repositorioCarta;
 
   @Autowired
-  public ServicioCombateImpl(RepositorioPartida repositorioPartida, RepositorioCarta repositorioCarta) {
+  public ServicioCombateImpl(
+    RepositorioPartida repositorioPartida,
+    RepositorioCarta repositorioCarta
+  ) {
     this.repositorioPartida = repositorioPartida;
     this.repositorioCarta = repositorioCarta;
   }
@@ -21,34 +24,53 @@ public class ServicioCombateImpl implements ServicioCombate {
   public String jugarTurno(Partida partida, Long idCarta) {
     Carta cartaJugada = repositorioCarta.buscarPorId(idCarta);
 
-    // Obtenemos los stats de la carta
     int dano = (cartaJugada.getDano() != null) ? cartaJugada.getDano() : 0;
     int defensa = (cartaJugada.getDefensa() != null) ? cartaJugada.getDefensa() : 0;
 
-    // 1. Fase de Ataque del Jugador
     partida.setHpEnemigo(partida.getHpEnemigo() - dano);
 
-    // 2. Fase de Defensa (El bicho nos pega 5 fijos, lo bloqueamos con nuestra carta si es de defensa)
-    int danoRecibido = 0;
-    if (partida.getHpEnemigo() > 0) { // El Infectado solo contraataca si sigue vivo
-      danoRecibido = 5 - defensa;
-      if (danoRecibido < 0) danoRecibido = 0; // Evitamos que nos cure si la defensa es alta
+    int danoRecibido;
+    if (partida.getHpEnemigo() > 0) {
+      int calculo = 5 - defensa;
+      danoRecibido = (calculo < 0) ? 0 : calculo;
       partida.setHpJugador(partida.getHpJugador() - danoRecibido);
+    } else {
+      danoRecibido = 0;
     }
 
-    // 3. Chequeo de victoria/derrota y armado del Log
+    String logCombate;
     if (partida.getHpEnemigo() <= 0) {
       partida.setEnumEstadoPartida(EnumEstadoPartida.GANADOR_JUGADOR);
-      return "¡EL INFECTADO HA SIDO DESTRUIDO! HAS GANADO. Tu golpe con [" + cartaJugada.getNombre() + "] fue letal.";
+      logCombate =
+        "¡EL INFECTADO HA SIDO DESTRUIDO! HAS GANADO. Tu golpe con [" +
+        cartaJugada.getNombre() +
+        "] hizo " +
+        dano;
     } else if (partida.getHpJugador() <= 0) {
       partida.setEnumEstadoPartida(EnumEstadoPartida.GANADOR_ENEMIGO);
-      return "HAS MUERTO. FIN DE LA PARTIDA.";
+      logCombate =
+        "HAS MUERTO. FIN DE LA PARTIDA. Usaste [" +
+        cartaJugada.getNombre() +
+        "], Daño: " +
+        dano +
+        ", Defensa: " +
+        defensa +
+        ", Recibiste: " +
+        danoRecibido +
+        " HP.";
     } else {
-      return "Usaste [" + cartaJugada.getNombre() + "]. " +
-              (dano > 0 ? "Hiciste " + dano + " de Daño. " : "") +
-              (defensa > 0 ? "Levantaste " + defensa + " de Escudo. " : "") +
-              "El Infectado te sacó " + danoRecibido + " HP.";
+      logCombate =
+        "Usaste [" +
+        cartaJugada.getNombre() +
+        "]. " +
+        (dano > 0 ? "Hiciste " + dano + " de Daño. " : "") +
+        (defensa > 0 ? "Levantaste " + defensa + " de Escudo. " : "") +
+        "El Infectado te sacó " +
+        danoRecibido +
+        " HP.";
     }
+
+    return logCombate;
   }
 
   @Override

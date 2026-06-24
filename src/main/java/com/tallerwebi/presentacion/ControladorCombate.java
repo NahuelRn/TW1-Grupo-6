@@ -52,15 +52,12 @@ public class ControladorCombate {
   ) {
     ModelMap modelo = new ModelMap();
 
-    // 1. Reconstruimos el estado actual
     Partida partidaActual = new Partida(hpJugador, hpEnemigo, 1);
 
-    // 2. Le pasamos la pelota al Servicio para que haga las cuentas
     String logCombate = servicioCombate.jugarTurno(partidaActual, idCarta);
 
-    // 3. Devolvemos los datos actualizados a la vista
     cargarManoEnModelo(modelo);
-    modelo.put("partida", partidaActual); // El servicio ya le modificó el HP por referencia
+    modelo.put("partida", partidaActual);
     modelo.put("logCombate", logCombate);
 
     return new ModelAndView("combate", modelo);
