@@ -179,7 +179,6 @@
                 <button type="button" class="btn btn-filter" data-filter="poco-comun">POCO COMUN</button>
                 <button type="button" class="btn btn-filter" data-filter="comun">COMUN</button>
                 <button type="button" class="btn btn-filter" data-filter="raro">RARO</button>
-                <button type="button" class="btn btn-filter" data-filter="epico">EPICO</button>
                 <button type="button" class="btn btn-filter" data-filter="exotico">EXOTICO</button>
                 <button type="button" class="btn btn-filter" data-filter="legendario">LEGENDARIO</button>
             </div>
@@ -263,7 +262,6 @@
             if (texto.includes("poco")) return "poco-comun";
             if (texto.includes("com")) return "comun";
             if (texto.includes("rar")) return "raro";
-            if (texto.includes("ep") || texto.includes("ê") || texto.includes("é")) return "epico";
             if (texto.includes("exot") || texto.includes("exót")) return "exotico";
             if (texto.includes("leg")) return "legendario";
             return "comun";
@@ -274,9 +272,8 @@
             "poco-comun": 1,
             "comun": 2,
             "raro": 3,
-            "epico": 4,
-            "exotico": 5,
-            "legendario": 6
+            "exotico": 4,
+            "legendario": 5
         };
 
         // Forzamos el ordenamiento inicial correcto

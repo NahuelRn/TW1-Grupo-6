@@ -2,7 +2,6 @@ package com.tallerwebi.dominio;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -253,14 +252,22 @@ public class ServicioMercadoImpl implements ServicioMercado {
   }
 
   private int obtenerValorRareza(String rareza) {
-    if (rareza == null) return 1;
-    switch (rareza.toUpperCase(Locale.ROOT)) {
+    if (rareza == null) {
+      return 1;
+    }
+
+    // Normalizamos a mayúsculas usando Locale.ROOT para evitar advertencias de PMD
+    switch (rareza.trim().toUpperCase(java.util.Locale.ROOT)) {
       case "LEGENDARIA":
+        return 5;
+      case "EXOTICA":
         return 4;
-      case "EPICA":
-        return 3;
       case "RARA":
+        return 3;
+      case "POCO COMUN":
         return 2;
+      case "COMUN":
+        return 1;
       default:
         return 1;
     }

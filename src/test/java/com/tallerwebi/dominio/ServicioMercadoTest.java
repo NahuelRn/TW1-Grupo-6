@@ -624,31 +624,135 @@ public class ServicioMercadoTest {
     assertThat(opciones.get(0), is(cartaComun));
   }
 
+  /* TESTS ESPECÍFICOS PARA EL SWITCH DE VALORACIÓN DE Rarezas */
+
   @Test
-  public void obtenerValorRarezaSoportaNulosYLosTrataComoComun() throws Exception {
-    Carta cartaRarezaNula = new Carta();
-    cartaRarezaNula.setId(99L);
-    cartaRarezaNula.setRareza(null); // Provoca caída en la validación por defecto
+  public void laReglaDeRarezaDebePermitirIntercambioSiLasRarezasTienenElMismoValorNumerico()
+    throws Exception {
+    Carta exoticaEmisor = new Carta();
+    exoticaEmisor.setId(101L);
+    exoticaEmisor.setRareza("EXOTICA"); // Valor 4
+
+    Carta exoticaReceptor = new Carta();
+    exoticaReceptor.setId(102L);
+    exoticaReceptor.setRareza("exotica"); // Caso lowerCase para probar trim/toUpperCase (Valor 4)
 
     PropuestaIntercambio propuesta = new PropuestaIntercambio();
     propuesta.setEstado("ACTIVA");
     propuesta.setUsuarioEmisor(emisor);
-    propuesta.setCartaBuscada(cartaComun); // Común tiene valor 1
+    propuesta.setCartaBuscada(exoticaReceptor);
 
     when(repoMercadoMock.buscarPorId(1L)).thenReturn(propuesta);
-    when(repoCartaMock.buscarPorId(99L)).thenReturn(cartaRarezaNula);
+    when(repoCartaMock.buscarPorId(101L)).thenReturn(exoticaEmisor);
 
     ItemInventario itemR = new ItemInventario();
-    itemR.setCarta(cartaComun);
+    itemR.setCarta(exoticaReceptor);
     itemR.setCantidad(2);
     receptor.getInventario().add(itemR);
 
     ItemInventario itemE = new ItemInventario();
-    itemE.setCarta(cartaRarezaNula);
+    itemE.setCarta(exoticaEmisor);
     itemE.setCantidad(2);
     emisor.getInventario().add(itemE);
 
-    servicio.finalizarIntercambio(20L, 1L, 99L);
+    servicio.finalizarIntercambio(20L, 1L, 101L);
     assertThat(propuesta.getEstado(), is("FINALIZADA"));
+  }
+
+  @Test
+  public void laReglaDeRarezaDebeImpedirIntercambiarUnaCartaPocoComunPorUnaRara() {
+    Carta pocoComunReceptor = new Carta();
+    pocoComunReceptor.setId(103L);
+    pocoComunReceptor.setRareza("POCO COMUN"); // Valor 2
+
+    Carta raraEmisor = new Carta();
+    raraEmisor.setId(104L);
+    raraEmisor.setRareza("RARA"); // Valor 3 -> Superior, debe fallar
+
+    PropuestaIntercambio propuesta = new PropuestaIntercambio();
+    propuesta.setEstado("ACTIVA");
+    propuesta.setUsuarioEmisor(emisor);
+    propuesta.setCartaBuscada(pocoComunReceptor);
+
+    when(repoMercadoMock.buscarPorId(1L)).thenReturn(propuesta);
+    when(repoCartaMock.buscarPorId(104L)).thenReturn(raraEmisor);
+
+    ItemInventario itemR = new ItemInventario();
+    itemR.setCarta(pocoComunReceptor);
+    itemR.setCantidad(2);
+    receptor.getInventario().add(itemR);
+
+    ItemInventario itemE = new ItemInventario();
+    itemE.setCarta(raraEmisor);
+    itemE.setCantidad(2);
+    emisor.getInventario().add(itemE);
+
+    Exception ex = assertThrows(
+      Exception.class,
+      () -> servicio.finalizarIntercambio(20L, 1L, 104L)
+    );
+    assertThat(ex.getMessage(), containsString("no permite una recompensa de rareza superior"));
+  }
+
+  @Test
+  public void elSwitchDeRarezaDebeTratarRarezasDesconocidasComoValorUnoEImpedirElTrade() {
+    Carta rarezaInvalidaBuscada = new Carta();
+    rarezaInvalidaBuscada.setId(99L);
+    rarezaInvalidaBuscada.setRareza("RAREZA_MUTANTE_X"); // Cae en default -> Valor 1 (Común)
+
+    PropuestaIntercambio propuesta = new PropuestaIntercambio();
+    propuesta.setEstado("ACTIVA");
+    propuesta.setUsuarioEmisor(emisor);
+    propuesta.setCartaBuscada(rarezaInvalidaBuscada); // Buscada = 1
+
+    when(repoMercadoMock.buscarPorId(1L)).thenReturn(propuesta);
+    when(repoCartaMock.buscarPorId(2L)).thenReturn(cartaRara); // Ofrecida = RARA (Valor 3)
+
+    // El receptor tiene la carta mutante (que vale 1)
+    ItemInventario itemR = new ItemInventario();
+    itemR.setCarta(rarezaInvalidaBuscada);
+    itemR.setCantidad(2);
+    receptor.getInventario().add(itemR);
+
+    // El emisor intenta ofrecer una RARA (3) a cambio de una que vale 1
+    ItemInventario itemE = new ItemInventario();
+    itemE.setCarta(cartaRara);
+    itemE.setCantidad(2);
+    emisor.getInventario().add(itemE);
+
+    // Ofrecida (3) > Buscada (1) -> ¡Recompensa de rareza superior! Explota.
+    Exception ex = assertThrows(Exception.class, () -> servicio.finalizarIntercambio(20L, 1L, 2L));
+    assertThat(ex.getMessage(), containsString("no permite una recompensa de rareza superior"));
+  }
+
+  @Test
+  public void elSwitchDeRarezaDebeRetornarUnoSiLaRarezaEsNulaProvocandoFalloDeTrade() {
+    Carta rarezaNulaBuscada = new Carta();
+    rarezaNulaBuscada.setId(100L);
+    rarezaNulaBuscada.setRareza(null); // Caso null -> Valor 1 (Común)
+
+    PropuestaIntercambio propuesta = new PropuestaIntercambio();
+    propuesta.setEstado("ACTIVA");
+    propuesta.setUsuarioEmisor(emisor);
+    propuesta.setCartaBuscada(rarezaNulaBuscada); // Buscada = 1
+
+    when(repoMercadoMock.buscarPorId(1L)).thenReturn(propuesta);
+    when(repoCartaMock.buscarPorId(2L)).thenReturn(cartaRara); // Ofrecida = RARA (Valor 3)
+
+    // El receptor tiene la carta nula (que vale 1)
+    ItemInventario itemR = new ItemInventario();
+    itemR.setCarta(rarezaNulaBuscada);
+    itemR.setCantidad(2);
+    receptor.getInventario().add(itemR);
+
+    // El emisor intenta ofrecer una RARA (3) a cambio de una que vale 1
+    ItemInventario itemE = new ItemInventario();
+    itemE.setCarta(cartaRara);
+    itemE.setCantidad(2);
+    emisor.getInventario().add(itemE);
+
+    // Ofrecida (3) > Buscada (1) -> ¡Recompensa de rareza superior! Explota.
+    Exception ex = assertThrows(Exception.class, () -> servicio.finalizarIntercambio(20L, 1L, 2L));
+    assertThat(ex.getMessage(), containsString("no permite una recompensa de rareza superior"));
   }
 }

@@ -17,7 +17,7 @@ public class PropuestaIntercambio {
   private Carta cartaBuscada; // La carta específica que desea obtener
 
   @ManyToOne(fetch = FetchType.LAZY)
-  private Carta cartaOfrecida; // La carta que el receptor le elegirá como pago (se define en Paso 3)
+  private Carta cartaOfrecida; // La carta que el receptor le elegirá como pago
 
   private String estado = "ACTIVA"; // "ACTIVA" o "FINALIZADA"
   private LocalDateTime fechaCreacion = LocalDateTime.now();
