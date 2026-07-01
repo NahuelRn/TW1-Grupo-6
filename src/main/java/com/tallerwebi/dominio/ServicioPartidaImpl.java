@@ -44,12 +44,17 @@ public class ServicioPartidaImpl implements ServicioPartida {
       mazoCompleto.addAll(usuario.getMazoActivo().getCartas());
     }
 
+    // ÚNICO shuffle de todo el flujo: acá se decide la mano y el mazo de robo.
     Collections.shuffle(mazoCompleto);
 
     int cartasARobar = Math.min(cartasIniciales, mazoCompleto.size());
     List<Carta> manoInicial = new ArrayList<>(mazoCompleto.subList(0, cartasARobar));
+    List<Carta> mazoRestante = new ArrayList<>(
+      mazoCompleto.subList(cartasARobar, mazoCompleto.size())
+    );
 
     nuevaPartida.setManoJugador(manoInicial);
+    nuevaPartida.setMazoRestante(mazoRestante);
 
     repositorioPartida.guardar(nuevaPartida);
 

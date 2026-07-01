@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.*;
 
+@SuppressWarnings("PMD.TooManyFields")
 @Entity
 public class Partida {
 
@@ -28,6 +29,9 @@ public class Partida {
 
   @Transient
   private List<Carta> manoJugador = new ArrayList<>();
+
+  @Transient
+  private List<Carta> mazoRestante = new ArrayList<>();
 
   @Transient
   private List<Integer> cartasEnManoJugador = new ArrayList<>();
@@ -112,6 +116,21 @@ public class Partida {
 
   public Partida setManoJugador(List<Carta> manoJugador) {
     this.manoJugador = manoJugador;
+    return this;
+  }
+
+  /**
+   * Cartas del mazo activo que quedaron disponibles para robar
+   * luego de armar la mano inicial. Calculado una única vez
+   * por ServicioPartida.iniciarPartida(), para evitar que otras
+   * capas (como el controlador) vuelvan a mezclar el mazo por su cuenta.
+   */
+  public List<Carta> getMazoRestante() {
+    return mazoRestante;
+  }
+
+  public Partida setMazoRestante(List<Carta> mazoRestante) {
+    this.mazoRestante = mazoRestante;
     return this;
   }
 

@@ -62,7 +62,6 @@ public class ControladorCombate {
 
     Long idPartidaActiva = (Long) session.getAttribute(SESSION_ID_PARTIDA);
 
-    // El método principal ahora es un semáforo limpio
     if (idPartidaActiva != null) {
       return retomarCombate(idPartidaActiva, usuarioReal, zona, session);
     } else {
@@ -71,7 +70,7 @@ public class ControladorCombate {
   }
 
   @RequestMapping(path = "/jugar-carta", method = RequestMethod.POST)
-  @SuppressWarnings("PMD.DataflowAnomalyAnalysis") // Este sí lo dejamos porque es un falso positivo de PMD
+  @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
   public ModelAndView jugarCarta(
     @RequestParam Long idCarta,
     @RequestParam Long idPartida,
@@ -115,10 +114,6 @@ public class ControladorCombate {
 
     return armarVistaCombate(partida, manoActual, idsMazoRobo, zona, logCombate);
   }
-
-  // =========================================================================
-  // MÉTODOS PRIVADOS PARA REDUCIR COMPLEJIDAD CICLOMÁTICA
-  // =========================================================================
 
   private ModelAndView retomarCombate(
     Long idPartidaActiva,

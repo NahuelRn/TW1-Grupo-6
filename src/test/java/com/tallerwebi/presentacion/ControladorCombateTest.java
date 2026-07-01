@@ -20,7 +20,7 @@ public class ControladorCombateTest {
   private ServicioUsuario servicioUsuarioMock;
   private ControladorCombate controladorCombate;
   private HttpServletRequest requestMock;
-  private HttpSession sessionMock; // <-- Necesitamos mockear la sesión ahora
+  private HttpSession sessionMock;
 
   @BeforeEach
   public void init() {
@@ -31,10 +31,8 @@ public class ControladorCombateTest {
     requestMock = mock(HttpServletRequest.class);
     sessionMock = mock(HttpSession.class);
 
-    // Le decimos al Request falso que devuelva nuestra Sesión falsa
     when(requestMock.getSession()).thenReturn(sessionMock);
 
-    // Inicializamos con los 3 correctos
     controladorCombate =
       new ControladorCombate(servicioCombateMock, servicioPartidaMock, servicioUsuarioMock);
   }
@@ -43,20 +41,17 @@ public class ControladorCombateTest {
   public void queSePuedaIniciarUnCombate() {
     Long idUsuario = 1L;
 
-    // 1. Simulamos que el usuario está logueado en la sesión
     when(sessionMock.getAttribute("USUARIO_ID")).thenReturn(idUsuario);
 
-    // 2. Creamos un Usuario falso con un Mazo falso para pasar la validación del Controlador
     Usuario usuarioSimulado = new Usuario();
     Mazo mazoSimulado = new Mazo();
     List<Carta> cartas = new ArrayList<>();
-    cartas.add(new Carta()); // Tiene que tener al menos 1 carta para no rebotar al lobby
+    cartas.add(new Carta());
     mazoSimulado.setCartas(cartas);
     usuarioSimulado.setMazoActivo(mazoSimulado);
 
     when(servicioUsuarioMock.buscarPorId(idUsuario)).thenReturn(usuarioSimulado);
 
-    // 3. Mockeamos el servicioPartida para que devuelva una Partida simulada
     Partida partidaSimulada = new Partida();
     partidaSimulada.setId(10L);
     when(
@@ -67,12 +62,68 @@ public class ControladorCombateTest {
     )
       .thenReturn(partidaSimulada);
 
-    // 4. Ejecutamos el método
     ModelAndView modelAndView = controladorCombate.iniciarCombate("bosque", requestMock);
 
-    // 5. Verificamos
     assertThat(modelAndView.getViewName(), equalTo("combate"));
     assertThat(modelAndView.getModel().get("partida"), notNullValue());
+  }
+
+  /**
+   * Test específico del fix: el controlador NO debe volver a mezclar el mazo.
+   * Tiene que tomar la mano y el mazo restante tal cual los devuelve el servicio,
+   * y las sesiones guardadas ("idsMano" / "idsMazoRobo") tienen que reflejar
+   * exactamente eso, sin re-armar nada por su cuenta.
+   */
+  @Test
+  public void alCrearNuevoCombateDebeUsarLaManoYElMazoRestanteQueDevuelveElServicioSinVolverAMezclar() {
+    Long idUsuario = 1L;
+    when(sessionMock.getAttribute("USUARIO_ID")).thenReturn(idUsuario);
+
+    Usuario usuarioSimulado = new Usuario();
+    Mazo mazoSimulado = new Mazo();
+    List<Carta> cartasDelMazo = new ArrayList<>();
+    for (long i = 1; i <= 8; i++) {
+      Carta c = new Carta();
+      c.setId(i);
+      cartasDelMazo.add(c);
+    }
+    mazoSimulado.setCartas(cartasDelMazo);
+    usuarioSimulado.setMazoActivo(mazoSimulado);
+    when(servicioUsuarioMock.buscarPorId(idUsuario)).thenReturn(usuarioSimulado);
+
+    // Simulamos el contrato real de ServicioPartida.iniciarPartida(): ya viene
+    // con la mano y el mazo restante calculados.
+    List<Carta> manoQueDevuelveElServicio = new ArrayList<>(cartasDelMazo.subList(0, 5));
+    List<Carta> mazoRestanteQueDevuelveElServicio = new ArrayList<>(cartasDelMazo.subList(5, 8));
+
+    Partida partidaSimulada = new Partida();
+    partidaSimulada.setId(20L);
+    partidaSimulada.setManoJugador(manoQueDevuelveElServicio);
+    partidaSimulada.setMazoRestante(mazoRestanteQueDevuelveElServicio);
+
+    when(
+      servicioPartidaMock.iniciarPartida(
+        org.mockito.ArgumentMatchers.any(Usuario.class),
+        anyString()
+      )
+    )
+      .thenReturn(partidaSimulada);
+
+    ModelAndView mav = controladorCombate.iniciarCombate("bosque", requestMock);
+
+    assertThat(mav.getViewName(), equalTo("combate"));
+
+    @SuppressWarnings("unchecked")
+    List<Carta> manoEnModelo = (List<Carta>) mav.getModel().get("mano");
+    assertThat(manoEnModelo, hasSize(5));
+    assertThat(manoEnModelo, is(manoQueDevuelveElServicio));
+
+    assertThat(mav.getModel().get("cartasEnMazo"), is(3));
+
+    verify(sessionMock, times(1)).setAttribute(eq("idsMano"), anyList());
+    verify(sessionMock, times(1)).setAttribute(eq("idsMazoRobo"), anyList());
+    verify(servicioPartidaMock, times(1))
+      .iniciarPartida(org.mockito.ArgumentMatchers.any(Usuario.class), anyString());
   }
 
   @Test
@@ -82,7 +133,6 @@ public class ControladorCombateTest {
     String zona = "bosque";
     Long idUsuario = 1L;
 
-    // 1. Simulamos usuario logueado con mazo para pasar la validación
     when(sessionMock.getAttribute("USUARIO_ID")).thenReturn(idUsuario);
     Usuario usuarioSimulado = new Usuario();
     Mazo mazoSimulado = new Mazo();
@@ -93,15 +143,13 @@ public class ControladorCombateTest {
     String logEsperado =
       "⚔️ Atacas con [Golpe Básico] causando 15 de daño. El Infectado contraataca y recibes 5 de daño.";
     Partida partidaActualizada = new Partida();
-    partidaActualizada.setHpJugador(85);   // el valor que corresponda después de recibir 5 de daño
-    partidaActualizada.setHpEnemigo(100);  // si el controlador también lee esto en la línea 109 o cerca
+    partidaActualizada.setHpJugador(85);
+    partidaActualizada.setHpEnemigo(100);
 
-    // 2. Simulamos las respuestas de los servicios
     when(servicioCombateMock.jugarTurno(idPartida, idCarta)).thenReturn(logEsperado);
     when(servicioCombateMock.obtenerPartidaPorIdentificador(idPartida))
       .thenReturn(partidaActualizada);
 
-    // 3. Ejecutamos (Acá te faltaba pasarle el requestMock)
     ModelAndView modelAndView = controladorCombate.jugarCarta(
       idCarta,
       idPartida,
@@ -109,7 +157,6 @@ public class ControladorCombateTest {
       requestMock
     );
 
-    // 4. Verificamos
     assertThat(modelAndView.getViewName(), equalTo("combate"));
     String log = (String) modelAndView.getModel().get("logCombate");
     assertThat(log, equalTo(logEsperado));
