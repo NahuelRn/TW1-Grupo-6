@@ -1,11 +1,16 @@
 package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.Carta;
+import com.tallerwebi.dominio.EnumEstadoPartida;
 import com.tallerwebi.dominio.Partida;
 import com.tallerwebi.dominio.ServicioCarta;
 import com.tallerwebi.dominio.ServicioCombate;
+import com.tallerwebi.dominio.Usuario;
+
 import java.util.Collections;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -17,62 +22,88 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class ControladorCombate {
 
-  private ServicioCombate servicioCombate;
-  private ServicioCarta servicioCarta;
+    private ServicioCombate servicioCombate;
+    private ServicioCarta servicioCarta;
 
-  @Autowired
-  public ControladorCombate(ServicioCombate servicioCombate, ServicioCarta servicioCarta) {
-    this.servicioCombate = servicioCombate;
-    this.servicioCarta = servicioCarta;
-  }
+    private static final String PARTIDA_ACTUAL = "PARTIDA_ACTUAL";
 
-  @RequestMapping(path = "/combate", method = RequestMethod.GET)
-  public ModelAndView iniciarCombate(@RequestParam(value = "zona", required = false) String zona) {
-    ModelMap modelo = new ModelMap();
+    private static final String LOG_COMBATE = "logCombate"; // Tuve que crear esto para que el pmd funcione.
 
-    Partida partida = new Partida(100, 50, 1);
+    @Autowired
+    public ControladorCombate(ServicioCombate servicioCombate, ServicioCarta servicioCarta) {
+        this.servicioCombate = servicioCombate;
+        this.servicioCarta = servicioCarta;
+    }
 
-    String nombreZona = (zona != null) ? zona.toUpperCase(java.util.Locale.ROOT) : "DESCONOCIDA";
-    String logCombate =
-      "¡Entraste a la zona " + nombreZona + " y un INFECTADO te cortó el paso! Es tu turno.";
+    @RequestMapping(path = "/combate", method = RequestMethod.GET)
+    public ModelAndView iniciarCombate(@RequestParam(value = "zona", required = false) String zona, HttpServletRequest request) {
+        ModelMap modelo = new ModelMap();
 
-    cargarManoEnModelo(modelo);
+        Partida partida = (Partida) request.getSession().getAttribute(this.PARTIDA_ACTUAL);
+        if (partida == null) {
+            Usuario usuario = (Usuario) request.getSession().getAttribute("USUARIO"); // L
+            partida = new Partida(100, 50, 1);
+            partida.setUsuario(usuario);
+            request.getSession().setAttribute(this.PARTIDA_ACTUAL, partida);
+        }
 
-    modelo.put("partida", partida);
-    modelo.put("logCombate", logCombate);
+        String nombreZona = (zona != null) ? zona.toUpperCase(java.util.Locale.ROOT) : "DESCONOCIDA";
+        String logCombate = "¡Entraste a la zona " + nombreZona + " y un INFECTADO te cortó el paso! Es tu turno.";
 
-    return new ModelAndView("combate", modelo);
-  }
+        cargarManoEnModelo(modelo);
 
-  @RequestMapping(path = "/jugar-carta", method = RequestMethod.POST)
-  public ModelAndView jugarCarta(
-    @RequestParam Long idCarta,
-    @RequestParam Integer hpJugador,
-    @RequestParam Integer hpEnemigo
-  ) {
-    ModelMap modelo = new ModelMap();
+        modelo.put("partida", partida);
+        modelo.put(LOG_COMBATE, logCombate);
 
-    Partida partidaActual = new Partida(hpJugador, hpEnemigo, 1);
+        return new ModelAndView("combate", modelo);
+    }
 
-    String logCombate = servicioCombate.jugarTurno(partidaActual, idCarta);
+    @RequestMapping(path = "/jugar-carta", method = RequestMethod.POST)
+    public ModelAndView jugarCarta(@RequestParam Long idCarta, @RequestParam Integer hpJugador, @RequestParam Integer hpEnemigo, HttpServletRequest request //
+    ) {
+        Partida partidaActual = (Partida) request.getSession().getAttribute(this.PARTIDA_ACTUAL);
 
-    cargarManoEnModelo(modelo);
-    modelo.put("partida", partidaActual);
-    modelo.put("logCombate", logCombate);
+        if (partidaActual == null) {
+            partidaActual = new Partida(100, 50, 1);
+            partidaActual.setHpJugador(hpJugador);
+            partidaActual.setHpEnemigo(hpEnemigo);
+            Usuario usuario = (Usuario) request.getSession().getAttribute("USUARIO"); // L
+            partidaActual.setUsuario(usuario);
+            request.getSession().setAttribute(this.PARTIDA_ACTUAL, partidaActual);
+        }
 
-    return new ModelAndView("combate", modelo);
-  }
+        String logCombate = this.servicioCombate.jugarTurno(partidaActual, idCarta);
+        request.getSession().setAttribute(this.PARTIDA_ACTUAL, partidaActual);
 
-  private void cargarManoEnModelo(ModelMap modelo) {
-    List<Carta> catalogo = servicioCarta.obtenerTodas();
-    Collections.shuffle(catalogo);
+        ModelMap modelo = new ModelMap();
+        if (partidaActual.getEnumEstadoPartida() == EnumEstadoPartida.GANADOR_JUGADOR) {
+            modelo.put(LOG_COMBATE, logCombate);
+            return new ModelAndView("redirect:/recompensas", modelo);
+        }
 
-    List<Carta> mazoSimulado = catalogo.subList(0, Math.min(15, catalogo.size()));
-    List<Carta> mano = mazoSimulado.subList(0, Math.min(5, mazoSimulado.size()));
+        if (partidaActual.getEnumEstadoPartida() == EnumEstadoPartida.GANADOR_ENEMIGO) {
+            modelo.put("partida", partidaActual);
+            modelo.put(LOG_COMBATE, logCombate);
+            return new ModelAndView("game-over", modelo);
+        }
 
-    int cartasEnMazo = mazoSimulado.size() - mano.size();
+        cargarManoEnModelo(modelo);
+        modelo.put("partida", partidaActual);
+        modelo.put(LOG_COMBATE, logCombate);
 
-    modelo.put("mano", mano);
-    modelo.put("cartasEnMazo", cartasEnMazo);
-  }
+        return new ModelAndView("combate", modelo);
+    }
+
+    private void cargarManoEnModelo(ModelMap modelo) {
+        List<Carta> catalogo = servicioCarta.obtenerTodas();
+        Collections.shuffle(catalogo);
+
+        List<Carta> mazoSimulado = catalogo.subList(0, Math.min(15, catalogo.size()));
+        List<Carta> mano = mazoSimulado.subList(0, Math.min(5, mazoSimulado.size()));
+
+        int cartasEnMazo = mazoSimulado.size() - mano.size();
+
+        modelo.put("mano", mano);
+        modelo.put("cartasEnMazo", cartasEnMazo);
+    }
 }

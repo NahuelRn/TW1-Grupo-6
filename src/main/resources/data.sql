@@ -108,3 +108,8 @@ UPDATE Carta SET imagen = 'Muro_de_Piedra.jpg' WHERE nombre = 'Muro de Piedra';
 UPDATE Carta SET imagen = 'Pocion_Curativa.jpg' WHERE nombre = 'Pocion Curativa';
 UPDATE Carta SET imagen = 'Preparacion.png' WHERE nombre = 'Preparacion';
 UPDATE Carta SET imagen = 'Afilado_de_Armas.png' WHERE nombre = 'Afilador de Armas';
+
+-- CONFIGURACION DE RECOMPENSAS
+INSERT INTO ConfiguracionJuego (clave, valor)
+VALUES ('ORO_BASE', 20),
+       ('EXPERIENCIA_BASE', 50);
