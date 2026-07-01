@@ -2,10 +2,8 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.HistorialPartida;
 import com.tallerwebi.dominio.ServicioHistorial;
-
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -16,22 +14,23 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class ControladorHistorialPartida {
 
-    private ServicioHistorial servicioHistorial;
+  private ServicioHistorial servicioHistorial;
 
-    @Autowired
-    public ControladorHistorialPartida(ServicioHistorial servicioHistorial) {
-        this.servicioHistorial = servicioHistorial;
-    }
+  @Autowired
+  public ControladorHistorialPartida(ServicioHistorial servicioHistorial) {
+    this.servicioHistorial = servicioHistorial;
+  }
 
-    @RequestMapping(path = "/historialPartida", method = RequestMethod.GET)
-    public ModelAndView mostrarHistorialPartida(HttpServletRequest request) {
-        Long usuarioId = (Long) request.getSession().getAttribute("USUARIO_ID");
+  @RequestMapping(path = "/historialPartida", method = RequestMethod.GET)
+  public ModelAndView mostrarHistorialPartida(HttpServletRequest request) {
+    Long usuarioId = (Long) request.getSession().getAttribute("USUARIO_ID");
 
-        List<HistorialPartida> historialPartidas = this.servicioHistorial.listarHistorialPorUsuario(usuarioId);
+    List<HistorialPartida> historialPartidas =
+      this.servicioHistorial.listarHistorialPorUsuario(usuarioId);
 
-        ModelMap modelMap = new ModelMap();
-        modelMap.put("historialPartidas", historialPartidas);
+    ModelMap modelMap = new ModelMap();
+    modelMap.put("historialPartidas", historialPartidas);
 
-        return new ModelAndView("historial", modelMap);
-    }
+    return new ModelAndView("historial", modelMap);
+  }
 }

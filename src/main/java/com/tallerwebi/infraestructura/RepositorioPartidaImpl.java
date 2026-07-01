@@ -9,24 +9,27 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class RepositorioPartidaImpl implements RepositorioPartida {
 
-    private SessionFactory sessionFactory;
+  private SessionFactory sessionFactory;
 
-    public RepositorioPartidaImpl(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
-    }
+  public RepositorioPartidaImpl(SessionFactory sessionFactory) {
+    this.sessionFactory = sessionFactory;
+  }
 
-    @Override
-    public Partida buscarPartidaPorIdentificador(Long identificador) {
-        return (Partida) this.sessionFactory.getCurrentSession().createCriteria(Partida.class).add(Restrictions.eq("id", identificador)).uniqueResult();
-    }
+  @Override
+  public Partida buscarPartidaPorIdentificador(Long identificador) {
+    return (Partida) this.sessionFactory.getCurrentSession()
+      .createCriteria(Partida.class)
+      .add(Restrictions.eq("id", identificador))
+      .uniqueResult();
+  }
 
-    @Override
-    public void guardar(Partida partida) { // L
-        this.sessionFactory.getCurrentSession().save(partida);
-    }
+  @Override
+  public void guardar(Partida partida) { // L
+    this.sessionFactory.getCurrentSession().save(partida);
+  }
 
-    @Override
-    public void modificar(Partida partida) {
-        this.sessionFactory.getCurrentSession().update(partida);
-    }
+  @Override
+  public void modificar(Partida partida) {
+    this.sessionFactory.getCurrentSession().update(partida);
+  }
 }
