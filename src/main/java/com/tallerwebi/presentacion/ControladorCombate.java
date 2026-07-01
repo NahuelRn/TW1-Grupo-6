@@ -2,10 +2,16 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.Carta;
 import com.tallerwebi.dominio.Partida;
-import com.tallerwebi.dominio.ServicioCarta;
 import com.tallerwebi.dominio.ServicioCombate;
+import com.tallerwebi.dominio.ServicioPartida;
+import com.tallerwebi.dominio.ServicioUsuario;
+import com.tallerwebi.dominio.Usuario;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -17,62 +23,173 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class ControladorCombate {
 
-  private ServicioCombate servicioCombate;
-  private ServicioCarta servicioCarta;
+  private final ServicioCombate servicioCombate;
+  private final ServicioPartida servicioPartida;
+  private final ServicioUsuario servicioUsuario;
+
+  private static final String SESSION_IDS_MANO = "idsMano";
+  private static final String SESSION_MAZO_ROBO = "idsMazoRobo";
+  private static final String SESSION_ID_PARTIDA = "idPartidaActiva";
+  private static final String SESSION_USUARIO_ID = "USUARIO_ID";
 
   @Autowired
-  public ControladorCombate(ServicioCombate servicioCombate, ServicioCarta servicioCarta) {
+  public ControladorCombate(
+    ServicioCombate servicioCombate,
+    ServicioPartida servicioPartida,
+    ServicioUsuario servicioUsuario
+  ) {
     this.servicioCombate = servicioCombate;
-    this.servicioCarta = servicioCarta;
+    this.servicioPartida = servicioPartida;
+    this.servicioUsuario = servicioUsuario;
   }
 
   @RequestMapping(path = "/combate", method = RequestMethod.GET)
-  public ModelAndView iniciarCombate(@RequestParam(value = "zona", required = false) String zona) {
-    ModelMap modelo = new ModelMap();
+  public ModelAndView iniciarCombate(
+    @RequestParam(value = "zona", required = false, defaultValue = "bosque") String zona,
+    HttpServletRequest request
+  ) {
+    HttpSession session = request.getSession();
+    Long idUsuario = (Long) session.getAttribute(SESSION_USUARIO_ID);
 
-    Partida partida = new Partida(100, 50, 1);
+    if (idUsuario == null) {
+      return new ModelAndView("redirect:/login");
+    }
 
-    String nombreZona = (zona != null) ? zona.toUpperCase(java.util.Locale.ROOT) : "DESCONOCIDA";
-    String logCombate =
-      "¡Entraste a la zona " + nombreZona + " y un INFECTADO te cortó el paso! Es tu turno.";
+    Usuario usuarioReal = servicioUsuario.buscarPorId(idUsuario);
+    if (usuarioReal.getMazoActivo() == null || usuarioReal.getMazoActivo().getCartas().isEmpty()) {
+      return new ModelAndView("lobby", new ModelMap("error", "Debes equipar un Mazo Activo."));
+    }
 
-    cargarManoEnModelo(modelo);
+    Long idPartidaActiva = (Long) session.getAttribute(SESSION_ID_PARTIDA);
 
-    modelo.put("partida", partida);
-    modelo.put("logCombate", logCombate);
-
-    return new ModelAndView("combate", modelo);
+    if (idPartidaActiva != null) {
+      return retomarCombate(idPartidaActiva, usuarioReal, zona, session);
+    } else {
+      return crearNuevoCombate(usuarioReal, zona, session);
+    }
   }
 
   @RequestMapping(path = "/jugar-carta", method = RequestMethod.POST)
+  @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
   public ModelAndView jugarCarta(
     @RequestParam Long idCarta,
-    @RequestParam Integer hpJugador,
-    @RequestParam Integer hpEnemigo
+    @RequestParam Long idPartida,
+    @RequestParam String zona,
+    HttpServletRequest request
   ) {
-    ModelMap modelo = new ModelMap();
+    HttpSession session = request.getSession();
+    Long idUsuario = (Long) session.getAttribute(SESSION_USUARIO_ID);
 
-    Partida partidaActual = new Partida(hpJugador, hpEnemigo, 1);
+    String logCombate = servicioCombate.jugarTurno(idPartida, idCarta);
+    Partida partida = servicioCombate.obtenerPartidaPorIdentificador(idPartida);
+    Usuario usuarioReal = servicioUsuario.buscarPorId(idUsuario);
 
-    String logCombate = servicioCombate.jugarTurno(partidaActual, idCarta);
+    List<Long> idsMano = (List<Long>) session.getAttribute(SESSION_IDS_MANO);
+    List<Long> idsMazoRobo = (List<Long>) session.getAttribute(SESSION_MAZO_ROBO);
+    List<Carta> manoActual;
 
-    cargarManoEnModelo(modelo);
-    modelo.put("partida", partidaActual);
-    modelo.put("logCombate", logCombate);
+    if (idsMano != null) {
+      servicioPartida.gestionarRoboDeCarta(idCarta, idsMano, idsMazoRobo);
 
-    return new ModelAndView("combate", modelo);
+      session.setAttribute(SESSION_IDS_MANO, idsMano);
+      session.setAttribute(SESSION_MAZO_ROBO, idsMazoRobo);
+
+      manoActual =
+        usuarioReal
+          .getMazoActivo()
+          .getCartas()
+          .stream()
+          .filter(c -> idsMano.contains(c.getId()))
+          .collect(Collectors.toList());
+      partida.setManoJugador(manoActual);
+    } else {
+      manoActual = new ArrayList<>();
+    }
+
+    if (partida.getHpJugador() <= 0 || partida.getHpEnemigo() <= 0) {
+      session.removeAttribute(SESSION_ID_PARTIDA);
+      session.removeAttribute(SESSION_IDS_MANO);
+      session.removeAttribute(SESSION_MAZO_ROBO);
+    }
+
+    return armarVistaCombate(partida, manoActual, idsMazoRobo, zona, logCombate);
   }
 
-  private void cargarManoEnModelo(ModelMap modelo) {
-    List<Carta> catalogo = servicioCarta.obtenerTodas();
-    Collections.shuffle(catalogo);
+  private ModelAndView retomarCombate(
+    Long idPartidaActiva,
+    Usuario usuarioReal,
+    String zona,
+    HttpSession session
+  ) {
+    Partida partida = servicioCombate.obtenerPartidaPorIdentificador(idPartidaActiva);
+    List<Long> idsMano = (List<Long>) session.getAttribute(SESSION_IDS_MANO);
+    List<Long> idsMazoRobo = (List<Long>) session.getAttribute(SESSION_MAZO_ROBO);
 
-    List<Carta> mazoSimulado = catalogo.subList(0, Math.min(15, catalogo.size()));
-    List<Carta> mano = mazoSimulado.subList(0, Math.min(5, mazoSimulado.size()));
+    List<Carta> manoActual = (idsMano != null)
+      ? usuarioReal
+        .getMazoActivo()
+        .getCartas()
+        .stream()
+        .filter(c -> idsMano.contains(c.getId()))
+        .collect(Collectors.toList())
+      : new ArrayList<>();
 
-    int cartasEnMazo = mazoSimulado.size() - mano.size();
+    partida.setManoJugador(manoActual);
 
-    modelo.put("mano", mano);
-    modelo.put("cartasEnMazo", cartasEnMazo);
+    return armarVistaCombate(partida, manoActual, idsMazoRobo, zona, "Retomas el combate.");
+  }
+
+  private ModelAndView crearNuevoCombate(Usuario usuarioReal, String zona, HttpSession session) {
+    Partida partida = servicioPartida.iniciarPartida(usuarioReal, zona);
+    session.setAttribute(SESSION_ID_PARTIDA, partida.getId());
+
+    List<Long> todosLosIds = usuarioReal
+      .getMazoActivo()
+      .getCartas()
+      .stream()
+      .map(Carta::getId)
+      .collect(Collectors.toList());
+    Collections.shuffle(todosLosIds);
+
+    List<Long> idsMano = new ArrayList<>();
+    List<Long> idsMazoRobo = new ArrayList<>();
+
+    int cartasIniciales = Math.min(5, todosLosIds.size());
+    for (int i = 0; i < cartasIniciales; i++) {
+      idsMano.add(todosLosIds.get(i));
+    }
+    for (int i = cartasIniciales; i < todosLosIds.size(); i++) {
+      idsMazoRobo.add(todosLosIds.get(i));
+    }
+
+    session.setAttribute(SESSION_IDS_MANO, idsMano);
+    session.setAttribute(SESSION_MAZO_ROBO, idsMazoRobo);
+
+    List<Carta> manoActual = usuarioReal
+      .getMazoActivo()
+      .getCartas()
+      .stream()
+      .filter(c -> idsMano.contains(c.getId()))
+      .collect(Collectors.toList());
+    partida.setManoJugador(manoActual);
+
+    return armarVistaCombate(partida, manoActual, idsMazoRobo, zona, "¡Comienza el combate!");
+  }
+
+  private ModelAndView armarVistaCombate(
+    Partida partida,
+    List<Carta> manoActual,
+    List<Long> idsMazoRobo,
+    String zona,
+    String logCombate
+  ) {
+    ModelMap modelo = new ModelMap();
+    modelo.put("mano", manoActual);
+    modelo.put("cartasEnMazo", idsMazoRobo != null ? idsMazoRobo.size() : 0);
+    modelo.put("partida", partida);
+    modelo.put("logCombate", logCombate);
+    modelo.put("configZona", servicioCombate.obtenerConfiguracionZona(zona));
+    modelo.put("zona", zona);
+    return new ModelAndView("combate", modelo);
   }
 }

@@ -11,7 +11,9 @@ import org.junit.jupiter.api.Test;
 
 public class ServicioPartidaTest {
 
+  // Declarás el mock original y el nuevo
   private RepositorioEnemigo repoEnemigoMock;
+  private RepositorioPartida repoPartidaMock; // <-- AGREGAR
   private ServicioPartida servicioPartida;
   private Usuario usuario;
   private Mazo mazoActivo;
@@ -19,7 +21,10 @@ public class ServicioPartidaTest {
   @BeforeEach
   public void setUp() {
     repoEnemigoMock = mock(RepositorioEnemigo.class);
-    servicioPartida = new ServicioPartidaImpl(repoEnemigoMock);
+    repoPartidaMock = mock(RepositorioPartida.class); // <-- INICIALIZAR
+
+    // 2. Pasar los dos parámetros al constructor
+    servicioPartida = new ServicioPartidaImpl(repoEnemigoMock, repoPartidaMock);
 
     usuario = new Usuario();
     mazoActivo = new Mazo();

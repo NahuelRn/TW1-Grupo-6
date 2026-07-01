@@ -69,7 +69,7 @@ public class ServicioLoginTest {
     carta.setId(1L);
 
     when(this.repositorioUsuarioMock.buscarUsuario(usuario.getEmail(), usuario.getPassword()))
-            .thenReturn(null);
+      .thenReturn(null);
 
     when(this.repositorioCartaMock.buscarPorNombre(anyString())).thenReturn(carta);
 

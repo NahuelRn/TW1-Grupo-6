@@ -28,3 +28,6 @@ body {
     color: var(--game-text);
     font-family: 'Roboto', sans-serif; /* Según tipografías recomendadas [7] */
 }
+/* Fondos dinámicos */
+.bosque { background-image: url('/img/Bosque.jpg'); background-size: cover; }
+.cueva { background-image: url('/img/Cueva.jpg'); background-size: cover; }

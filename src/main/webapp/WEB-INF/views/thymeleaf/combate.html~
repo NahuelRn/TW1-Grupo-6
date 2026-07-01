@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MythicStack - Combate</title>
+    <style>
+        /* Ajustes base y bloqueo de scroll */
+        body { background-color: #0c0c0e; font-family: 'Courier New', Courier, monospace; color: #ffffff; margin: 0; padding: 10px 20px; height: 100vh; box-sizing: border-box; overflow: hidden; display: flex; flex-direction: column; align-items: center; /* Centramos todo */ }
+        h2 { margin: 5px 0; font-size: 22px; } /* Esto achica el espacio gigante de arriba */
+
+        /* Arena y Personajes */
+        .arena { display: flex; justify-content: space-around; align-items: center; margin: 10px auto; width: 100%; max-width: 900px; flex-grow: 1; /* NUEVO: Permite que la arena crezca pero no empuje todo */ max-height: 400px; /* NUEVO: Limitamos el alto de la arena para que no aplaste la mano */ }
+        .personaje { background-color: rgba(26, 26, 31, 0.85); border: 2px solid #555; border-radius: 8px; padding: 15px 20px; width: 280px; box-shadow: 0 0 15px rgba(0, 0, 0, 0.8); backdrop-filter: blur(4px); }
+        .jugador { border-color: #4CAF50; }
+        .enemigo { border-color: #e63946; }
+        .hp-bar { font-size: 24px; font-weight: bold; margin: 10px 0 0 0; }
+        .hp-jugador { color: #4CAF50; }
+        .hp-enemigo { color: #e63946; }
+        .retrato-pj { width: 140px; height: 140px; object-fit: cover; border-radius: 50%; border: 3px solid; margin: 0 auto; display: block; box-shadow: 0 0 15px rgba(0,0,0,0.8); }
+        .jugador .retrato-pj { border-color: #4CAF50; }
+        .enemigo .retrato-pj { border-color: #e63946; }
+
+        /* Log de combate */
+        .log-box { background-color: rgba(0, 0, 0, 0.7); border: 1px solid #e5a93b; color: #e5a93b; padding: 8px 15px; margin: 5px auto 10px auto; max-width: 600px; font-size: 15px; border-radius: 4px; }
+
+        /* Contenedor de la Mano */
+        .mano { display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 15px; width: 100%; margin-bottom: 20px; z-index: 10; }
+        .mano form { margin: 0; display: flex; }
+        .muerto { display: none; }
+
+        /* CARTAS (Agrandadas a 230px para que respire el arte y el texto) */
+        .carta-btn {
+            background: #18181b;
+            border: 2px solid #3f3f46;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Courier New', Courier, monospace;
+            transition: all 0.2s ease;
+            width: 180px;  /* Un poquito más anchas */
+            height: 290px; /* Un poquito más altas */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.7);
+            box-sizing: border-box;
+        }
+        .carta-btn:hover { background: #27272a; border-color: #e5a93b; transform: translateY(-10px); }
+
+        /* IMAGEN: Cambiamos 'contain' por 'cover' y quitamos bordes internos */
+        .carta-btn .card-img {
+            width: 100%;
+            height: 170px;
+            object-fit: cover;        /* Vuelve a llenar todo el espacio */
+            object-position: center;  /* Esto centra la imagen para que no pierda los bordes clave */
+            background-color: transparent; /* Por si acaso, quitamos el fondo negro */
+            border-radius: 4px;
+            border: none;
+            margin-bottom: 5px;
+        }
+
+        /* NOMBRE Y STATS: Ajustados al nuevo tamaño */
+        .carta-btn .card-name { font-size: 14px; font-weight: bold; color: #e5a93b; margin: 4px 0; width: 100%; line-height: 1.1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; white-space: normal; }
+        .carta-btn .card-stat { font-size: 13px; font-weight: bold; color: #d4d4d8; margin-bottom: 4px; }
+        .carta-btn .card-stat.util { color: #8a8a93; }
+
+        /* INDICADOR DE MAZO */
+        .deck-panel { position: fixed; bottom: 40px; right: 40px; background-color: #121215; border: 2px solid #e5a93b; border-radius: 8px; padding: 10px 18px; box-shadow: 0 0 15px rgba(229, 169, 59, 0.15); z-index: 100; text-align: center; letter-spacing: 1px; }
+        .deck-panel .deck-label { display: block; color: #a1a1aa; font-size: 10px; font-weight: bold; }
+        .deck-panel .num-cartas { display: block; color: #e5a93b; font-size: 26px; font-weight: 900; margin-top: 2px; }
+    </style>
+</head>
+<body th:with="rutaFondo=@{/img/{archivo}(archivo=${configZona.archivoFondo})}"
+      th:style="|background-image: url('${rutaFondo}'); background-size: cover; background-position: center; background-attachment: fixed;|">
+<h2 style="color: #e5a93b;">>>> ARENA DE COMBATE <<<</h2>
+
+<div class="log-box" th:text="${logCombate}">Preparando combate...</div>
+
+<div class="arena">
+    <div class="personaje jugador">
+        <h3>TU PERSONAJE</h3>
+        <div class="hp-bar hp-jugador">HP: <span th:text="${partida.hpJugador}"></span></div>
+    </div>
+
+    <div class="personaje enemigo">
+        <h3 th:text="${partida.enemigo.nombre}"></h3>
+        <img th:src="@{|/img/${partida.enemigo.imagen}|}" class="retrato-pj" alt="Enemigo">
+        <div class="hp-bar hp-enemigo">HP: <span th:text="${partida.hpEnemigo}"></span></div>
+    </div>
+</div>
+
+<div class="mano" th:classappend="${partida.hpJugador <= 0 or partida.hpEnemigo <= 0} ? 'muerto' : ''">
+
+    <form th:action="@{/jugar-carta}" method="POST" th:each="carta : ${mano}">
+        <input type="hidden" name="idPartida" th:value="${partida.id}">
+        <input type="hidden" name="idCarta" th:value="${carta.id}">
+        <input type="hidden" name="zona" th:value="${zona}">
+
+        <button type="submit" class="carta-btn">
+            <img th:src="@{/img/{img}(img=${carta.imagen})}" class="card-img" alt="Carta"/>
+
+            <span class="card-name">[<span th:text="${carta.nombre}"></span>]</span>
+
+            <span class="card-stat" th:if="${carta.tipo == 'ATAQUE'}" th:text="'Daño: ' + (${carta.dano != null ? carta.dano : 0})"></span>
+            <span class="card-stat" th:if="${carta.tipo == 'DEFENSA'}" th:text="'Defensa: ' + (${carta.defensa != null ? carta.defensa : 0})"></span>
+            <span class="card-stat util" th:if="${carta.tipo == 'HECHIZO'}">Utilidad</span>
+        </button>
+    </form>
+</div>
+
+<div class="deck-panel">
+    <span class="deck-label">CARTAS EN MAZO</span>
+    <span class="num-cartas" th:text="${cartasEnMazo}">10</span>
+</div>
+
+</body>
+<input type="hidden" name="zona" th:value="${zona}">
+</html>

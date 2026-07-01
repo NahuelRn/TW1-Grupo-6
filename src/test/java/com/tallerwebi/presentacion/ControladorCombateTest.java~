@@ -1,86 +1,82 @@
-package com.tallerwebi.dominio;
+package com.tallerwebi.presentacion;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.*;
 
+import com.tallerwebi.dominio.*;
+
+import java.util.ArrayList;
+import javax.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.web.servlet.ModelAndView;
 
-public class ServicioCombateTest {
+public class ControladorCombateTest {
 
-  private RepositorioPartida repositorioPartidaMock;
-  private RepositorioCarta repositorioCartaMock;
-  private ServicioCombateImpl servicioCombate;
+  private ServicioCombate servicioCombateMock;
+  private ServicioPartida servicioPartidaMock; // Ya no necesitamos ServicioCarta acá
+  private ServicioUsuario servicioUsuarioMock; // Este es el nuevo
+  private ControladorCombate controladorCombate;
+  private HttpServletRequest requestMock;
 
   @BeforeEach
   public void init() {
-    this.repositorioPartidaMock = mock(RepositorioPartida.class);
-    this.repositorioCartaMock = mock(RepositorioCarta.class);
-    this.servicioCombate = new ServicioCombateImpl(repositorioPartidaMock, repositorioCartaMock);
+    servicioCombateMock = mock(ServicioCombate.class);
+    servicioPartidaMock = mock(ServicioPartida.class);
+    servicioUsuarioMock = mock(ServicioUsuario.class);
+    requestMock = mock(HttpServletRequest.class);
+
+    // ¡AQUÍ ESTÁ EL ERROR DE COMPILACIÓN! Pasale los 3 correctos:
+    controladorCombate = new ControladorCombate(servicioCombateMock, servicioPartidaMock, servicioUsuarioMock);
+  }
+
+  // Y en el test 'queSePuedaIniciarUnCombate' tenés que usar los mocks nuevos
+  // Cambia el 'any(Usuario.class)' por 'org.mockito.Mockito.any(Usuario.class)'
+  // para evitar el error de "Ambiguous method call" que te salió en la captura.
+}
+
+  @Test
+  public void queSePuedaIniciarUnCombate() {
+    when(servicioCartaMock.obtenerTodas()).thenReturn(new ArrayList<>());
+
+    // Mockeamos el servicioPartida para que devuelva una Partida simulada
+    Partida partidaSimulada = new Partida();
+    when(
+      servicioPartidaMock.iniciarPartida(
+        org.mockito.Mockito.any(Usuario.class),
+        org.mockito.Mockito.anyString()
+      )
+    )
+      .thenReturn(partidaSimulada);
+
+    // Ejecutamos el método
+    ModelAndView modelAndView = controladorCombate.iniciarCombate("bosque", requestMock);
+
+    assertThat(modelAndView.getViewName(), equalTo("combate"));
+    assertThat(modelAndView.getModel().get("partida"), notNullValue());
   }
 
   @Test
-  public void queAlJugarTurnoAtaqueSeResteVidaAlEnemigoYElZombiContraataque() {
-    Partida partida = new Partida(100, 50, 1);
-    Carta carta = new Carta();
-    carta.setNombre("Golpe Básico");
-    carta.setDano(15);
-    carta.setDefensa(0);
+  public void queAlJugarUnaCartaElControladorDelegueAlServicioYDevuelvaLaVista() {
+    Long idCarta = 1L;
+    Long idPartida = 1L; // NUEVO PARÁMETRO
+    String zona = "bosque";
 
-    when(repositorioCartaMock.buscarPorId(1L)).thenReturn(carta);
+    String logEsperado =
+      "⚔️ Atacas con [Golpe Básico] causando 15 de daño. El Infectado contraataca y recibes 5 de daño.";
+    Partida partidaActualizada = new Partida();
 
-    String resultado = servicioCombate.jugarTurno(partida, 1L);
+    // Simulamos las respuestas de los servicios
+    when(servicioCombateMock.jugarTurno(idPartida, idCarta)).thenReturn(logEsperado);
+    when(servicioCombateMock.obtenerPartidaPorIdentificador(idPartida))
+      .thenReturn(partidaActualizada);
 
-    assertEquals(35, partida.getHpEnemigo()); // El Zombi tenía 50, pierde 15 -> queda en 35
-    assertEquals(95, partida.getHpJugador()); // El Jugador tenía 100, el Zombi le saca 5 fijos -> queda 95
-    assertTrue(resultado.contains("Hiciste 15 de Daño"));
-  }
+    // Ajustamos los parámetros al nuevo controlador
+    ModelAndView modelAndView = controladorCombate.jugarCarta(idCarta, idPartida, zona);
 
-  @Test
-  public void queAlMatarAlZombiElEstadoSeaGanadorJugador() {
-    Partida partida = new Partida(100, 10, 1); // Zombi a punto de morir (10 HP)
-    Carta carta = new Carta();
-    carta.setNombre("Golpe Letal");
-    carta.setDano(15);
-    carta.setDefensa(0);
-
-    when(repositorioCartaMock.buscarPorId(1L)).thenReturn(carta);
-
-    String resultado = servicioCombate.jugarTurno(partida, 1L);
-
-    assertEquals(EnumEstadoPartida.GANADOR_JUGADOR, partida.getEnumEstadoPartida());
-    assertTrue(resultado.contains("HA SIDO DESTRUIDO"));
-  }
-
-  @Test
-  public void queAlMorirPorContraataqueElEstadoSeaGanadorEnemigo() {
-    Partida partida = new Partida(4, 50, 1); // Jugador a un golpe de morir (el Zombi saca 5 fijos)
-    Carta carta = new Carta();
-    carta.setNombre("Golpe Flojo");
-    carta.setDano(10); // Golpe que no llega a matar al Zombi
-    carta.setDefensa(0);
-
-    when(repositorioCartaMock.buscarPorId(1L)).thenReturn(carta);
-
-    String resultado = servicioCombate.jugarTurno(partida, 1L);
-
-    assertEquals(EnumEstadoPartida.GANADOR_ENEMIGO, partida.getEnumEstadoPartida());
-    assertTrue(resultado.contains("HAS MUERTO"));
-  }
-
-  @Test
-  public void queAlJugarCartaDefensaNoRecibaDano() {
-    Partida partida = new Partida(100, 50, 1);
-    Carta carta = new Carta();
-    carta.setNombre("Súper Escudo");
-    carta.setDano(0);
-    carta.setDefensa(10); // Defensa alta para bloquear los 5 del Zombi
-
-    when(repositorioCartaMock.buscarPorId(1L)).thenReturn(carta);
-
-    servicioCombate.jugarTurno(partida, 1L);
-
-    assertEquals(50, partida.getHpEnemigo()); // No le pegamos
-    assertEquals(100, partida.getHpJugador()); // Bloqueamos el golpe y no nos bajó vida
+    assertThat(modelAndView.getViewName(), equalTo("combate"));
+    String log = (String) modelAndView.getModel().get("logCombate");
+    assertThat(log, equalTo(logEsperado));
   }
 }
