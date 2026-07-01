@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 public class ServicioPartidaTest {
 
@@ -21,10 +22,11 @@ public class ServicioPartidaTest {
   @BeforeEach
   public void setUp() {
     repoEnemigoMock = mock(RepositorioEnemigo.class);
-    repoPartidaMock = mock(RepositorioPartida.class); // <-- INICIALIZAR
+    repoPartidaMock = mock(RepositorioPartida.class);
 
-    // 2. Pasar los dos parámetros al constructor
     servicioPartida = new ServicioPartidaImpl(repoEnemigoMock, repoPartidaMock);
+
+    ReflectionTestUtils.setField(servicioPartida, "cartasIniciales", 5);
 
     usuario = new Usuario();
     mazoActivo = new Mazo();
@@ -79,19 +81,24 @@ public class ServicioPartidaTest {
   public void alIniciarPartidaSiElMazoTieneMenosDeCincoCartasDebeAsignarTodasLasDisponiblesALaMano() {
     String zona = "Pantano";
     Enemigo enemigoSimulado = new Enemigo();
-    enemigoSimulado.setHpBase(120); // Inicializado para evitar el NullPointerException en el unboxing
-
+    enemigoSimulado.setHpBase(120);
     when(repoEnemigoMock.obtenerEnemigoAleatorioPorZona(zona)).thenReturn(enemigoSimulado);
 
-    // Usamos una ArrayList tradicional para asegurar mutabilidad limpia
+    // 1. Instanciá objetos REALES
+    Usuario usuarioReal = new Usuario();
+    Mazo mazoReal = new Mazo();
     List<Carta> cartasPocas = new ArrayList<>();
     cartasPocas.add(new Carta());
     cartasPocas.add(new Carta());
-    mazoActivo.setCartas(cartasPocas);
 
-    Partida partida = servicioPartida.iniciarPartida(usuario, zona);
+    // 2. Cargá los datos como lo harías en la vida real
+    mazoReal.setCartas(cartasPocas);
+    usuarioReal.setMazoActivo(mazoReal);
 
-    // Verifica que ejecutó el bloque 'else' asignando las cartas directamente
+    // 3. Ejecutá con el usuario real
+    Partida partida = servicioPartida.iniciarPartida(usuarioReal, zona);
+
+    // 4. Assert
     assertThat(partida.getManoJugador(), hasSize(2));
   }
 
