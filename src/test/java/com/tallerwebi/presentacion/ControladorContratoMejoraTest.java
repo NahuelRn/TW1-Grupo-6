@@ -30,15 +30,11 @@ public class ControladorContratoMejoraTest {
     controlador = new ControladorContratoMejora(servicioIntercambioMock);
   }
 
-  // ==========================================
-  // TESTS: GET /contrato-mejora
-  // ==========================================
-
   @Test
   public void siNoHayJugadorEnSesionElGetDebeRedirigirALogin() {
     when(sessionMock.getAttribute("jugadorId")).thenReturn(null);
 
-    ModelAndView mav = controlador.verContratoMejora(sessionMock);
+    ModelAndView mav = controlador.verContratoMejora("all", sessionMock);
 
     assertThat(mav.getViewName(), equalTo("redirect:/login"));
   }
@@ -49,17 +45,14 @@ public class ControladorContratoMejoraTest {
     List<ItemInventario> inventario = List.of(new ItemInventario(), new ItemInventario());
 
     when(sessionMock.getAttribute("jugadorId")).thenReturn(jugadorId);
-    when(servicioIntercambioMock.obtenerInventario(jugadorId)).thenReturn(inventario);
+    when(servicioIntercambioMock.obtenerInventarioFiltrado(jugadorId, "all"))
+      .thenReturn(inventario);
 
-    ModelAndView mav = controlador.verContratoMejora(sessionMock);
+    ModelAndView mav = controlador.verContratoMejora("all", sessionMock);
 
     assertThat(mav.getViewName(), equalTo("contrato-mejora"));
     assertThat(mav.getModel().get("inventario"), equalTo(inventario));
   }
-
-  // ==========================================
-  // TESTS: POST /contrato-mejora/intercambiar
-  // ==========================================
 
   @Test
   public void siNoHayJugadorEnSesionElPostDebeRedirigirALogin() {
@@ -126,7 +119,6 @@ public class ControladorContratoMejoraTest {
     Long jugadorId = 1L;
     when(sessionMock.getAttribute("jugadorId")).thenReturn(jugadorId);
 
-    // Usamos una lista vacía instanciada de forma tradicional para asegurar la evaluación limpia del isEmpty()
     List<Long> idsVacios = new ArrayList<>();
 
     ModelAndView mav = controlador.intercambiarCartas(
@@ -143,12 +135,11 @@ public class ControladorContratoMejoraTest {
       );
   }
 
-  // Evalúa un número de cartas inválido (pero no nulo ni vacío)
   @Test
   public void siSeSeleccionaUnaCantidadDeCartasDistintaDeCuatroDebeFallarSegunLaLogicaDelServicio()
     throws Exception {
     Long jugadorId = 1L;
-    List<Long> idsInsuficientes = List.of(1L, 2L); // Solo 2 cartas de las 4 requeridas
+    List<Long> idsInsuficientes = List.of(1L, 2L);
 
     when(sessionMock.getAttribute("jugadorId")).thenReturn(jugadorId);
     when(servicioIntercambioMock.realizarMejora(jugadorId, idsInsuficientes))
@@ -164,10 +155,6 @@ public class ControladorContratoMejoraTest {
     verify(redirectAttributesMock, times(1))
       .addFlashAttribute("error", "Cantidad incorrecta de cartas.");
   }
-
-  // ==========================================
-  // TESTS: GET /contrato-mejora/resultado
-  // ==========================================
 
   @Test
   public void siNoHayJugadorEnSesionAlVerResultadoDebeRedirigirALogin() {

@@ -2,9 +2,7 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.Carta;
 import com.tallerwebi.dominio.PropuestaIntercambio;
-import com.tallerwebi.dominio.RepositorioMercado;
 import com.tallerwebi.dominio.ServicioMercado;
-import com.tallerwebi.dominio.Usuario;
 import java.util.List;
 import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -18,21 +16,15 @@ import org.springframework.web.servlet.ModelAndView;
 @Transactional
 public class ControladorMercado {
 
-  // Constantes PARA EL CONTROLADOR (¡Acá solucionamos el problema de PMD!)
   private static final String JUGADOR_ID_KEY = "jugadorId";
   private static final String REDIRECT_LOGIN = "redirect:/login";
   private static final String ATRIBUTO_ERROR = "error";
   private static final String VISTA_INTERCAMBIO = "intercambio";
 
   private final ServicioMercado servicioMercado;
-  private final RepositorioMercado repositorioMercado;
 
-  public ControladorMercado(
-    ServicioMercado servicioMercado,
-    RepositorioMercado repositorioMercado
-  ) {
+  public ControladorMercado(ServicioMercado servicioMercado) {
     this.servicioMercado = servicioMercado;
-    this.repositorioMercado = repositorioMercado;
   }
 
   @RequestMapping(value = "/mercado", method = RequestMethod.GET)
@@ -42,12 +34,10 @@ public class ControladorMercado {
       return new ModelAndView(REDIRECT_LOGIN);
     }
 
-    Usuario usuario = repositorioMercado.buscarUsuarioPorId(jugadorId);
-    List<PropuestaIntercambio> ofertas = servicioMercado.obtenerOfertasCompatibles(usuario);
-    List<Carta> faltantes = servicioMercado.obtenerCartasFaltantes(usuario);
+    List<PropuestaIntercambio> ofertas = servicioMercado.obtenerOfertasCompatibles(jugadorId);
+    List<Carta> faltantes = servicioMercado.obtenerCartasFaltantes(jugadorId);
+    List<PropuestaIntercambio> misTrades = servicioMercado.obtenerMisTrades(jugadorId);
 
-    // Obtenemos tus trades actuales
-    List<PropuestaIntercambio> misTrades = servicioMercado.obtenerMisTrades(usuario);
     if (misTrades != null) {
       for (PropuestaIntercambio trade : misTrades) {
         if (trade.getCartaBuscada() != null) {
@@ -59,7 +49,7 @@ public class ControladorMercado {
     ModelAndView mav = new ModelAndView(VISTA_INTERCAMBIO);
     mav.addObject("ofertas", ofertas);
     mav.addObject("cartasFaltantes", faltantes);
-    mav.addObject("misTrades", misTrades); // NUEVO: Pasamos la lista a la vista
+    mav.addObject("misTrades", misTrades);
     return mav;
   }
 
@@ -73,16 +63,16 @@ public class ControladorMercado {
       return new ModelAndView(REDIRECT_LOGIN);
     }
 
-    Usuario usuario = repositorioMercado.buscarUsuarioPorId(jugadorId);
     try {
-      servicioMercado.publicarSolicitud(usuario, idCartaBuscada);
+      servicioMercado.publicarSolicitud(jugadorId, idCartaBuscada);
       return new ModelAndView("redirect:/mercado/mis-trades");
     } catch (Exception e) {
       ModelAndView mav = new ModelAndView(VISTA_INTERCAMBIO);
       mav.addObject(ATRIBUTO_ERROR, e.getMessage());
 
-      mav.addObject("ofertas", servicioMercado.obtenerOfertasCompatibles(usuario));
-      mav.addObject("cartasFaltantes", servicioMercado.obtenerCartasFaltantes(usuario));
+      mav.addObject("ofertas", servicioMercado.obtenerOfertasCompatibles(jugadorId));
+      mav.addObject("cartasFaltantes", servicioMercado.obtenerCartasFaltantes(jugadorId));
+      mav.addObject("misTrades", servicioMercado.obtenerMisTrades(jugadorId));
       return mav;
     }
   }
@@ -94,10 +84,8 @@ public class ControladorMercado {
       return new ModelAndView(REDIRECT_LOGIN);
     }
 
-    Usuario usuario = repositorioMercado.buscarUsuarioPorId(jugadorId);
-    List<PropuestaIntercambio> misTrades = servicioMercado.obtenerMisTrades(usuario);
+    List<PropuestaIntercambio> misTrades = servicioMercado.obtenerMisTrades(jugadorId);
 
-    // Inicialización explícita de proxies Lazy para evitar la excepción y los warnings del IDE
     if (misTrades != null) {
       for (PropuestaIntercambio trade : misTrades) {
         if (trade.getCartaBuscada() != null) {
@@ -145,9 +133,8 @@ public class ControladorMercado {
       return new ModelAndView(REDIRECT_LOGIN);
     }
 
-    Usuario receptor = repositorioMercado.buscarUsuarioPorId(jugadorId);
     try {
-      servicioMercado.finalizarIntercambio(receptor, idPropuesta, idCartaRecompensa);
+      servicioMercado.finalizarIntercambio(jugadorId, idPropuesta, idCartaRecompensa);
       return new ModelAndView("redirect:/mercado");
     } catch (Exception e) {
       return new ModelAndView("redirect:/mercado?error=" + e.getMessage());
@@ -161,9 +148,8 @@ public class ControladorMercado {
       return new ModelAndView(REDIRECT_LOGIN);
     }
 
-    Usuario usuario = repositorioMercado.buscarUsuarioPorId(jugadorId);
     try {
-      servicioMercado.eliminarMiTrade(usuario, idPropuesta);
+      servicioMercado.eliminarMiTrade(jugadorId, idPropuesta);
       return new ModelAndView("redirect:/mercado/mis-trades");
     } catch (Exception e) {
       return new ModelAndView("redirect:/mercado/mis-trades?error=" + e.getMessage());

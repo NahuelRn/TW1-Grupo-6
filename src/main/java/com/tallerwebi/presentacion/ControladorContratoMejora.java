@@ -24,21 +24,27 @@ public class ControladorContratoMejora {
     this.servicioIntercambio = servicioIntercambio;
   }
 
-  // Muestra la pantalla del Contrato con el inventario del jugador en sesión
+  // Ahora el controlador atiende el filtro enviado por parámetro de URL
   @GetMapping("/contrato-mejora")
-  public ModelAndView verContratoMejora(HttpSession session) {
+  public ModelAndView verContratoMejora(
+    @RequestParam(value = "rareza", required = false, defaultValue = "all") String rareza,
+    HttpSession session
+  ) {
     Long jugadorId = (Long) session.getAttribute("jugadorId");
     if (jugadorId == null) {
       return new ModelAndView("redirect:/login");
     }
 
-    List<ItemInventario> inventario = servicioIntercambio.obtenerInventario(jugadorId);
+    List<ItemInventario> inventario = servicioIntercambio.obtenerInventarioFiltrado(
+      jugadorId,
+      rareza
+    );
     ModelMap modelo = new ModelMap();
     modelo.put("inventario", inventario);
+    modelo.put("rarezaSeleccionada", rareza); // Guardamos cuál se filtró para la UI
     return new ModelAndView("contrato-mejora", modelo);
   }
 
-  // Procesa el intercambio al presionar "FIRMAR CONTRATO"
   @PostMapping("/contrato-mejora/intercambiar")
   public ModelAndView intercambiarCartas(
     @RequestParam(value = "ids", required = false) List<Long> ids,
@@ -50,7 +56,6 @@ public class ControladorContratoMejora {
       return new ModelAndView("redirect:/login");
     }
 
-    // Validación temprana por si mandan el formulario vacío
     if (ids == null || ids.isEmpty()) {
       redirectAttributes.addFlashAttribute(
         "error",
@@ -60,22 +65,15 @@ public class ControladorContratoMejora {
     }
 
     try {
-      // LLAMADA AL SERVICIO: Ejecuta la lógica (quita las 4 viejas, genera la nueva)
       Carta cartaGanada = servicioIntercambio.realizarMejora(jugadorId, ids);
-
-      // Enviamos el premio de forma segura (FlashAttribute sobrevive a la redirección)
       redirectAttributes.addFlashAttribute("cartaPremio", cartaGanada);
-
-      // Redirige al flujo de éxito
       return new ModelAndView("redirect:/contrato-mejora/resultado");
     } catch (Exception e) {
-      // Si el servicio tira error (ej: menos de 4 cartas o raras mezcladas), volvemos atrás mostrando el porqué
       redirectAttributes.addFlashAttribute("error", e.getMessage());
       return new ModelAndView("redirect:/contrato-mejora");
     }
   }
 
-  // Muestra la pantalla "resultado-mejora" con la nueva carta obtenida
   @GetMapping("/contrato-mejora/resultado")
   public ModelAndView verResultado(HttpSession session) {
     Long jugadorId = (Long) session.getAttribute("jugadorId");

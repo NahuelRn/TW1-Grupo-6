@@ -39,21 +39,29 @@ public class ServicioMercadoTest {
 
     emisor = new Usuario();
     emisor.setId(10L);
+
     if (emisor.getInventario() != null) {
       emisor.getInventario().clear();
     }
+
     Jugador jEmisor = new Jugador();
     jEmisor.setUsuario(emisor);
     emisor.setJugador(jEmisor);
 
     receptor = new Usuario();
     receptor.setId(20L);
+
     if (receptor.getInventario() != null) {
       receptor.getInventario().clear();
     }
+
     Jugador jReceptor = new Jugador();
     jReceptor.setUsuario(receptor);
     receptor.setJugador(jReceptor);
+
+    // Mock general para que el servicio siempre encuentre a los usuarios
+    when(repoMercadoMock.buscarUsuarioPorId(10L)).thenReturn(emisor);
+    when(repoMercadoMock.buscarUsuarioPorId(20L)).thenReturn(receptor);
   }
 
   @Test
@@ -65,7 +73,7 @@ public class ServicioMercadoTest {
     item.setCantidad(1);
     emisor.getInventario().add(item);
 
-    Exception ex = assertThrows(Exception.class, () -> servicio.publicarSolicitud(emisor, 1L));
+    Exception ex = assertThrows(Exception.class, () -> servicio.publicarSolicitud(10L, 1L));
     assertThat(ex.getMessage(), containsString("No puedes solicitar una carta que ya posees"));
   }
 
@@ -79,7 +87,7 @@ public class ServicioMercadoTest {
 
     when(repoMercadoMock.listarMisTrades(emisor)).thenReturn(List.of(tradeActivo));
 
-    Exception ex = assertThrows(Exception.class, () -> servicio.publicarSolicitud(emisor, 1L));
+    Exception ex = assertThrows(Exception.class, () -> servicio.publicarSolicitud(10L, 1L));
     assertThat(ex.getMessage(), containsString("Ya tienes una solicitud activa"));
   }
 
@@ -92,10 +100,7 @@ public class ServicioMercadoTest {
 
     when(repoMercadoMock.buscarPorId(1L)).thenReturn(propuesta);
 
-    Exception ex = assertThrows(
-      Exception.class,
-      () -> servicio.finalizarIntercambio(receptor, 1L, 2L)
-    );
+    Exception ex = assertThrows(Exception.class, () -> servicio.finalizarIntercambio(20L, 1L, 2L));
     assertThat(ex.getMessage(), containsString("No tienes la carta solicitada repetida"));
   }
 
@@ -119,15 +124,12 @@ public class ServicioMercadoTest {
     itemE.setCantidad(2);
     emisor.getInventario().add(itemE);
 
-    Exception ex = assertThrows(
-      Exception.class,
-      () -> servicio.finalizarIntercambio(receptor, 1L, 2L)
-    );
+    Exception ex = assertThrows(Exception.class, () -> servicio.finalizarIntercambio(20L, 1L, 2L));
     assertThat(ex.getMessage(), containsString("no permite una recompensa de rareza superior"));
   }
 
   @Test
-  public void unIntercambioValidoModificaStocksYSeteaEstadoFinalizada() throws Exception {
+  public void unIntercambioValidoModificaStocksYSetEstadoFinalizada() throws Exception {
     PropuestaIntercambio propuesta = new PropuestaIntercambio();
     propuesta.setEstado("ACTIVA");
     propuesta.setUsuarioEmisor(emisor);
@@ -146,7 +148,7 @@ public class ServicioMercadoTest {
     itemR.setCantidad(2);
     receptor.getInventario().add(itemR);
 
-    servicio.finalizarIntercambio(receptor, 1L, 1L);
+    servicio.finalizarIntercambio(20L, 1L, 1L);
 
     assertThat(itemR.getCantidad(), is(1));
     assertThat(itemE.getCantidad(), is(1));
@@ -161,7 +163,7 @@ public class ServicioMercadoTest {
 
     when(repoMercadoMock.buscarPorId(1L)).thenReturn(propuesta);
 
-    servicio.eliminarMiTrade(emisor, 1L);
+    servicio.eliminarMiTrade(10L, 1L);
 
     verify(repoMercadoMock, times(1)).eliminar(propuesta);
   }
@@ -170,11 +172,11 @@ public class ServicioMercadoTest {
   public void eliminarTradeDeOtroUsuarioLanzaError() {
     PropuestaIntercambio propuesta = new PropuestaIntercambio();
     propuesta.setEstado("ACTIVA");
-    propuesta.setUsuarioEmisor(receptor); // Es de otro usuario
+    propuesta.setUsuarioEmisor(receptor);
 
     when(repoMercadoMock.buscarPorId(1L)).thenReturn(propuesta);
 
-    Exception ex = assertThrows(Exception.class, () -> servicio.eliminarMiTrade(emisor, 1L));
+    Exception ex = assertThrows(Exception.class, () -> servicio.eliminarMiTrade(10L, 1L));
     assertThat(ex.getMessage(), containsString("No puedes eliminar este trade"));
   }
 
@@ -184,7 +186,7 @@ public class ServicioMercadoTest {
 
     Exception ex = assertThrows(
       Exception.class,
-      () -> servicio.finalizarIntercambio(receptor, 999L, 1L)
+      () -> servicio.finalizarIntercambio(20L, 999L, 1L)
     );
     assertThat(ex.getMessage(), containsString("La propuesta ya no esta disponible"));
   }
@@ -198,13 +200,11 @@ public class ServicioMercadoTest {
 
     when(repoMercadoMock.buscarPorId(1L)).thenReturn(propuesta);
 
-    // Receptor tiene la carta que busca el emisor
     ItemInventario itemR = new ItemInventario();
     itemR.setCarta(cartaRara);
     itemR.setCantidad(2);
     receptor.getInventario().add(itemR);
 
-    // Emisor NO tiene la recompensa suficiente (cantidad 1 no es repetida)
     ItemInventario itemE = new ItemInventario();
     itemE.setCarta(cartaComun);
     itemE.setCantidad(1);
@@ -212,7 +212,7 @@ public class ServicioMercadoTest {
 
     Exception ex = assertThrows(
       Exception.class,
-      () -> servicio.finalizarIntercambio(receptor, 1L, cartaComun.getId())
+      () -> servicio.finalizarIntercambio(20L, 1L, cartaComun.getId())
     );
     assertThat(ex.getMessage(), containsString("El emisor ya no dispone de esa recompensa"));
   }
@@ -245,7 +245,7 @@ public class ServicioMercadoTest {
     itemE.setCantidad(2);
     emisor.getInventario().add(itemE);
 
-    servicio.finalizarIntercambio(receptor, 1L, 4L);
+    servicio.finalizarIntercambio(20L, 1L, 4L);
     assertThat(propuesta.getEstado(), is("FINALIZADA"));
   }
 
@@ -277,7 +277,7 @@ public class ServicioMercadoTest {
     itemE.setCantidad(2);
     emisor.getInventario().add(itemE);
 
-    servicio.finalizarIntercambio(receptor, 1L, 6L);
+    servicio.finalizarIntercambio(20L, 1L, 6L);
     assertThat(propuesta.getEstado(), is("FINALIZADA"));
   }
 
@@ -285,18 +285,17 @@ public class ServicioMercadoTest {
   public void obtenerOfertasCompatiblesFiltraCorrectamente() {
     PropuestaIntercambio propuestaAjena = new PropuestaIntercambio();
     propuestaAjena.setEstado("ACTIVA");
-    propuestaAjena.setUsuarioEmisor(receptor); // Es de otro
+    propuestaAjena.setUsuarioEmisor(receptor);
     propuestaAjena.setCartaBuscada(cartaComun);
 
     when(repoMercadoMock.listarTodasLasActivas()).thenReturn(List.of(propuestaAjena));
 
-    // El emisor tiene la carta repetida que la otra persona busca
     ItemInventario item = new ItemInventario();
     item.setCarta(cartaComun);
     item.setCantidad(2);
     emisor.getInventario().add(item);
 
-    List<PropuestaIntercambio> resultado = servicio.obtenerOfertasCompatibles(emisor);
+    List<PropuestaIntercambio> resultado = servicio.obtenerOfertasCompatibles(10L);
     assertThat(resultado, hasSize(1));
   }
 
@@ -321,7 +320,7 @@ public class ServicioMercadoTest {
 
     when(repoCartaMock.listarCartasFaltantes(anyList())).thenReturn(List.of(cartaRara));
 
-    List<Carta> faltantes = servicio.obtenerCartasFaltantes(emisor);
+    List<Carta> faltantes = servicio.obtenerCartasFaltantes(10L);
 
     assertThat(faltantes, hasSize(1));
     assertThat(faltantes.get(0), is(cartaRara));
@@ -331,19 +330,19 @@ public class ServicioMercadoTest {
   @Test
   public void eliminarMiTradeLanzaExceptionSiLaPropuestaNoEstaActiva() {
     PropuestaIntercambio propuestaInactiva = new PropuestaIntercambio();
-    propuestaInactiva.setEstado("FINALIZADA"); // No está activa
+    propuestaInactiva.setEstado("FINALIZADA");
     propuestaInactiva.setUsuarioEmisor(emisor);
 
     when(repoMercadoMock.buscarPorId(1L)).thenReturn(propuestaInactiva);
 
-    assertThrows(Exception.class, () -> servicio.eliminarMiTrade(emisor, 1L));
+    assertThrows(Exception.class, () -> servicio.eliminarMiTrade(10L, 1L));
   }
 
   @Test
   public void eliminarMiTradeLanzaExceptionSiLaPropuestaEsNull() {
     when(repoMercadoMock.buscarPorId(1L)).thenReturn(null);
 
-    assertThrows(Exception.class, () -> servicio.eliminarMiTrade(emisor, 1L));
+    assertThrows(Exception.class, () -> servicio.eliminarMiTrade(10L, 1L));
   }
 
   @Test
@@ -351,10 +350,8 @@ public class ServicioMercadoTest {
     when(repoCartaMock.buscarPorId(1L)).thenReturn(cartaComun);
     when(repoMercadoMock.listarMisTrades(emisor)).thenReturn(new ArrayList<>());
 
-    // El usuario no tiene la carta en su inventario (camino feliz)
-    servicio.publicarSolicitud(emisor, 1L);
+    servicio.publicarSolicitud(10L, 1L);
 
-    // Desempatamos usando explícitamente ArgumentMatchers de Mockito
     verify(repoMercadoMock, times(1))
       .guardar(org.mockito.ArgumentMatchers.any(PropuestaIntercambio.class));
   }
@@ -363,15 +360,15 @@ public class ServicioMercadoTest {
   public void validarRarezaSoportaCasoPorDefectoComun() throws Exception {
     Carta cartaComun2 = new Carta();
     cartaComun2.setId(7L);
-    cartaComun2.setRareza("COMUN"); // Entra en el 'default' del switch (retorna 1)
+    cartaComun2.setRareza("COMUN");
 
     PropuestaIntercambio propuesta = new PropuestaIntercambio();
     propuesta.setEstado("ACTIVA");
     propuesta.setUsuarioEmisor(emisor);
-    propuesta.setCartaBuscada(cartaComun); // COMÚN (1)
+    propuesta.setCartaBuscada(cartaComun);
 
     when(repoMercadoMock.buscarPorId(1L)).thenReturn(propuesta);
-    when(repoCartaMock.buscarPorId(7L)).thenReturn(cartaComun2); // COMÚN (1)
+    when(repoCartaMock.buscarPorId(7L)).thenReturn(cartaComun2);
 
     ItemInventario itemR = new ItemInventario();
     itemR.setCarta(cartaComun);
@@ -383,8 +380,7 @@ public class ServicioMercadoTest {
     itemE.setCantidad(2);
     emisor.getInventario().add(itemE);
 
-    // 1 no es mayor que 1, por lo que debe finalizar con éxito
-    servicio.finalizarIntercambio(receptor, 1L, 7L);
+    servicio.finalizarIntercambio(20L, 1L, 7L);
     assertThat(propuesta.getEstado(), is("FINALIZADA"));
   }
 
@@ -397,12 +393,7 @@ public class ServicioMercadoTest {
 
     when(repoMercadoMock.buscarPorId(1L)).thenReturn(propuesta);
 
-    // El receptor no tiene absolutamente nada en su inventario
-    // Esto va a forzar que buscarItemEnInventario devuelva null al inicio de finalizarIntercambio
-    Exception ex = assertThrows(
-      Exception.class,
-      () -> servicio.finalizarIntercambio(receptor, 1L, 1L)
-    );
+    Exception ex = assertThrows(Exception.class, () -> servicio.finalizarIntercambio(20L, 1L, 1L));
     assertThat(ex.getMessage(), containsString("No tienes la carta solicitada repetida"));
   }
 
@@ -416,25 +407,18 @@ public class ServicioMercadoTest {
     when(repoMercadoMock.buscarPorId(1L)).thenReturn(propuesta);
     when(repoCartaMock.buscarPorId(1L)).thenReturn(cartaComun);
 
-    // El emisor ofrece cartaComun (tiene 2)
     ItemInventario itemE = new ItemInventario();
     itemE.setCarta(cartaComun);
     itemE.setCantidad(2);
     emisor.getInventario().add(itemE);
 
-    // El receptor ofrece cartaRara (tiene 2)
     ItemInventario itemR = new ItemInventario();
     itemR.setCarta(cartaRara);
     itemR.setCantidad(2);
     receptor.getInventario().add(itemR);
 
-    // Forzamos el escenario: El emisor NO tiene la cartaRara en su inventario (destinoEmisor == null)
-    // Y el receptor NO tiene la carta Común en su inventario (destinoReceptor == null)
-    // Esto obliga a ejecutar los bloques 'if (destinoEmisor == null)' e 'if (destinoReceptor == null)' completos
+    servicio.finalizarIntercambio(20L, 1L, 1L);
 
-    servicio.finalizarIntercambio(receptor, 1L, 1L);
-
-    // Verificamos que se crearon los nuevos ItemInventario con cantidad 1
     assertThat(emisor.getInventario(), hasSize(2));
     assertThat(receptor.getInventario(), hasSize(2));
   }
@@ -449,7 +433,6 @@ public class ServicioMercadoTest {
     when(repoMercadoMock.buscarPorId(1L)).thenReturn(propuesta);
     when(repoCartaMock.buscarPorId(1L)).thenReturn(cartaComun);
 
-    // El emisor ofrece cartaComun (tiene 2) y YA TIENE la cartaRara que va a recibir (tiene 1)
     ItemInventario itemE1 = new ItemInventario();
     itemE1.setCarta(cartaComun);
     itemE1.setCantidad(2);
@@ -459,7 +442,6 @@ public class ServicioMercadoTest {
     emisor.getInventario().add(itemE1);
     emisor.getInventario().add(itemE2);
 
-    // El receptor ofrece cartaRara (tiene 2) y YA TIENE la cartaComun que va a recibir (tiene 1)
     ItemInventario itemR1 = new ItemInventario();
     itemR1.setCarta(cartaRara);
     itemR1.setCantidad(2);
@@ -469,10 +451,8 @@ public class ServicioMercadoTest {
     receptor.getInventario().add(itemR1);
     receptor.getInventario().add(itemR2);
 
-    // Esto obliga a ejecutar los bloques 'else { destinoEmisor.setCantidad(...); }'
-    servicio.finalizarIntercambio(receptor, 1L, 1L);
+    servicio.finalizarIntercambio(20L, 1L, 1L);
 
-    // El stock existente debió incrementarse a 2
     assertThat(itemE2.getCantidad(), is(2));
     assertThat(itemR2.getCantidad(), is(2));
   }
@@ -505,22 +485,19 @@ public class ServicioMercadoTest {
     itemE.setCantidad(2);
     emisor.getInventario().add(itemE);
 
-    servicio.finalizarIntercambio(receptor, 1L, 9L);
+    servicio.finalizarIntercambio(20L, 1L, 9L);
     assertThat(propuesta.getEstado(), is("FINALIZADA"));
   }
 
   @Test
   public void finalizarIntercambioLanzaErrorSiLaPropuestaNoEstaActiva() {
     PropuestaIntercambio propuestaInactiva = new PropuestaIntercambio();
-    propuestaInactiva.setEstado("FINALIZADA"); // Rompe validación básica
+    propuestaInactiva.setEstado("FINALIZADA");
     propuestaInactiva.setUsuarioEmisor(emisor);
 
     when(repoMercadoMock.buscarPorId(1L)).thenReturn(propuestaInactiva);
 
-    Exception ex = assertThrows(
-      Exception.class,
-      () -> servicio.finalizarIntercambio(receptor, 1L, 1L)
-    );
+    Exception ex = assertThrows(Exception.class, () -> servicio.finalizarIntercambio(20L, 1L, 1L));
     assertThat(ex.getMessage(), containsString("La propuesta ya no esta disponible"));
   }
 
@@ -533,13 +510,12 @@ public class ServicioMercadoTest {
 
     when(repoMercadoMock.listarTodasLasActivas()).thenReturn(List.of(propuestaAjena));
 
-    // El emisor tiene la carta pero NO REPETIDA (cantidad = 1)
     ItemInventario item = new ItemInventario();
     item.setCarta(cartaComun);
     item.setCantidad(1);
     emisor.getInventario().add(item);
 
-    List<PropuestaIntercambio> resultado = servicio.obtenerOfertasCompatibles(emisor);
+    List<PropuestaIntercambio> resultado = servicio.obtenerOfertasCompatibles(10L);
     assertThat(resultado, is(empty()));
   }
 
@@ -548,27 +524,24 @@ public class ServicioMercadoTest {
     PropuestaIntercambio propuestaAjena = new PropuestaIntercambio();
     propuestaAjena.setEstado("ACTIVA");
     propuestaAjena.setUsuarioEmisor(receptor);
-    propuestaAjena.setCartaBuscada(cartaRara); // Busca Rara
+    propuestaAjena.setCartaBuscada(cartaRara);
 
     when(repoMercadoMock.listarTodasLasActivas()).thenReturn(List.of(propuestaAjena));
 
-    // El emisor tiene repetida la Común, no la Rara
     ItemInventario item = new ItemInventario();
     item.setCarta(cartaComun);
     item.setCantidad(3);
     emisor.getInventario().add(item);
 
-    List<PropuestaIntercambio> resultado = servicio.obtenerOfertasCompatibles(emisor);
+    List<PropuestaIntercambio> resultado = servicio.obtenerOfertasCompatibles(10L);
     assertThat(resultado, is(empty()));
   }
 
   @Test
   public void obtenerCartasFaltantesConInventarioVacioDebeListarTodasLasCartas() {
-    // Forzamos el caso donde el usuario no tiene ninguna carta (lista vacía)
-    // Esto prueba que el flujo no se rompe y pasa un array vacío al repositorio
     when(repoCartaMock.listarCartasFaltantes(anyList())).thenReturn(List.of(cartaComun, cartaRara));
 
-    List<Carta> faltantes = servicio.obtenerCartasFaltantes(receptor);
+    List<Carta> faltantes = servicio.obtenerCartasFaltantes(20L);
 
     assertThat(faltantes, hasSize(2));
     verify(repoCartaMock, times(1)).listarCartasFaltantes(anyList());
@@ -583,17 +556,99 @@ public class ServicioMercadoTest {
 
     when(repoMercadoMock.buscarPorId(1L)).thenReturn(propuesta);
 
-    // El receptor tiene la carta solicitada correctamente
     ItemInventario itemR = new ItemInventario();
     itemR.setCarta(cartaRara);
     itemR.setCantidad(2);
     receptor.getInventario().add(itemR);
 
-    // El emisor tiene el inventario COMPLETAMENTE VACÍO (buscarItemEnInventario devolverá null)
     Exception ex = assertThrows(
       Exception.class,
-      () -> servicio.finalizarIntercambio(receptor, 1L, 999L)
+      () -> servicio.finalizarIntercambio(20L, 1L, 999L)
     );
     assertThat(ex.getMessage(), containsString("El emisor ya no dispone de esa recompensa"));
+  }
+
+  /* --- NUEVOS TESTS AGREGADOS PARA REVENTAR LA COBERTURA DE JACOCO (> 80%) --- */
+
+  @Test
+  public void publicarSolicitudLanzaErrorSiElUsuarioNoExiste() {
+    when(repoMercadoMock.buscarUsuarioPorId(999L)).thenReturn(null);
+    assertThrows(Exception.class, () -> servicio.publicarSolicitud(999L, 1L));
+  }
+
+  @Test
+  public void obtenerOfertasCompatiblesDevuelveListaVaciaSiElUsuarioNoExiste() {
+    when(repoMercadoMock.buscarUsuarioPorId(999L)).thenReturn(null);
+    List<PropuestaIntercambio> resultado = servicio.obtenerOfertasCompatibles(999L);
+    assertThat(resultado, is(empty()));
+  }
+
+  @Test
+  public void obtenerCartasFaltantesDevuelveListaVaciaSiElUsuarioNoExiste() {
+    when(repoMercadoMock.buscarUsuarioPorId(999L)).thenReturn(null);
+    List<Carta> resultado = servicio.obtenerCartasFaltantes(999L);
+    assertThat(resultado, is(empty()));
+  }
+
+  @Test
+  public void obtenerMisTradesDevuelveListaVaciaSiElUsuarioNoExiste() {
+    when(repoMercadoMock.buscarUsuarioPorId(999L)).thenReturn(null);
+    List<PropuestaIntercambio> resultado = servicio.obtenerMisTrades(999L);
+    assertThat(resultado, is(empty()));
+  }
+
+  @Test
+  public void finalizarIntercambioLanzaErrorSiElReceptorNoExiste() {
+    when(repoMercadoMock.buscarUsuarioPorId(999L)).thenReturn(null);
+    assertThrows(Exception.class, () -> servicio.finalizarIntercambio(999L, 1L, 1L));
+  }
+
+  @Test
+  public void obtenerOpcionesRecompensaFiltraLasQueTienenCantidadMayorAlMinimo() {
+    PropuestaIntercambio propuesta = new PropuestaIntercambio();
+    propuesta.setUsuarioEmisor(emisor);
+
+    ItemInventario itemConStock = new ItemInventario();
+    itemConStock.setCarta(cartaComun);
+    itemConStock.setCantidad(2); // Duplicada (Pasa el filtro)
+
+    ItemInventario itemSinStockRepetido = new ItemInventario();
+    itemSinStockRepetido.setCarta(cartaRara);
+    itemSinStockRepetido.setCantidad(1); // No duplicada (Filtra)
+
+    emisor.getInventario().add(itemConStock);
+    emisor.getInventario().add(itemSinStockRepetido);
+
+    List<Carta> opciones = servicio.obtenerOpcionesRecompensa(propuesta);
+    assertThat(opciones, hasSize(1));
+    assertThat(opciones.get(0), is(cartaComun));
+  }
+
+  @Test
+  public void obtenerValorRarezaSoportaNulosYLosTrataComoComun() throws Exception {
+    Carta cartaRarezaNula = new Carta();
+    cartaRarezaNula.setId(99L);
+    cartaRarezaNula.setRareza(null); // Provoca caída en la validación por defecto
+
+    PropuestaIntercambio propuesta = new PropuestaIntercambio();
+    propuesta.setEstado("ACTIVA");
+    propuesta.setUsuarioEmisor(emisor);
+    propuesta.setCartaBuscada(cartaComun); // Común tiene valor 1
+
+    when(repoMercadoMock.buscarPorId(1L)).thenReturn(propuesta);
+    when(repoCartaMock.buscarPorId(99L)).thenReturn(cartaRarezaNula);
+
+    ItemInventario itemR = new ItemInventario();
+    itemR.setCarta(cartaComun);
+    itemR.setCantidad(2);
+    receptor.getInventario().add(itemR);
+
+    ItemInventario itemE = new ItemInventario();
+    itemE.setCarta(cartaRarezaNula);
+    itemE.setCantidad(2);
+    emisor.getInventario().add(itemE);
+
+    servicio.finalizarIntercambio(20L, 1L, 99L);
+    assertThat(propuesta.getEstado(), is("FINALIZADA"));
   }
 }
