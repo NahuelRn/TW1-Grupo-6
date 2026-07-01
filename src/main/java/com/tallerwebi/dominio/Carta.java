@@ -21,9 +21,10 @@ public class Carta {
   private String descripcion;
   private String imagen;
 
-  // --- NUEVOS ATRIBUTOS PARA EL MVP ---
-  private Integer dano;
-  private Integer defensa;
+  private Integer danoMin;
+  private Integer danoMax;
+  private Integer defensaMin;
+  private Integer defensaMax;
 
   public Long getId() {
     return id;
@@ -113,19 +114,35 @@ public class Carta {
     this.imagen = imagen;
   }
 
-  public Integer getDano() {
-    return dano;
+  public Integer getDanoMin() {
+    return danoMin;
   }
 
-  public void setDano(Integer dano) {
-    this.dano = dano;
+  public void setDanoMin(Integer danoMin) {
+    this.danoMin = danoMin;
   }
 
-  public Integer getDefensa() {
-    return defensa;
+  public Integer getDefensaMin() {
+    return defensaMin;
   }
 
-  public void setDefensa(Integer defensa) {
-    this.defensa = defensa;
+  public void setDefensaMin(Integer defensaMin) {
+    this.defensaMin = defensaMin;
+  }
+
+  public Integer getDanoMax() {
+    return danoMax;
+  }
+
+  public void setDanoMax(Integer danoMax) {
+    this.danoMax = danoMax;
+  }
+
+  public Integer getDefensaMax() {
+    return defensaMax;
+  }
+
+  public void setDefensaMax(Integer defensaMax) {
+    this.defensaMax = defensaMax;
   }
 }

@@ -4,17 +4,27 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service("servicioPartida")
+@Transactional
 public class ServicioPartidaImpl implements ServicioPartida {
 
-  private static final int CARTAS_INICIALES = 5;
+  @Value("${partida.cartas.iniciales:5}")
+  private int cartasIniciales;
+
   private RepositorioEnemigo repositorioEnemigo;
+  private RepositorioPartida repositorioPartida;
 
   @Autowired
-  public ServicioPartidaImpl(RepositorioEnemigo repositorioEnemigo) {
+  public ServicioPartidaImpl(
+    RepositorioEnemigo repositorioEnemigo,
+    RepositorioPartida repositorioPartida
+  ) {
     this.repositorioEnemigo = repositorioEnemigo;
+    this.repositorioPartida = repositorioPartida;
   }
 
   @Override
@@ -22,28 +32,73 @@ public class ServicioPartidaImpl implements ServicioPartida {
     Partida nuevaPartida = new Partida();
     nuevaPartida.setUsuario(usuario);
 
-    // 1. Buscamos al enemigo y seteamos la vida
-    Enemigo enemigo = repositorioEnemigo.obtenerEnemigoAleatorioPorZona(zona);
-    nuevaPartida.setEnemigo(enemigo);
-    nuevaPartida.setHpEnemigo(enemigo != null ? enemigo.getHpBase() : 100);
-    nuevaPartida.setHpJugador(100);
+    // 1. Delegamos la lógica molesta a un método privado (PMD feliz)
+    Enemigo enemigoSeleccionado = determinarEnemigoParaZona(zona);
 
-    // 2. Extraer cartas del Mazo
+    nuevaPartida.setEnemigo(enemigoSeleccionado);
+    nuevaPartida.setHpEnemigo(enemigoSeleccionado != null ? enemigoSeleccionado.getHpBase() : 100);
+    nuevaPartida.setHpJugador(100);
+    nuevaPartida.setEnumEstadoPartida(EnumEstadoPartida.ACTIVA); // ACÁ ESTÁ EL CAMBIO A "ACTIVA"
+
+    // 2. Armamos la mano inicial de forma segura
     List<Carta> mazoCompleto = new ArrayList<>();
     if (usuario.getMazoActivo() != null && usuario.getMazoActivo().getCartas() != null) {
       mazoCompleto.addAll(usuario.getMazoActivo().getCartas());
     }
 
-    // 3. Mezclar y repartir cartas
-    // 3. Mezclar y repartir cartas
-    if (mazoCompleto.size() >= CARTAS_INICIALES) {
-      Collections.shuffle(mazoCompleto);
-      List<Carta> manoInicial = new ArrayList<>(mazoCompleto.subList(0, CARTAS_INICIALES));
-      nuevaPartida.setManoJugador(manoInicial);
-    } else {
-      nuevaPartida.setManoJugador(mazoCompleto);
-    }
+    // 3. Mezclamos el mazo al azar
+    Collections.shuffle(mazoCompleto);
+
+    // 4. Robamos las cartas iniciales
+    int cartasARobar = Math.min(cartasIniciales, mazoCompleto.size());
+    List<Carta> manoInicial = new ArrayList<>(mazoCompleto.subList(0, cartasARobar));
+
+    nuevaPartida.setManoJugador(manoInicial);
+
+    // 5. GUARDAMOS EN LA BASE DE DATOS
+    repositorioPartida.guardar(nuevaPartida);
 
     return nuevaPartida;
+  }
+
+  @Override
+  public void gestionarRoboDeCarta(Long idCartaJugada, List<Long> idsMano, List<Long> idsMazoRobo) {
+    if (idsMano != null) {
+      idsMano.remove(idCartaJugada);
+      if (idsMazoRobo != null && !idsMazoRobo.isEmpty() && idsMano.size() < 5) {
+        Long cartaRobada = idsMazoRobo.remove(0);
+        idsMano.add(cartaRobada);
+      }
+    }
+  }
+
+  // =========================================================================
+  // MÉTODO PRIVADO (Aísla las variables roll, acumulador y enemigoSeleccionado)
+  // =========================================================================
+  @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+  private Enemigo determinarEnemigoParaZona(String zona) {
+    List<Enemigo> enemigosZona = repositorioEnemigo.buscarPorZona(zona);
+
+    if (enemigosZona == null || enemigosZona.isEmpty()) {
+      return repositorioEnemigo.obtenerEnemigoAleatorioPorZona(zona);
+    }
+
+    int sumaProbabilidades = enemigosZona
+      .stream()
+      .mapToInt(e -> e.getProbabilidad() != null ? e.getProbabilidad() : 10)
+      .sum();
+
+    int roll = new java.util.Random().nextInt(sumaProbabilidades) + 1;
+    int acumulador = 0;
+
+    for (Enemigo e : enemigosZona) {
+      acumulador += (e.getProbabilidad() != null ? e.getProbabilidad() : 10);
+      if (roll <= acumulador) {
+        return e;
+      }
+    }
+
+    // Fallback de seguridad por si falla la matemática
+    return enemigosZona.get(0);
   }
 }

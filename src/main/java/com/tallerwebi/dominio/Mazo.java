@@ -12,7 +12,7 @@ public class Mazo {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @OneToMany(mappedBy = "mazo", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "mazo", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   private List<MazoCarta> mazoCartas = new ArrayList<>();
 
   public Long getId() {

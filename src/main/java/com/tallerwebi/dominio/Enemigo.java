@@ -12,6 +12,10 @@ public class Enemigo {
   private String nombre;
   private Integer hpBase;
   private String zona;
+  private Integer danoMin;
+  private Integer danoMax;
+  private String imagen;
+  private Integer probabilidad;
 
   public Long getId() {
     return id;
@@ -43,5 +47,37 @@ public class Enemigo {
 
   public void setZona(String zona) {
     this.zona = zona;
+  }
+
+  public Integer getDanoMin() {
+    return danoMin;
+  }
+
+  public void setDanoMin(Integer danoMin) {
+    this.danoMin = danoMin;
+  }
+
+  public Integer getDanoMax() {
+    return danoMax;
+  }
+
+  public void setDanoMax(Integer danoMax) {
+    this.danoMax = danoMax;
+  }
+
+  public String getImagen() {
+    return imagen;
+  }
+
+  public void setImagen(String imagen) {
+    this.imagen = imagen;
+  }
+
+  public Integer getProbabilidad() {
+    return probabilidad;
+  }
+
+  public void setProbabilidad(Integer probabilidad) {
+    this.probabilidad = probabilidad;
   }
 }

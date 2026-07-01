@@ -74,7 +74,7 @@ public class ServicioCartaTest {
     item2.setCantidad(3);
 
     when(repositorioInventario.listarInventarioDeJugador(jugadorId))
-            .thenReturn(List.of(item1, item2));
+      .thenReturn(List.of(item1, item2));
 
     when(repositorioCarta.listarCartasFaltantes(List.of(10L))).thenReturn(List.of(carta2));
 

@@ -1,8 +1,10 @@
 package com.tallerwebi.dominio;
 
+import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 @Service
+@Transactional
 public class ServicioUsuarioImpl implements ServicioUsuario {
 
   private final RepositorioUsuario REPOSITORIO_USUARIO;
@@ -17,6 +19,11 @@ public class ServicioUsuarioImpl implements ServicioUsuario {
     this.REPOSITORIO_USUARIO = REPOSITORIO_USUARIO;
     this.REPOSITORIO_CARTA = REPOSITORIO_CARTA;
     this.REPOSITORIO_INVENTARIO = REPOSITORIO_INVENTARIO;
+  }
+
+  @Override
+  public Usuario buscarPorId(Long id) {
+    return REPOSITORIO_USUARIO.buscarPorId(id);
   }
 
   @Override
