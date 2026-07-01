@@ -6,63 +6,63 @@ import javax.persistence.*;
 @Entity
 public class HistorialPartida {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long identificador;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long identificador;
 
-    private LocalDate fecha;
-    private String resultado;
-    private Integer oroGanado;
-    private Integer experienciaGanada;
+  private LocalDate fecha;
+  private String resultado;
+  private Integer oroGanado;
+  private Integer experienciaGanada;
 
-    @ManyToOne
-    private Usuario usuario;
+  @ManyToOne
+  private Usuario usuario;
 
-    public Long getIdentificador() {
-        return this.identificador;
-    }
+  public Long getIdentificador() {
+    return this.identificador;
+  }
 
-    public LocalDate getFecha() {
-        return this.fecha;
-    }
+  public LocalDate getFecha() {
+    return this.fecha;
+  }
 
-    public String getResultado() {
-        return this.resultado;
-    }
+  public String getResultado() {
+    return this.resultado;
+  }
 
-    public Integer getOroGanado() {
-        return this.oroGanado;
-    }
+  public Integer getOroGanado() {
+    return this.oroGanado;
+  }
 
-    public Integer getExperienciaGanada() {
-        return this.experienciaGanada;
-    }
+  public Integer getExperienciaGanada() {
+    return this.experienciaGanada;
+  }
 
-    public Usuario getUsuario() {
-        return this.usuario;
-    }
+  public Usuario getUsuario() {
+    return this.usuario;
+  }
 
-    public void setIdentificador(Long identificador) {
-        this.identificador = identificador;
-    }
+  public void setIdentificador(Long identificador) {
+    this.identificador = identificador;
+  }
 
-    public void setFecha(LocalDate fecha) {
-        this.fecha = fecha;
-    }
+  public void setFecha(LocalDate fecha) {
+    this.fecha = fecha;
+  }
 
-    public void setResultado(String resultado) {
-        this.resultado = resultado;
-    }
+  public void setResultado(String resultado) {
+    this.resultado = resultado;
+  }
 
-    public void setOroGanado(Integer oroGanado) {
-        this.oroGanado = oroGanado;
-    }
+  public void setOroGanado(Integer oroGanado) {
+    this.oroGanado = oroGanado;
+  }
 
-    public void setExperienciaGanada(Integer experienciaGanada) {
-        this.experienciaGanada = experienciaGanada;
-    }
+  public void setExperienciaGanada(Integer experienciaGanada) {
+    this.experienciaGanada = experienciaGanada;
+  }
 
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-    }
+  public void setUsuario(Usuario usuario) {
+    this.usuario = usuario;
+  }
 }

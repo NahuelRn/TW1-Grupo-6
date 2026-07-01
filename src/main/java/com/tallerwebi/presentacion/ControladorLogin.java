@@ -42,6 +42,7 @@ public class ControladorLogin {
     if (usuarioBuscado != null) {
       request.getSession().setAttribute("ROL", usuarioBuscado.getRol());
       request.getSession().setAttribute("USUARIO_ID", usuarioBuscado.getId());
+      request.getSession().setAttribute("USUARIO", usuarioBuscado); // L
 
       if (usuarioBuscado.getJugador() != null) {
         request.getSession().setAttribute("jugadorId", usuarioBuscado.getJugador().getId());

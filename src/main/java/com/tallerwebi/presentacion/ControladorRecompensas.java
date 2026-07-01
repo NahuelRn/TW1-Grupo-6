@@ -5,9 +5,7 @@ import com.tallerwebi.dominio.RecompensaDTO;
 import com.tallerwebi.dominio.ServicioCalculoRecompensa;
 import com.tallerwebi.dominio.ServicioUsuario;
 import com.tallerwebi.dominio.Usuario;
-
 import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -18,42 +16,42 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class ControladorRecompensas {
 
-    @Autowired
-    private ServicioUsuario servicioUsuario;
+  @Autowired
+  private ServicioUsuario servicioUsuario;
 
-    @Autowired
-    private ServicioCalculoRecompensa servicioCalculoRecompensa;
+  @Autowired
+  private ServicioCalculoRecompensa servicioCalculoRecompensa;
 
-    @RequestMapping("/recompensas")
-    public ModelAndView recompensas(HttpServletRequest request) {
-        Partida partida = (Partida) request.getSession().getAttribute("PARTIDA_ACTUAL");
+  @RequestMapping("/recompensas")
+  public ModelAndView recompensas(HttpServletRequest request) {
+    Partida partida = (Partida) request.getSession().getAttribute("PARTIDA_ACTUAL");
 
-        if (partida == null) {
-            return new ModelAndView("redirect:/combate");
-        }
-
-        ModelMap modelMap = new ModelMap();
-
-        RecompensaDTO recompensa = this.servicioCalculoRecompensa.obtenerRecompensa(partida);
-
-        modelMap.put("recompensa", recompensa);
-
-        return new ModelAndView("recompensas", modelMap);
+    if (partida == null) {
+      return new ModelAndView("redirect:/combate");
     }
 
-    @RequestMapping(value = "/reclamar-recompensa", method = RequestMethod.POST)
-    public ModelAndView reclamar(HttpServletRequest httpServletRequest) {
-        Usuario usuario = (Usuario) httpServletRequest.getSession().getAttribute("USUARIO");
+    ModelMap modelMap = new ModelMap();
 
-        if (usuario == null) {
-            return new ModelAndView("redirect:/login");
-        }
+    RecompensaDTO recompensa = this.servicioCalculoRecompensa.obtenerRecompensa(partida);
 
-        Partida partida = (Partida) httpServletRequest.getSession().getAttribute("PARTIDA_ACTUAL");
-        this.servicioUsuario.aplicarRecompensa(usuario, partida);
+    modelMap.put("recompensa", recompensa);
 
-        httpServletRequest.getSession().setAttribute("USUARIO", usuario);
+    return new ModelAndView("recompensas", modelMap);
+  }
 
-        return new ModelAndView("redirect:/lobby");
+  @RequestMapping(value = "/reclamar-recompensa", method = RequestMethod.POST)
+  public ModelAndView reclamar(HttpServletRequest httpServletRequest) {
+    Usuario usuario = (Usuario) httpServletRequest.getSession().getAttribute("USUARIO");
+
+    if (usuario == null) {
+      return new ModelAndView("redirect:/login");
     }
+
+    Partida partida = (Partida) httpServletRequest.getSession().getAttribute("PARTIDA_ACTUAL");
+    this.servicioUsuario.aplicarRecompensa(usuario, partida);
+
+    httpServletRequest.getSession().setAttribute("USUARIO", usuario);
+
+    return new ModelAndView("redirect:/lobby");
+  }
 }
