@@ -1,6 +1,10 @@
 package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,16 +16,19 @@ public class ServicioLoginImpl implements ServicioLogin {
   private final RepositorioUsuario repositorioUsuario;
   private final RepositorioCarta repositorioCarta;
   private final RepositorioInventario repositorioInventario;
+  private final RepositorioMazo repositorioMazo; // ¡NUEVO: Necesitamos guardar el mazo!
 
   @Autowired
   public ServicioLoginImpl(
     RepositorioUsuario repositorioUsuario,
     RepositorioCarta repositorioCarta,
-    RepositorioInventario repositorioInventario
+    RepositorioInventario repositorioInventario,
+    RepositorioMazo repositorioMazo
   ) {
     this.repositorioUsuario = repositorioUsuario;
     this.repositorioCarta = repositorioCarta;
     this.repositorioInventario = repositorioInventario;
+    this.repositorioMazo = repositorioMazo;
   }
 
   @Override
@@ -43,39 +50,51 @@ public class ServicioLoginImpl implements ServicioLogin {
     jugador.setUsuario(usuario);
     usuario.setJugador(jugador);
 
-    // 1. Guardamos al usuario y al jugador en la BD
     repositorioUsuario.guardar(usuario);
 
-    // 2. Definimos las 15 cartas exactas del Mazo Inicial (las que tienen arte en data.sql)
-    String[] mazoInicial = {
-      "Patada Voladora",
-      "Tajo Basico",
-      "Puntazo",
-      "Golpe Pesado",
-      "Tajo Cruzado",
-      "Cuchillo Arrojadizo",
-      "Escudo de Madera",
-      "Bloqueo Perfecto",
-      "Postura Defensiva",
-      "Anticipacion",
-      "Sacrificio de Sangre",
-      "Muro de Piedra",
-      "Pocion Curativa",
-      "Preparacion",
-      "Afilador de Armas",
-    };
+    // 2. Armamos el mazo balanceado con mezcla de rarezas
+    List<Carta> seleccionRandom = new ArrayList<>();
 
-    // 3. Buscamos cada carta por nombre y se la damos al jugador
-    for (String nombreCarta : mazoInicial) {
-      Carta cartaFisica = repositorioCarta.buscarPorNombre(nombreCarta);
+    // -- ATAQUE (5 cartas): 3 Comunes + 1 Poco Comun + 1 Rara --
+    seleccionRandom.addAll(obtenerCartasRandom("ATAQUE", "Comun", 3));
+    seleccionRandom.addAll(obtenerCartasRandom("ATAQUE", "Poco Comun", 1));
+    seleccionRandom.addAll(obtenerCartasRandom("ATAQUE", "Rara", 1));
 
-      if (cartaFisica != null) {
-        ItemInventario item = new ItemInventario();
-        item.setCarta(cartaFisica);
-        item.setJugador(jugador);
-        item.setCantidad(1); // Arrancan con x1 de cada carta básica
-        repositorioInventario.guardar(item);
-      }
+    // -- DEFENSA (5 cartas): 3 Comunes + 1 Poco Comun + 1 Rara --
+    seleccionRandom.addAll(obtenerCartasRandom("DEFENSA", "Comun", 3));
+    seleccionRandom.addAll(obtenerCartasRandom("DEFENSA", "Poco Comun", 1));
+    seleccionRandom.addAll(obtenerCartasRandom("DEFENSA", "Rara", 1));
+
+    // -- HECHIZOS (5 cartas): 3 Comunes + 1 Poco Comun + 1 Rara --
+    seleccionRandom.addAll(obtenerCartasRandom("HECHIZO", "Comun", 3));
+    seleccionRandom.addAll(obtenerCartasRandom("HECHIZO", "Poco Comun", 1));
+    seleccionRandom.addAll(obtenerCartasRandom("HECHIZO", "Rara", 1));
+
+    Mazo mazoStarter = new Mazo();
+    mazoStarter.setCartas(seleccionRandom);
+    repositorioMazo.guardar(mazoStarter);
+
+    usuario.setMazoActivo(mazoStarter);
+    repositorioUsuario.modificar(usuario);
+
+    for (Carta cartaFisica : seleccionRandom) {
+      ItemInventario item = new ItemInventario();
+      item.setCarta(cartaFisica);
+      item.setJugador(jugador);
+      item.setCantidad(5);
+      repositorioInventario.guardar(item);
     }
+  }
+
+  private List<Carta> obtenerCartasRandom(String tipo, String rareza, int cantidad) {
+    List<Carta> disponibles = repositorioCarta.buscarPorTipoYRareza(tipo, rareza);
+
+    if (disponibles == null || disponibles.isEmpty()) {
+      return new ArrayList<>();
+    }
+
+    Collections.shuffle(disponibles);
+
+    return disponibles.stream().limit(cantidad).collect(Collectors.toList());
   }
 }

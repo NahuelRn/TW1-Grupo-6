@@ -12,5 +12,4 @@ public interface RepositorioCarta {
   Carta buscarPorNombre(String nombre);
 
   void guardar(Carta carta);
-  List<Carta> buscarPorTipoYRareza(String tipo, String rareza);
 }

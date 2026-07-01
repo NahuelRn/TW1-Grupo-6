@@ -10,16 +10,19 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+
 public class ServicioLoginTest {
 
   private ServicioLogin servicioLogin;
   private RepositorioUsuario repositorioUsuarioMock;
   private RepositorioCarta repositorioCartaMock;
   private RepositorioInventario repositorioInventarioMock;
+  private RepositorioMazo repositorioMazo;
 
   @BeforeEach
   public void init() {
     this.repositorioUsuarioMock = mock(RepositorioUsuario.class);
+    this.repositorioMazo = mock(RepositorioMazo.class);
     this.repositorioCartaMock = mock(RepositorioCarta.class);
     this.repositorioInventarioMock = mock(RepositorioInventario.class);
     this.servicioLogin =
@@ -69,18 +72,14 @@ public class ServicioLoginTest {
     carta.setId(1L);
 
     when(this.repositorioUsuarioMock.buscarUsuario(usuario.getEmail(), usuario.getPassword()))
-            .thenReturn(null);
+      .thenReturn(null);
 
     when(this.repositorioCartaMock.buscarPorNombre(anyString())).thenReturn(carta);
 
     this.servicioLogin.registrar(usuario);
 
-<<<<<<< HEAD
     verify(this.repositorioUsuarioMock, times(1)).guardar(usuario);
     assertThat(usuario.getInventario(), notNullValue());
-=======
-    verify(this.repositorioInventarioMock, times(15)).guardar(any(ItemInventario.class));
->>>>>>> feature/combate-mvp
   }
 
   @Test
