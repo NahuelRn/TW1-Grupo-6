@@ -63,8 +63,8 @@ public class ControladorMercadoTest {
     when(sessionMock.getAttribute("jugadorId")).thenReturn(1L);
 
     doThrow(new RuntimeException("Ya tienes una solicitud activa"))
-            .when(servicioMercadoMock)
-            .publicarSolicitud(1L, 5L);
+      .when(servicioMercadoMock)
+      .publicarSolicitud(1L, 5L);
 
     ModelAndView mav = controlador.procesarPublicarTrade(5L, sessionMock);
 
@@ -115,7 +115,7 @@ public class ControladorMercadoTest {
     when(sessionMock.getAttribute("jugadorId")).thenReturn(1L);
 
     when(servicioMercadoMock.buscarPorId(10L))
-            .thenThrow(new RuntimeException("Error de propuesta"));
+      .thenThrow(new RuntimeException("Error de propuesta"));
 
     ModelAndView mav = controlador.iniciarAceptarTrade(10L, sessionMock);
 
@@ -136,8 +136,8 @@ public class ControladorMercadoTest {
     when(sessionMock.getAttribute("jugadorId")).thenReturn(1L);
 
     doThrow(new RuntimeException("No tienes la carta"))
-            .when(servicioMercadoMock)
-            .finalizarIntercambio(1L, 10L, 5L);
+      .when(servicioMercadoMock)
+      .finalizarIntercambio(1L, 10L, 5L);
 
     ModelAndView mav = controlador.confirmarTrade(10L, 5L, sessionMock);
 
@@ -158,8 +158,8 @@ public class ControladorMercadoTest {
     when(sessionMock.getAttribute("jugadorId")).thenReturn(1L);
 
     doThrow(new RuntimeException("No se pudo eliminar"))
-            .when(servicioMercadoMock)
-            .eliminarMiTrade(1L, 10L);
+      .when(servicioMercadoMock)
+      .eliminarMiTrade(1L, 10L);
 
     ModelAndView mav = controlador.eliminarTrade(10L, sessionMock);
 
@@ -177,7 +177,10 @@ public class ControladorMercadoTest {
 
     ModelAndView mav = controlador.verDetalleTrade(10L, sessionMock);
 
-    assertThat(mav.getViewName(), is("redirect:/mercado/mis-trades?error=El intercambio no esta finalizado o no existe"));
+    assertThat(
+      mav.getViewName(),
+      is("redirect:/mercado/mis-trades?error=El intercambio no esta finalizado o no existe")
+    );
   }
 
   @Test
@@ -241,8 +244,14 @@ public class ControladorMercadoTest {
     when(sessionMock.getAttribute("jugadorId")).thenReturn(null);
 
     assertThat(controlador.verMisTrades(sessionMock).getViewName(), is("redirect:/login"));
-    assertThat(controlador.iniciarAceptarTrade(10L, sessionMock).getViewName(), is("redirect:/login"));
-    assertThat(controlador.confirmarTrade(10L, 5L, sessionMock).getViewName(), is("redirect:/login"));
+    assertThat(
+      controlador.iniciarAceptarTrade(10L, sessionMock).getViewName(),
+      is("redirect:/login")
+    );
+    assertThat(
+      controlador.confirmarTrade(10L, 5L, sessionMock).getViewName(),
+      is("redirect:/login")
+    );
     assertThat(controlador.eliminarTrade(10L, sessionMock).getViewName(), is("redirect:/login"));
     assertThat(controlador.verDetalleTrade(10L, sessionMock).getViewName(), is("redirect:/login"));
   }

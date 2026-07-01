@@ -15,7 +15,7 @@ public class ServicioPartidaImpl implements ServicioPartida {
   @Value("${partida.cartas.iniciales:5}")
   private int cartasIniciales;
 
-  @Value("${partida.hp.jugador.inicial:100}")
+  @Value("${partida.hp.jugador.inicial}")
   private int hpInicial;
 
   private RepositorioEnemigo repositorioEnemigo;

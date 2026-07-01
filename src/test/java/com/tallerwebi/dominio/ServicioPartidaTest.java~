@@ -54,6 +54,7 @@ public class ServicioPartidaTest {
     mazoActivo.setCartas(cartas);
 
     Partida partida = servicioPartida.iniciarPartida(usuario, zona);
+    System.out.println("DEBUG: HP del Jugador en la partida devuelta es: " + partida.getHpJugador());
     assertThat(partida, notNullValue());
     assertThat(partida.getUsuario(), is(usuario));
     assertThat(partida.getEnemigo(), is(enemigoSimulado));

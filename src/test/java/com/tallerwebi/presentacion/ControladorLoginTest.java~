@@ -119,7 +119,7 @@ public class ControladorLoginTest {
   @Test
   public void irALoginDeberiaRetornarVistaLoginConDatosLogin() {
     // ejecucion
-    ModelAndView modelAndView = controladorLogin.irALogin(requestMock);
+    ModelAndView modelAndView = controladorLogin.irALogin();
 
     // validacion
     assertThat(modelAndView.getViewName(), equalToIgnoringCase("login"));
