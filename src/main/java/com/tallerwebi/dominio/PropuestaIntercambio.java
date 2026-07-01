@@ -14,6 +14,9 @@ public class PropuestaIntercambio {
   private Usuario usuarioEmisor; // El que crea la solicitud (busca la carta)
 
   @ManyToOne(fetch = FetchType.LAZY)
+  private Usuario usuarioReceptor; // El que acepta la solicitud y entrega la carta (NUEVO)
+
+  @ManyToOne(fetch = FetchType.LAZY)
   private Carta cartaBuscada; // La carta específica que desea obtener
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -36,6 +39,14 @@ public class PropuestaIntercambio {
 
   public void setUsuarioEmisor(Usuario usuarioEmisor) {
     this.usuarioEmisor = usuarioEmisor;
+  }
+
+  public Usuario getUsuarioReceptor() {
+    return usuarioReceptor;
+  }
+
+  public void setUsuarioReceptor(Usuario usuarioReceptor) {
+    this.usuarioReceptor = usuarioReceptor;
   }
 
   public Carta getCartaBuscada() {

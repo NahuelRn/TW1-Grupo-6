@@ -7,6 +7,8 @@ import java.util.List;
 import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,6 +22,7 @@ public class ControladorMercado {
   private static final String REDIRECT_LOGIN = "redirect:/login";
   private static final String ATRIBUTO_ERROR = "error";
   private static final String VISTA_INTERCAMBIO = "intercambio";
+  private static final String ESTADO_ACTIVA = "ACTIVA";
 
   private final ServicioMercado servicioMercado;
 
@@ -154,5 +157,40 @@ public class ControladorMercado {
     } catch (Exception e) {
       return new ModelAndView("redirect:/mercado/mis-trades?error=" + e.getMessage());
     }
+  }
+
+  @RequestMapping(value = "/mercado/mis-trades/detalle/{id}", method = RequestMethod.GET)
+  public ModelAndView verDetalleTrade(@PathVariable Long id, HttpSession session) {
+    Long jugadorId = (Long) session.getAttribute(JUGADOR_ID_KEY);
+    if (jugadorId == null) {
+      return new ModelAndView(REDIRECT_LOGIN);
+    }
+
+    PropuestaIntercambio propuesta = servicioMercado.buscarPorId(id);
+
+    // Línea corregida usando la constante ESTADO_ACTIVA
+    if (propuesta == null || ESTADO_ACTIVA.equals(propuesta.getEstado())) {
+      return new ModelAndView(
+        "redirect:/mercado/mis-trades?error=El intercambio no esta finalizado o no existe"
+      );
+    }
+
+    ModelMap modelo = new ModelMap();
+    boolean esEmisor = propuesta.getUsuarioEmisor().getId().equals(jugadorId);
+
+    modelo.put("propuesta", propuesta);
+    modelo.put("esEmisor", esEmisor);
+
+    if (esEmisor) {
+      modelo.put("usuarioCoincidencia", propuesta.getUsuarioReceptor().getEmail());
+      modelo.put("cartaRecibida", propuesta.getCartaBuscada());
+      modelo.put("cartaEntregada", propuesta.getCartaOfrecida());
+    } else {
+      modelo.put("usuarioCoincidencia", propuesta.getUsuarioEmisor().getEmail());
+      modelo.put("cartaRecibida", propuesta.getCartaOfrecida());
+      modelo.put("cartaEntregada", propuesta.getCartaBuscada());
+    }
+
+    return new ModelAndView("mercado-detalle-trade", modelo);
   }
 }
