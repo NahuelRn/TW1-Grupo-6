@@ -63,16 +63,6 @@ public class RepositorioCartaImpl implements RepositorioCarta {
   }
 
   @Override
-  public List<Carta> buscarPorTipoYRareza(String tipo, String rareza) {
-    return sessionFactory
-      .getCurrentSession()
-      .createQuery("FROM Carta WHERE tipo = :tipo AND rareza = :rareza", Carta.class)
-      .setParameter("tipo", tipo)
-      .setParameter("rareza", rareza)
-      .getResultList();
-  }
-
-  @Override
   public void guardar(Carta carta) {
     sessionFactory.getCurrentSession().save(carta);
   }

@@ -16,17 +16,20 @@ public class ServicioLoginTest {
   private RepositorioUsuario repositorioUsuarioMock;
   private RepositorioCarta repositorioCartaMock;
   private RepositorioInventario repositorioInventarioMock;
+  private RepositorioMazo repositorioMazo;
 
   @BeforeEach
   public void init() {
     this.repositorioUsuarioMock = mock(RepositorioUsuario.class);
+    this.repositorioMazo = mock(RepositorioMazo.class);
     this.repositorioCartaMock = mock(RepositorioCarta.class);
     this.repositorioInventarioMock = mock(RepositorioInventario.class);
     this.servicioLogin =
       new ServicioLoginImpl(
         this.repositorioUsuarioMock,
         this.repositorioCartaMock,
-        this.repositorioInventarioMock
+        this.repositorioInventarioMock,
+        this.repositorioMazo
       );
   }
 
