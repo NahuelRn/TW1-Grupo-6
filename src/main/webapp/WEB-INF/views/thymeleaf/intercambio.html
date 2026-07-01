@@ -72,8 +72,6 @@
             color: #f0ead6;
             border-bottom: 3px solid rgba(212, 175, 55, 0.4);
         }
-
-        /* Botonera de Filtros Horizontales */
         .btn-filter {
             border: 1px solid #4a1212;
             background-color: #1a1111;
@@ -154,17 +152,31 @@
                         <hr style="border-color: var(--game-border, #4a1212);">
                         <p class="small text-white-50">Tienes esta carta repetida. Haz clic abajo para elegir tu recompensa de su inventario.</p>
 
-                        <form th:action="@{/mercado/aceptar-paso-1}" method="POST">
-                            <input type="hidden" name="idPropuesta" th:value="${oferta.id}">
-                            <button type="submit" class="btn btn-trade w-100 py-2">ACEPTAR Y ELEGIR PAGO</button>
-                        </form>
+                        <!-- COMPORTAMIENTO DINÁMICO DEL BOTÓN SEGÚN DUPLICADOS DISPONIBLES -->
+                        <div th:with="puedeAceptar=${#lists.contains(idsCartasQuePuedoDar, oferta.cartaBuscada.id)}">
+
+                            <!-- Habilitado -->
+                            <form th:if="${puedeAceptar}" th:action="@{/mercado/aceptar-paso-1}" method="POST">
+                                <input type="hidden" name="idPropuesta" th:value="${oferta.id}">
+                                <button type="submit" class="btn btn-trade w-100 py-2">ACEPTAR Y ELEGIR PAGO</button>
+                            </form>
+
+                            <!-- Deshabilitado -->
+                            <div th:unless="${puedeAceptar}">
+                                <button type="button" class="btn w-100 py-2" disabled
+                                        style="background-color: #2d2222; border: 1px solid #423333; color: #7a6a6a; cursor: not-allowed; font-family: 'Cinzel', serif; font-weight: bold;">
+                                    FALTAN DUPLICADOS 🔒
+                                </button>
+                                <small class="text-danger d-block mt-2" style="font-size: 0.78rem;">No tienes copias repetidas para ofrecer.</small>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <div th:if="${#lists.isEmpty(ofertas)}" class="col-12 text-center my-2">
                     <div class="p-4 rounded" style="background-color: rgba(26, 17, 17, 0.6); border: 1px dashed var(--game-border, #4a1212); max-width: 600px; margin: 0 auto;">
                         <p class="lead mb-0" style="color: var(--game-muted, #a09090); font-style: italic;">
-                            No hay propuestas del mercado compatibles con tus cartas duplicadas actualmente.
+                            No hay propuestas del mercado activas de otros usuarios actualmente.
                         </p>
                     </div>
                 </div>
@@ -195,11 +207,9 @@
                         </div>
 
                         <h5 th:text="${carta.nombre}" style="font-family: 'Cinzel', serif;">Nombre</h5>
-
                         <div class="mb-2">
                             <span class="badge badge-rarity" th:text="${carta.rareza}">RAREZA</span>
                         </div>
-
                         <p class="small text-muted flex-grow-1" th:text="${carta.descripcion}"></p>
 
                         <div th:if="${misTrades != null and #lists.contains(misTrades.?[estado != null and estado.toString() == 'ACTIVA'].![cartaBuscada.id], carta.id)}">
@@ -225,9 +235,7 @@
     </div>
 
     <div class="mt-5">
-        <a th:href="@{/lobby}" class="btn btn-mythic-back">
-            Volver al Lobby
-        </a>
+        <a th:href="@{/lobby}" class="btn btn-mythic-back">Volver al Lobby</a>
     </div>
 </div>
 
@@ -247,13 +255,11 @@
             }
         }
 
-        // --- MANIPULACIÓN DEL DOM ---
         const contenedor = document.getElementById('contenedorFaltantes');
         if (!contenedor) return;
 
         const cartasNodes = Array.from(contenedor.querySelectorAll('.carta-faltante-item'));
 
-        // Función de mapeo robusta y a prueba de tildes/strings de BD
         function mapearRarezaSegura(elemento) {
             const badge = elemento.querySelector(".badge-rarity");
             if (!badge) return "comun";
@@ -267,7 +273,6 @@
             return "comun";
         }
 
-        // NUEVO MAPA DE PESOS: Orden estricto de menor a mayor rareza
         const pesosRareza = {
             "poco-comun": 1,
             "comun": 2,
@@ -276,17 +281,14 @@
             "legendario": 5
         };
 
-        // Forzamos el ordenamiento inicial correcto
         cartasNodes.sort((a, b) => {
             const pesoA = pesosRareza[mapearRarezaSegura(a)] || 99;
             const pesoB = pesosRareza[mapearRarezaSegura(b)] || 99;
             return pesoA - pesoB;
         });
 
-        // Inyectamos las tarjetas ordenadas al contenedor
         cartasNodes.forEach(nodo => contenedor.appendChild(nodo));
 
-        // Lógica de los botones de filtrado
         document.querySelectorAll('.btn-filter').forEach(button => {
             button.addEventListener('click', function() {
                 document.querySelectorAll('.btn-filter').forEach(btn => btn.classList.remove('active'));

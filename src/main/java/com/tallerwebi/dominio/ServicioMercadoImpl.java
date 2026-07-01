@@ -23,13 +23,11 @@ public class ServicioMercadoImpl implements ServicioMercado {
 
   @Override
   public void publicarSolicitud(Long idUsuario, Long idCartaBuscada) throws Exception {
-    // Buscamos el usuario persistido real de la base de datos
     Usuario usuario = repoMercado.buscarUsuarioPorId(idUsuario);
     if (usuario == null) {
       throw new Exception("El usuario no existe en el sistema");
     }
 
-    // El inventario ahora está sincronizado dentro de la transacción activa
     boolean yaLaTiene = usuario
       .getInventario()
       .stream()
@@ -69,17 +67,20 @@ public class ServicioMercadoImpl implements ServicioMercado {
     List<PropuestaIntercambio> compatibles = new ArrayList<>();
 
     for (PropuestaIntercambio propuesta : activas) {
-      if (
-        !propuesta.getUsuarioEmisor().getId().equals(usuario.getId()) &&
-        tieneCartaRepetida(usuario, propuesta.getCartaBuscada().getId())
-      ) {
+      // Modificado: Ahora se muestran todas las ofertas de la comunidad que no sean propias
+      if (!propuesta.getUsuarioEmisor().getId().equals(usuario.getId())) {
         compatibles.add(propuesta);
       }
     }
     return compatibles;
   }
 
-  private boolean tieneCartaRepetida(Usuario usuario, Long idCarta) {
+  // Método expuesto para que el controlador verifique el stock duplicado del usuario actual
+  @Override
+  public boolean usuarioTieneCartaRepetida(Long idUsuario, Long idCarta) {
+    Usuario usuario = repoMercado.buscarUsuarioPorId(idUsuario);
+    if (usuario == null) return false;
+
     for (ItemInventario item : usuario.getInventario()) {
       if (
         item.getCarta().getId().equals(idCarta) && item.getCantidad() > CANTIDAD_MINIMA_DUPLICADO
@@ -137,7 +138,6 @@ public class ServicioMercadoImpl implements ServicioMercado {
     PropuestaIntercambio propuesta = repoMercado.buscarPorId(idPropuesta);
     validarPropuestaBasica(propuesta);
 
-    // Primero se valida el RECEPTOR (Como estaba originalmente)
     ItemInventario itemReceptorEntrega = buscarItemEnInventario(
       receptor,
       propuesta.getCartaBuscada().getId()
@@ -148,7 +148,6 @@ public class ServicioMercadoImpl implements ServicioMercado {
       throw new Exception("No tienes la carta solicitada repetida");
     }
 
-    // Después se valida el EMISOR usando la propuesta directamente
     ItemInventario itemEmisorOfrece = buscarItemEnInventario(
       propuesta.getUsuarioEmisor(),
       idCartaRecompensa
@@ -256,7 +255,6 @@ public class ServicioMercadoImpl implements ServicioMercado {
       return 1;
     }
 
-    // Normalizamos a mayúsculas usando Locale.ROOT para evitar advertencias de PMD
     switch (rareza.trim().toUpperCase(java.util.Locale.ROOT)) {
       case "LEGENDARIA":
         return 5;

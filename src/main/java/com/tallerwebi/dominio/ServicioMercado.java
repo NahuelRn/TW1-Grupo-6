@@ -12,4 +12,5 @@ public interface ServicioMercado {
   void finalizarIntercambio(Long idReceptor, Long idOferta, Long idCartaRecompensa)
     throws Exception;
   void eliminarMiTrade(Long idUsuario, Long idOferta) throws Exception;
+  boolean usuarioTieneCartaRepetida(Long idUsuario, Long idCarta);
 }
