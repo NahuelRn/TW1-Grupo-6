@@ -87,8 +87,9 @@ public class ServicioLoginTest {
     Usuario usuario = new Usuario();
     usuario.setEmail("existe@test.com");
     usuario.setPassword("123");
-    when(this.repositorioUsuarioMock.buscarUsuario(usuario.getEmail(), usuario.getPassword()))
-      .thenReturn(new Usuario());
+
+    // CORRECCIÓN: Mockear 'buscarPorEmail' que es lo que realmente invoca el servicio
+    when(this.repositorioUsuarioMock.buscarPorEmail(usuario.getEmail())).thenReturn(new Usuario());
 
     assertThrows(UsuarioExistente.class, () -> this.servicioLogin.registrar(usuario));
     verify(this.repositorioUsuarioMock, times(0)).guardar(usuario);

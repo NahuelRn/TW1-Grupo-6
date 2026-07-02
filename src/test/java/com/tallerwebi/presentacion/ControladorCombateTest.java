@@ -82,7 +82,7 @@ public class ControladorCombateTest {
     String zona = "bosque";
     Long idUsuario = 1L;
 
-    // 1. Simulamos usuario logueado con mazo para pasar la validación
+    // 1. Simulamos usuario logueado con mazo activo cargado
     when(sessionMock.getAttribute("USUARIO_ID")).thenReturn(idUsuario);
     Usuario usuarioSimulado = new Usuario();
     Mazo mazoSimulado = new Mazo();
@@ -93,15 +93,15 @@ public class ControladorCombateTest {
     String logEsperado =
       "⚔️ Atacas con [Golpe Básico] causando 15 de daño. El Infectado contraataca y recibes 5 de daño.";
     Partida partidaActualizada = new Partida();
-    partidaActualizada.setHpJugador(85);   // el valor que corresponda después de recibir 5 de daño
-    partidaActualizada.setHpEnemigo(100);  // si el controlador también lee esto en la línea 109 o cerca
+    partidaActualizada.setHpJugador(85); // el valor que corresponda después de recibir 5 de daño
+    partidaActualizada.setHpEnemigo(100); // si el controlador también lee esto en la línea 109 o cerca
 
     // 2. Simulamos las respuestas de los servicios
     when(servicioCombateMock.jugarTurno(idPartida, idCarta)).thenReturn(logEsperado);
     when(servicioCombateMock.obtenerPartidaPorIdentificador(idPartida))
       .thenReturn(partidaActualizada);
 
-    // 3. Ejecutamos (Acá te faltaba pasarle el requestMock)
+    // 3. Ejecutamos pasándole el requestMock estructurado
     ModelAndView modelAndView = controladorCombate.jugarCarta(
       idCarta,
       idPartida,

@@ -17,7 +17,7 @@ public class Usuario {
   private Integer oro = 0;
   private Integer experiencia = 0;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "mazo_activo_id")
   private Mazo mazoActivo;
 
@@ -29,7 +29,7 @@ public class Usuario {
     this.mazoActivo = mazoActivo;
   }
 
-  @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
+  @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   private Jugador jugador;
 
   public Jugador getJugador() {

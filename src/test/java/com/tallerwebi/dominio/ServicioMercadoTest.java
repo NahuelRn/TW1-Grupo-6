@@ -15,6 +15,7 @@ public class ServicioMercadoTest {
 
   private RepositorioMercado repoMercadoMock;
   private RepositorioCarta repoCartaMock;
+  private RepositorioInventario repoInventarioMock;
   private ServicioMercadoImpl servicio;
 
   private static final Long USER_ID = 1L;
@@ -25,28 +26,27 @@ public class ServicioMercadoTest {
   public void setUp() {
     repoMercadoMock = mock(RepositorioMercado.class);
     repoCartaMock = mock(RepositorioCarta.class);
-    servicio = new ServicioMercadoImpl(repoMercadoMock, repoCartaMock);
+    repoInventarioMock = mock(RepositorioInventario.class);
+
+    servicio = new ServicioMercadoImpl(repoMercadoMock, repoCartaMock, repoInventarioMock);
   }
 
   private Usuario crearUsuarioBase(Long id) {
     Usuario usuario = new Usuario();
     usuario.setId(id);
 
-    // Creamos el jugador intermedio y le inicializamos su inventario real
     Jugador jugador = new Jugador();
-    // Asumiendo que tu clase Jugador tiene un setInventario o inicializa un Set mutable
-    try {
-      java.lang.reflect.Field field = Jugador.class.getDeclaredField("inventario");
-      field.setAccessible(true);
-      field.set(jugador, new java.util.HashSet<>());
-    } catch (Exception e) {
-      // Por si en Jugador se llama diferente
-    }
-
-    // Vinculamos el jugador al usuario para que getInventario() no devuelva null ni una lista vacía suelta
+    jugador.setId(id + 1000L);
     usuario.setJugador(jugador);
 
+    List<ItemInventario> listaInventario = new ArrayList<>();
+    when(repoInventarioMock.listarInventarioDeJugador(jugador.getId())).thenReturn(listaInventario);
+
     return usuario;
+  }
+
+  private List<ItemInventario> obtenerListaMockeada(Usuario usuario) {
+    return repoInventarioMock.listarInventarioDeJugador(usuario.getJugador().getId());
   }
 
   @Test
@@ -82,9 +82,9 @@ public class ServicioMercadoTest {
     Carta carta = new Carta();
     carta.setId(CARTA_ID);
     item.setCarta(carta);
+    item.setCantidad(1);
 
-    // Ahora que tiene Jugador, el .add() va a impactar en la instancia correcta
-    usuario.getInventario().add(item);
+    obtenerListaMockeada(usuario).add(item);
 
     when(repoMercadoMock.buscarUsuarioPorId(USER_ID)).thenReturn(usuario);
 
@@ -155,9 +155,7 @@ public class ServicioMercadoTest {
     item.setCarta(carta);
     item.setCantidad(1);
 
-    if (usuario.getInventario() != null) {
-      usuario.getInventario().add(item);
-    }
+    obtenerListaMockeada(usuario).add(item);
 
     when(repoMercadoMock.buscarUsuarioPorId(USER_ID)).thenReturn(usuario);
 
@@ -179,10 +177,9 @@ public class ServicioMercadoTest {
     Carta carta = new Carta();
     carta.setId(CARTA_ID);
     item.setCarta(carta);
+    item.setCantidad(1);
 
-    if (usuario.getInventario() != null) {
-      usuario.getInventario().add(item);
-    }
+    obtenerListaMockeada(usuario).add(item);
 
     when(repoMercadoMock.buscarUsuarioPorId(USER_ID)).thenReturn(usuario);
     when(repoCartaMock.listarCartasFaltantes(anyList())).thenReturn(List.of(carta));
@@ -223,10 +220,8 @@ public class ServicioMercadoTest {
     item2.setCarta(c2);
     item2.setCantidad(1);
 
-    if (emisor.getInventario() != null) {
-      emisor.getInventario().add(item1);
-      emisor.getInventario().add(item2);
-    }
+    obtenerListaMockeada(emisor).add(item1);
+    obtenerListaMockeada(emisor).add(item2);
 
     PropuestaIntercambio propuesta = new PropuestaIntercambio();
     propuesta.setUsuarioEmisor(emisor);
@@ -287,9 +282,7 @@ public class ServicioMercadoTest {
     itemR.setCarta(cartaB);
     itemR.setCantidad(2);
 
-    if (receptor.getInventario() != null) {
-      receptor.getInventario().add(itemR);
-    }
+    obtenerListaMockeada(receptor).add(itemR);
 
     Usuario emisor = crearUsuarioBase(2L);
 
@@ -314,9 +307,7 @@ public class ServicioMercadoTest {
     itemR.setCarta(cartaB);
     itemR.setCantidad(2);
 
-    if (receptor.getInventario() != null) {
-      receptor.getInventario().add(itemR);
-    }
+    obtenerListaMockeada(receptor).add(itemR);
 
     Usuario emisor = crearUsuarioBase(2L);
     ItemInventario itemE = new ItemInventario();
@@ -326,9 +317,7 @@ public class ServicioMercadoTest {
     itemE.setCarta(cartaRecompensa);
     itemE.setCantidad(2);
 
-    if (emisor.getInventario() != null) {
-      emisor.getInventario().add(itemE);
-    }
+    obtenerListaMockeada(emisor).add(itemE);
 
     PropuestaIntercambio propuesta = new PropuestaIntercambio();
     propuesta.setEstado("ACTIVA");
@@ -352,9 +341,7 @@ public class ServicioMercadoTest {
     itemR.setCarta(cartaB);
     itemR.setCantidad(2);
 
-    if (receptor.getInventario() != null) {
-      receptor.getInventario().add(itemR);
-    }
+    obtenerListaMockeada(receptor).add(itemR);
 
     Usuario emisor = crearUsuarioBase(2L);
     ItemInventario itemE = new ItemInventario();
@@ -364,9 +351,7 @@ public class ServicioMercadoTest {
     itemE.setCarta(cartaRecompensa);
     itemE.setCantidad(2);
 
-    if (emisor.getInventario() != null) {
-      emisor.getInventario().add(itemE);
-    }
+    obtenerListaMockeada(emisor).add(itemE);
 
     PropuestaIntercambio propuesta = new PropuestaIntercambio();
     propuesta.setEstado("ACTIVA");
@@ -381,7 +366,7 @@ public class ServicioMercadoTest {
       servicio.finalizarIntercambio(USER_ID, PROPUESTA_ID, 55L);
       assertThat(propuesta.getEstado(), is("FINALIZADA"));
     } catch (Exception e) {
-      // Preventivo si la implementación exige base de datos activa
+      // Preventivo
     }
   }
 
@@ -419,9 +404,8 @@ public class ServicioMercadoTest {
     cartaB.setRareza("RARA");
     itemR.setCarta(cartaB);
     itemR.setCantidad(2);
-    receptor.getInventario().add(itemR);
+    obtenerListaMockeada(receptor).add(itemR);
 
-    // Caso donde el Emisor YA tiene la carta que le va a dar el receptor (entra al else de destinoEmisor)
     Usuario emisor = crearUsuarioBase(2L);
     ItemInventario itemE = new ItemInventario();
     Carta cartaRecompensa = new Carta();
@@ -429,19 +413,17 @@ public class ServicioMercadoTest {
     cartaRecompensa.setRareza("COMUN");
     itemE.setCarta(cartaRecompensa);
     itemE.setCantidad(2);
-    emisor.getInventario().add(itemE);
+    obtenerListaMockeada(emisor).add(itemE);
 
-    // Le agregamos al emisor también la cartaB, pero con cantidad 1 para que ya exista en su destino
     ItemInventario yaExisteEmisor = new ItemInventario();
     yaExisteEmisor.setCarta(cartaB);
     yaExisteEmisor.setCantidad(1);
-    emisor.getInventario().add(yaExisteEmisor);
+    obtenerListaMockeada(emisor).add(yaExisteEmisor);
 
-    // Le agregamos al receptor la cartaRecompensa con cantidad 1 para que ya exista en su destino (entra al else de destinoReceptor)
     ItemInventario yaExisteReceptor = new ItemInventario();
     yaExisteReceptor.setCarta(cartaRecompensa);
     yaExisteReceptor.setCantidad(1);
-    receptor.getInventario().add(yaExisteReceptor);
+    obtenerListaMockeada(receptor).add(yaExisteReceptor);
 
     PropuestaIntercambio propuesta = new PropuestaIntercambio();
     propuesta.setEstado("ACTIVA");
@@ -454,7 +436,6 @@ public class ServicioMercadoTest {
 
     servicio.finalizarIntercambio(USER_ID, PROPUESTA_ID, 55L);
 
-    // Verificamos que se incrementaron las cantidades en lugar de crear ítems nuevos
     assertThat(yaExisteEmisor.getCantidad(), is(2));
     assertThat(yaExisteReceptor.getCantidad(), is(2));
   }
@@ -468,7 +449,7 @@ public class ServicioMercadoTest {
     cartaB.setRareza("POCO COMUN");
     itemR.setCarta(cartaB);
     itemR.setCantidad(2);
-    receptor.getInventario().add(itemR);
+    obtenerListaMockeada(receptor).add(itemR);
 
     Usuario emisor = crearUsuarioBase(2L);
     ItemInventario itemE = new ItemInventario();
@@ -477,7 +458,7 @@ public class ServicioMercadoTest {
     cartaRecompensa.setRareza("EXOTICA");
     itemE.setCarta(cartaRecompensa);
     itemE.setCantidad(2);
-    emisor.getInventario().add(itemE);
+    obtenerListaMockeada(emisor).add(itemE);
 
     PropuestaIntercambio propuesta = new PropuestaIntercambio();
     propuesta.setEstado("ACTIVA");
@@ -488,7 +469,6 @@ public class ServicioMercadoTest {
     when(repoMercadoMock.buscarPorId(PROPUESTA_ID)).thenReturn(propuesta);
     when(repoCartaMock.buscarPorId(55L)).thenReturn(cartaRecompensa);
 
-    // Al quitarle el 'throws Exception' al test, IntelliJ se queda conforme porque la excepción solo vive dentro del assert
     assertThrows(Exception.class, () -> servicio.finalizarIntercambio(USER_ID, PROPUESTA_ID, 55L));
   }
 
@@ -498,19 +478,19 @@ public class ServicioMercadoTest {
     ItemInventario itemR = new ItemInventario();
     Carta cartaB = new Carta();
     cartaB.setId(CARTA_ID);
-    cartaB.setRareza(null); // Evalúa rareza == null -> retorna 1
+    cartaB.setRareza(null);
     itemR.setCarta(cartaB);
     itemR.setCantidad(2);
-    receptor.getInventario().add(itemR);
+    obtenerListaMockeada(receptor).add(itemR);
 
     Usuario emisor = crearUsuarioBase(2L);
     ItemInventario itemE = new ItemInventario();
     Carta cartaRecompensa = new Carta();
     cartaRecompensa.setId(55L);
-    cartaRecompensa.setRareza("CUALQUIER_OTRA"); // Evalúa el default -> retorna 1
+    cartaRecompensa.setRareza("CUALQUIER_OTRA");
     itemE.setCarta(cartaRecompensa);
     itemE.setCantidad(2);
-    emisor.getInventario().add(itemE);
+    obtenerListaMockeada(emisor).add(itemE);
 
     PropuestaIntercambio propuesta = new PropuestaIntercambio();
     propuesta.setEstado("ACTIVA");
@@ -521,7 +501,6 @@ public class ServicioMercadoTest {
     when(repoMercadoMock.buscarPorId(PROPUESTA_ID)).thenReturn(propuesta);
     when(repoCartaMock.buscarPorId(55L)).thenReturn(cartaRecompensa);
 
-    // Como ambos devuelven valor 1, son compatibles y el intercambio finaliza exitosamente
     servicio.finalizarIntercambio(USER_ID, PROPUESTA_ID, 55L);
     assertThat(propuesta.getEstado(), is("FINALIZADA"));
   }
@@ -533,16 +512,13 @@ public class ServicioMercadoTest {
     Carta carta = new Carta();
     carta.setId(CARTA_ID);
     item.setCarta(carta);
-
-    // Le asignamos una cantidad que supere el mínimo de duplicados (por ejemplo, 2 o más)
     item.setCantidad(2);
 
-    usuario.getInventario().add(item);
+    obtenerListaMockeada(usuario).add(item);
     when(repoMercadoMock.buscarUsuarioPorId(USER_ID)).thenReturn(usuario);
 
     boolean result = servicio.usuarioTieneCartaRepetida(USER_ID, CARTA_ID);
 
-    // Verificamos que ahora sí ingresa al IF y retorna true
     assertThat(result, is(true));
   }
 }

@@ -3,14 +3,22 @@ package com.tallerwebi.dominio;
 import java.util.List;
 
 public interface ServicioMercado {
-  void publicarSolicitud(Long idUsuario, Long idCartaBuscada) throws Exception;
-  List<PropuestaIntercambio> obtenerOfertasCompatibles(Long idUsuario);
-  List<PropuestaIntercambio> obtenerMisTrades(Long idUsuario);
-  List<Carta> obtenerCartasFaltantes(Long idUsuario);
+  void publicarSolicitud(Long jugadorId, Long idCartaBuscada) throws Exception;
+
+  List<PropuestaIntercambio> obtenerOfertasCompatibles(Long jugadorId);
+
+  boolean usuarioTieneCartaRepetida(Long jugadorId, Long idCarta);
+
+  List<Carta> obtenerCartasFaltantes(Long jugadorId);
+
+  List<PropuestaIntercambio> obtenerMisTrades(Long jugadorId);
+
   PropuestaIntercambio buscarPorId(Long id);
+
   List<Carta> obtenerOpcionesRecompensa(PropuestaIntercambio propuesta);
-  void finalizarIntercambio(Long idReceptor, Long idOferta, Long idCartaRecompensa)
+
+  void finalizarIntercambio(Long jugadorId, Long idPropuesta, Long idCartaRecompensa)
     throws Exception;
-  void eliminarMiTrade(Long idUsuario, Long idOferta) throws Exception;
-  boolean usuarioTieneCartaRepetida(Long idUsuario, Long idCarta);
+
+  void eliminarMiTrade(Long jugadorId, Long idPropuesta) throws Exception;
 }

@@ -45,14 +45,20 @@ public class RepositorioCartaImpl implements RepositorioCarta {
   @Override
   @SuppressWarnings("unchecked")
   public List<Carta> listarCartasFaltantes(List<Long> idsCartasPoseidas) {
-    Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Carta.class);
-
-    // Si la lista de IDs tiene algo, le decimos a Hibernate que excluya esos IDs (NOT IN)
-    if (idsCartasPoseidas != null && !idsCartasPoseidas.isEmpty()) {
-      criteria.add(Restrictions.not(Restrictions.in("id", idsCartasPoseidas)));
+    // Si no tiene ninguna carta asignada, le faltan absolutamente TODAS las cartas del juego
+    if (idsCartasPoseidas == null || idsCartasPoseidas.isEmpty()) {
+      return sessionFactory
+        .getCurrentSession()
+        .createQuery("FROM Carta", Carta.class)
+        .getResultList();
     }
 
-    return criteria.list();
+    // Usamos HQL explícito con NOT IN, que es mucho más robusto que la API de Criteria para colecciones
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery("FROM Carta c WHERE c.id NOT IN (:ids)", Carta.class)
+      .setParameterList("ids", idsCartasPoseidas)
+      .getResultList();
   }
 
   @Override

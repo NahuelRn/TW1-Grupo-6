@@ -16,7 +16,7 @@ public class ServicioLoginImpl implements ServicioLogin {
   private final RepositorioUsuario repositorioUsuario;
   private final RepositorioCarta repositorioCarta;
   private final RepositorioInventario repositorioInventario;
-  private final RepositorioMazo repositorioMazo; // ¡NUEVO: Necesitamos guardar el mazo!
+  private final RepositorioMazo repositorioMazo;
 
   @Autowired
   public ServicioLoginImpl(
@@ -38,13 +38,15 @@ public class ServicioLoginImpl implements ServicioLogin {
 
   @Override
   public void registrar(Usuario usuario) throws UsuarioExistente {
-    Usuario usuarioEncontrado = repositorioUsuario.buscarUsuario(
-      usuario.getEmail(),
-      usuario.getPassword()
-    );
+    Usuario usuarioEncontrado = repositorioUsuario.buscarPorEmail(usuario.getEmail());
+
     if (usuarioEncontrado != null) {
       throw new UsuarioExistente();
     }
+
+    // ===========================
+    // Crear jugador
+    // ===========================
 
     Jugador jugador = new Jugador();
     jugador.setUsuario(usuario);
@@ -52,36 +54,47 @@ public class ServicioLoginImpl implements ServicioLogin {
 
     repositorioUsuario.guardar(usuario);
 
-    // 2. Armamos el mazo balanceado con mezcla de rarezas
+    // ===========================
+    // Crear mazo inicial
+    // ===========================
+
     List<Carta> seleccionRandom = new ArrayList<>();
 
-    // -- ATAQUE (5 cartas): 3 Comunes + 1 Poco Comun + 1 Rara --
+    // ATAQUE
     seleccionRandom.addAll(obtenerCartasRandom("ATAQUE", "Comun", 3));
     seleccionRandom.addAll(obtenerCartasRandom("ATAQUE", "Poco Comun", 1));
     seleccionRandom.addAll(obtenerCartasRandom("ATAQUE", "Rara", 1));
 
-    // -- DEFENSA (5 cartas): 3 Comunes + 1 Poco Comun + 1 Rara --
+    // DEFENSA
     seleccionRandom.addAll(obtenerCartasRandom("DEFENSA", "Comun", 1));
     seleccionRandom.addAll(obtenerCartasRandom("DEFENSA", "Poco Comun", 3));
     seleccionRandom.addAll(obtenerCartasRandom("DEFENSA", "Rara", 1));
 
-    // -- HECHIZOS (5 cartas): 3 Comunes + 1 Poco Comun + 1 Rara --
+    // HECHIZO
     seleccionRandom.addAll(obtenerCartasRandom("HECHIZO", "Comun", 2));
     seleccionRandom.addAll(obtenerCartasRandom("HECHIZO", "Poco Comun", 2));
     seleccionRandom.addAll(obtenerCartasRandom("HECHIZO", "Rara", 1));
 
     Mazo mazoStarter = new Mazo();
     mazoStarter.setCartas(seleccionRandom);
+
     repositorioMazo.guardar(mazoStarter);
 
     usuario.setMazoActivo(mazoStarter);
+
     repositorioUsuario.modificar(usuario);
 
-    for (Carta cartaFisica : seleccionRandom) {
+    // ===========================
+    // Crear inventario
+    // ===========================
+
+    for (Carta carta : seleccionRandom) {
       ItemInventario item = new ItemInventario();
-      item.setCarta(cartaFisica);
+
       item.setJugador(jugador);
+      item.setCarta(carta);
       item.setCantidad(5);
+
       repositorioInventario.guardar(item);
     }
   }

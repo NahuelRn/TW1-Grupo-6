@@ -10,19 +10,29 @@ public class PropuestaIntercambio {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  private Usuario usuarioEmisor; // El que crea la solicitud (busca la carta)
+  // Quien publica la solicitud (quiere obtener cartaBuscada)
+  @ManyToOne
+  @JoinColumn(name = "usuario_emisor_id")
+  private Usuario usuarioEmisor;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  private Usuario usuarioReceptor; // El que acepta la solicitud y entrega la carta (NUEVO)
+  // Quien acepta y completa el trade
+  @ManyToOne
+  @JoinColumn(name = "usuario_receptor_id")
+  private Usuario usuarioReceptor;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  private Carta cartaBuscada; // La carta específica que desea obtener
+  // La carta específica que el emisor DESEA OBTENER
+  @ManyToOne
+  @JoinColumn(name = "carta_buscada_id")
+  private Carta cartaBuscada;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  private Carta cartaOfrecida; // La carta que el receptor le elegirá como pago
+  // La carta que el emisor entrega como recompensa (se asigna al finalizar)
+  @ManyToOne
+  @JoinColumn(name = "carta_ofrecida_id")
+  private Carta cartaOfrecida;
 
-  private String estado = "ACTIVA"; // "ACTIVA" o "FINALIZADA"
+  // "ACTIVA" | "FINALIZADA"
+  private String estado = "ACTIVA";
+
   private LocalDateTime fechaCreacion = LocalDateTime.now();
 
   public Long getId() {

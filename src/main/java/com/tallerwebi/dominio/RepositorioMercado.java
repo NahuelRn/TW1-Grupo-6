@@ -6,10 +6,13 @@ public interface RepositorioMercado {
   void guardar(PropuestaIntercambio propuesta);
   PropuestaIntercambio buscarPorId(Long id);
   void eliminar(PropuestaIntercambio propuesta);
+
+  // Busca por ID de Usuario (tabla usuario)
   Usuario buscarUsuarioPorId(Long id);
 
-  // Métodos nuevos para el modelo INTERCAMBIO 1.1
+  // *** NUEVO: Busca el Usuario a partir del ID de Jugador (lo que guardamos en sesión) ***
+  Usuario buscarUsuarioPorJugadorId(Long jugadorId);
+
+  List<PropuestaIntercambio> listarMisTrades(Usuario usuario);
   List<PropuestaIntercambio> listarTodasLasActivas();
-  List<PropuestaIntercambio> listarMisTrades(Usuario usuarioActual);
-  List<Carta> listarTodasLasCartas();
 }

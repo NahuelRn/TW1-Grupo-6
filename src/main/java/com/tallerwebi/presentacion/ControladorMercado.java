@@ -18,44 +18,47 @@ public class ControladorMercado {
 
   private final ServicioMercado servicioMercado;
 
-  // Constantes descriptivas para evitar literals repetidos y hardcodeados
   private static final String ATTRIBUTE_JUGADOR_ID = "jugadorId";
-  private static final Long ID_FILTRO_DETALLE = 1L;
   private static final String REDIRECT_LOGIN = "redirect:/login";
   private static final String VISTA_INTERCAMBIO = "intercambio";
   private static final String VISTA_MIS_TRADES = "mis-trades";
-  private static final String VISTA_DETALLE = "mercado-detalle-trade";
   private static final String VISTA_ELEGIR_RECOMPENSA = "elegir-recompensa";
+  private static final String VISTA_DETALLE = "mercado-detalle-trade";
+  private static final Long ID_FILTRO_DETALLE = 1L;
 
   @Autowired
   public ControladorMercado(ServicioMercado servicioMercado) {
     this.servicioMercado = servicioMercado;
   }
 
+  // -----------------------------------------------------------------------
+  // Pantalla principal: Ofertas de la Comunidad
+  // -----------------------------------------------------------------------
+
   @RequestMapping(path = "/mercado", method = RequestMethod.GET)
   public ModelAndView verMercadoComunidad(HttpSession session) {
     Long jugadorId = (Long) session.getAttribute(ATTRIBUTE_JUGADOR_ID);
-    if (jugadorId == null) {
-      return new ModelAndView(REDIRECT_LOGIN);
-    }
+    if (jugadorId == null) return new ModelAndView(REDIRECT_LOGIN);
 
     ModelAndView mav = new ModelAndView(VISTA_INTERCAMBIO);
     cargarModeloMercado(mav, jugadorId);
     return mav;
   }
 
+  // -----------------------------------------------------------------------
+  // Publicar trade
+  // -----------------------------------------------------------------------
+
   @RequestMapping(path = "/mercado/publicar", method = RequestMethod.POST)
   public ModelAndView procesarPublicarTrade(
-    @RequestParam("cartaBuscadaId") Long cartaBuscadaId,
+    @RequestParam("idCartaBuscada") Long idCartaBuscada,
     HttpSession session
   ) {
     Long jugadorId = (Long) session.getAttribute(ATTRIBUTE_JUGADOR_ID);
-    if (jugadorId == null) {
-      return new ModelAndView(REDIRECT_LOGIN);
-    }
+    if (jugadorId == null) return new ModelAndView(REDIRECT_LOGIN);
 
     try {
-      servicioMercado.publicarSolicitud(jugadorId, cartaBuscadaId);
+      servicioMercado.publicarSolicitud(jugadorId, idCartaBuscada);
       return new ModelAndView("redirect:/mercado/mis-trades");
     } catch (Exception e) {
       ModelAndView mav = new ModelAndView(VISTA_INTERCAMBIO);
@@ -65,25 +68,28 @@ public class ControladorMercado {
     }
   }
 
+  // -----------------------------------------------------------------------
+  // Mis Trades
+  // -----------------------------------------------------------------------
+
   @RequestMapping(path = "/mercado/mis-trades", method = RequestMethod.GET)
   public ModelAndView verMisTrades(HttpSession session) {
     Long jugadorId = (Long) session.getAttribute(ATTRIBUTE_JUGADOR_ID);
-    if (jugadorId == null) {
-      return new ModelAndView(REDIRECT_LOGIN);
-    }
+    if (jugadorId == null) return new ModelAndView(REDIRECT_LOGIN);
 
-    List<PropuestaIntercambio> misTrades = servicioMercado.obtenerMisTrades(jugadorId);
     ModelAndView mav = new ModelAndView(VISTA_MIS_TRADES);
-    mav.addObject("misTrades", misTrades);
+    mav.addObject("misTrades", servicioMercado.obtenerMisTrades(jugadorId));
     return mav;
   }
+
+  // -----------------------------------------------------------------------
+  // Aceptar trade: ver opciones de recompensa
+  // -----------------------------------------------------------------------
 
   @RequestMapping(path = "/mercado/aceptar", method = RequestMethod.GET)
   public ModelAndView iniciarAceptarTrade(@RequestParam("id") Long idTrade, HttpSession session) {
     Long jugadorId = (Long) session.getAttribute(ATTRIBUTE_JUGADOR_ID);
-    if (jugadorId == null) {
-      return new ModelAndView(REDIRECT_LOGIN);
-    }
+    if (jugadorId == null) return new ModelAndView(REDIRECT_LOGIN);
 
     try {
       PropuestaIntercambio propuesta = servicioMercado.buscarPorId(idTrade);
@@ -91,12 +97,16 @@ public class ControladorMercado {
 
       ModelAndView mav = new ModelAndView(VISTA_ELEGIR_RECOMPENSA);
       mav.addObject("trade", propuesta);
-      mav.addObject("opciones", opciones);
+      mav.addObject("opciones", opciones != null ? opciones : new ArrayList<>());
       return mav;
     } catch (Exception e) {
       return new ModelAndView("redirect:/mercado?error=" + e.getMessage());
     }
   }
+
+  // -----------------------------------------------------------------------
+  // Confirmar intercambio
+  // -----------------------------------------------------------------------
 
   @RequestMapping(path = "/mercado/confirmar", method = RequestMethod.POST)
   public ModelAndView confirmarTrade(
@@ -105,9 +115,7 @@ public class ControladorMercado {
     HttpSession session
   ) {
     Long jugadorId = (Long) session.getAttribute(ATTRIBUTE_JUGADOR_ID);
-    if (jugadorId == null) {
-      return new ModelAndView(REDIRECT_LOGIN);
-    }
+    if (jugadorId == null) return new ModelAndView(REDIRECT_LOGIN);
 
     try {
       servicioMercado.finalizarIntercambio(jugadorId, idTrade, idCartaRecompensa);
@@ -117,12 +125,14 @@ public class ControladorMercado {
     }
   }
 
+  // -----------------------------------------------------------------------
+  // Eliminar trade
+  // -----------------------------------------------------------------------
+
   @RequestMapping(path = "/mercado/eliminar", method = RequestMethod.POST)
   public ModelAndView eliminarTrade(@RequestParam("id") Long idTrade, HttpSession session) {
     Long jugadorId = (Long) session.getAttribute(ATTRIBUTE_JUGADOR_ID);
-    if (jugadorId == null) {
-      return new ModelAndView(REDIRECT_LOGIN);
-    }
+    if (jugadorId == null) return new ModelAndView(REDIRECT_LOGIN);
 
     try {
       servicioMercado.eliminarMiTrade(jugadorId, idTrade);
@@ -132,12 +142,14 @@ public class ControladorMercado {
     }
   }
 
+  // -----------------------------------------------------------------------
+  // Detalle de trade finalizado
+  // -----------------------------------------------------------------------
+
   @RequestMapping(path = "/mercado/detalle", method = RequestMethod.GET)
   public ModelAndView verDetalleTrade(@RequestParam("id") Long idTrade, HttpSession session) {
     Long jugadorId = (Long) session.getAttribute(ATTRIBUTE_JUGADOR_ID);
-    if (jugadorId == null) {
-      return new ModelAndView(REDIRECT_LOGIN);
-    }
+    if (jugadorId == null) return new ModelAndView(REDIRECT_LOGIN);
 
     try {
       PropuestaIntercambio propuesta = servicioMercado.buscarPorId(idTrade);
@@ -149,34 +161,45 @@ public class ControladorMercado {
         propuesta.getUsuarioReceptor().getId().equals(ID_FILTRO_DETALLE)
       ) {
         mav.addObject("usuarioCoincidencia", propuesta.getUsuarioEmisor().getEmail());
-      } else {
+      } else if (propuesta.getUsuarioReceptor() != null) {
         mav.addObject("usuarioCoincidencia", propuesta.getUsuarioReceptor().getEmail());
+      } else {
+        mav.addObject("usuarioCoincidencia", "");
       }
-
       return mav;
     } catch (Exception e) {
       return new ModelAndView("redirect:/mercado?error=" + e.getMessage());
     }
   }
 
+  // -----------------------------------------------------------------------
+  // Helper privado: carga el modelo completo para la vista intercambio
+  // -----------------------------------------------------------------------
+
   private void cargarModeloMercado(ModelAndView mav, Long jugadorId) {
     List<PropuestaIntercambio> ofertas = servicioMercado.obtenerOfertasCompatibles(jugadorId);
     List<Carta> faltantes = servicioMercado.obtenerCartasFaltantes(jugadorId);
     List<PropuestaIntercambio> misTrades = servicioMercado.obtenerMisTrades(jugadorId);
 
+    // CRÍTICO: siempre una lista concreta, nunca null
     List<Long> idsCartasQuePuedoDar = new ArrayList<>();
-    for (PropuestaIntercambio o : ofertas) {
-      if (
-        o.getCartaBuscada() != null &&
-        servicioMercado.usuarioTieneCartaRepetida(jugadorId, o.getCartaBuscada().getId())
-      ) {
-        idsCartasQuePuedoDar.add(o.getCartaBuscada().getId());
+
+    if (ofertas != null) {
+      for (PropuestaIntercambio o : ofertas) {
+        if (o.getCartaBuscada() != null) {
+          Long idCarta = o.getCartaBuscada().getId();
+          // Solo agrega si el usuario realmente tiene esa carta duplicada
+          if (servicioMercado.usuarioTieneCartaRepetida(jugadorId, idCarta)) {
+            idsCartasQuePuedoDar.add(idCarta);
+          }
+        }
       }
     }
 
-    mav.addObject("ofertas", ofertas);
-    mav.addObject("faltantes", faltantes);
-    mav.addObject("misTrades", misTrades);
+    mav.addObject("ofertas", ofertas != null ? ofertas : new ArrayList<>());
+    mav.addObject("faltantes", faltantes != null ? faltantes : new ArrayList<>());
+    mav.addObject("misTrades", misTrades != null ? misTrades : new ArrayList<>());
+    // Nunca será null: garantizado por ArrayList arriba
     mav.addObject("idsCartasQuePuedoDar", idsCartasQuePuedoDar);
   }
 }
