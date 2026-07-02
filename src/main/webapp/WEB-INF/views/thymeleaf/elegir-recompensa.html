@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Elegir Recompensa - MythicStack</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <link rel="stylesheet" th:href="@{/css/main.css}" />
+    <style>
+        body { background-color: #120c0c; color: #f0ead6; font-family: 'Roboto', sans-serif; }
+        .titulo-mercado { font-family: 'Cinzel', serif; color: #8b0000; text-shadow: 0 0 10px rgba(139,0,0,0.5); }
+        .card-trade { background-color: #1a1111; border: 1px solid #4a1212; border-radius: 6px; transition: transform 0.3s; cursor: pointer; }
+        .card-trade:hover { transform: scale(1.03); border-color: #d4af37; }
+        .card-trade.seleccionada { border: 2px solid #d4af37; box-shadow: 0 0 15px rgba(212,175,55,0.4); }
+        .btn-trade { background-color: #8b0000; color: #fff; font-family: 'Cinzel', serif; font-weight: bold; border-radius: 6px; border: none; }
+        .btn-trade:hover { background-color: #b30000; color: #fff; }
+        .btn-trade:disabled { background-color: #3a1111; color: #7a6a6a; cursor: not-allowed; }
+        .btn-mythic-back { font-family: 'Cinzel', serif; color: #d4af37 !important; border: 1px solid #d4af37 !important; background-color: transparent; padding: 10px 25px; border-radius: 6px; transition: all 0.3s; text-decoration: none; display: inline-block; }
+        .btn-mythic-back:hover { background-color: rgba(212,175,55,0.15) !important; }
+        .badge-rarity { background-color: transparent !important; border: 1px solid #d4af37 !important; color: #d4af37 !important; font-size: 0.75rem; font-weight: 700; padding: 4px 8px; }
+        .carta-solicitada-box { background-color: #1a1111; border: 1px solid #4a1212; border-radius: 8px; padding: 20px; max-width: 280px; margin: 0 auto; }
+        .flecha-intercambio { font-size: 2rem; color: #d4af37; }
+    </style>
+</head>
+<body>
+<div class="container py-5" style="min-height: 90vh;">
+
+    <h1 class="titulo-mercado display-5 text-center mb-2">Elegir Recompensa</h1>
+    <p class="text-center mb-5" style="color: #a09090;">
+        Vas a entregar tu copia de <strong style="color:#d4af37;" th:text="${trade.cartaBuscada.nombre}">la carta</strong>.
+        Elegí qué carta quieres recibir a cambio del inventario del solicitante.
+    </p>
+
+    <!-- Resumen del intercambio -->
+    <div class="d-flex align-items-center justify-content-center gap-4 mb-5 flex-wrap">
+
+        <!-- Lo que VOS entregás -->
+        <div class="carta-solicitada-box text-center">
+            <p class="small mb-2" style="color:#a09090;">VOS ENTREGÁS:</p>
+            <img th:if="${trade.cartaBuscada.imagen != null and not #strings.isEmpty(trade.cartaBuscada.imagen)}"
+                 th:src="@{/img/{img}(img=${trade.cartaBuscada.imagen})}"
+                 class="img-fluid mb-2" style="max-height:130px; object-fit:contain;" alt="Tu carta"/>
+            <h5 th:text="${trade.cartaBuscada.nombre}" style="font-family:'Cinzel',serif;">Carta</h5>
+            <span class="badge badge-rarity" th:text="${trade.cartaBuscada.rareza}">RAREZA</span>
+        </div>
+
+        <div class="flecha-intercambio">⇄</div>
+
+        <!-- Lo que vas a RECIBIR (a elegir) -->
+        <div class="carta-solicitada-box text-center" style="border-color: #d4af37; min-width:180px;">
+            <p class="small mb-2" style="color:#d4af37;">VOS RECIBÍS:</p>
+            <div id="preview-elegida" style="min-height:130px; display:flex; align-items:center; justify-content:center;">
+                <p style="color:#7a6a6a; font-style:italic; font-size:0.85rem;">Selecciona una carta abajo</p>
+            </div>
+        </div>
+    </div>
+
+    <hr style="border-color:#4a1212; margin-bottom: 2rem;">
+
+    <!-- Aviso de regla de rareza -->
+    <div class="text-center mb-4">
+        <p style="color:#a09090; font-size:0.9rem;">
+            Solo puedes elegir cartas de rareza igual o menor a
+            <strong style="color:#d4af37;" th:text="${trade.cartaBuscada.rareza}">RAREZA</strong>.
+        </p>
+    </div>
+
+    <!-- Grilla de cartas elegibles -->
+    <div th:if="${opciones == null or #lists.isEmpty(opciones)}" class="text-center py-4">
+        <div class="p-4 rounded" style="background-color:rgba(26,17,17,0.6); border:1px dashed #4a1212; max-width:500px; margin:0 auto;">
+            <p class="lead mb-0" style="color:#a09090; font-style:italic;">
+                El solicitante no tiene cartas disponibles para ofrecerte como recompensa.
+            </p>
+        </div>
+    </div>
+
+    <form th:unless="${opciones == null or #lists.isEmpty(opciones)}"
+          th:action="@{/mercado/confirmar}" method="POST" id="formConfirmar">
+        <input type="hidden" name="idTrade" th:value="${trade.id}">
+        <!-- Este campo se completa con JS al seleccionar una carta -->
+        <input type="hidden" name="idCartaRecompensa" id="idCartaRecompensaInput" value="">
+
+        <div class="row justify-content-center m-0 mb-5">
+            <div th:each="carta : ${opciones}" class="col-md-3 col-sm-6 mb-4">
+                <div class="card card-trade p-3 text-center h-100 d-flex flex-column carta-opcion"
+                     th:data-id="${carta.id}"
+                     th:data-nombre="${carta.nombre}"
+                     th:data-rareza="${carta.rareza}"
+                     th:data-imagen="${carta.imagen}"
+                     onclick="seleccionarCarta(this)">
+
+                    <img th:if="${carta.imagen != null and not #strings.isEmpty(carta.imagen)}"
+                         th:src="@{/img/{img}(img=${carta.imagen})}"
+                         class="img-fluid mx-auto mb-2" style="max-height:120px; object-fit:contain;" alt="Opción"/>
+                    <div th:unless="${carta.imagen != null and not #strings.isEmpty(carta.imagen)}"
+                         class="mb-2 d-flex align-items-center justify-content-center"
+                         style="height:120px; background-color:#222; color:#777; border-radius:4px;">
+                        <small>Sin imagen</small>
+                    </div>
+
+                    <h6 th:text="${carta.nombre}" style="font-family:'Cinzel',serif; font-size:0.9rem;">Nombre</h6>
+                    <span class="badge badge-rarity mt-auto" th:text="${carta.rareza}">RAREZA</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mb-5">
+            <button type="submit" id="btnConfirmar" class="btn btn-trade px-5 py-3 text-uppercase" disabled>
+                Confirmar Intercambio
+            </button>
+            <p class="small mt-2" style="color:#7a6a6a;" id="textoConfirmar">
+                Selecciona una carta para habilitar el botón.
+            </p>
+        </div>
+    </form>
+
+    <div class="text-center">
+        <a th:href="@{/mercado}" class="btn-mythic-back">Volver al Mercado</a>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+        crossorigin="anonymous"></script>
+<script>
+    function seleccionarCarta(el) {
+        // Deseleccionar todas
+        document.querySelectorAll('.carta-opcion').forEach(c => c.classList.remove('seleccionada'));
+
+        // Marcar la seleccionada
+        el.classList.add('seleccionada');
+
+        const id      = el.getAttribute('data-id');
+        const nombre  = el.getAttribute('data-nombre');
+        const rareza  = el.getAttribute('data-rareza');
+        const imagen  = el.getAttribute('data-imagen');
+
+        // Actualizar el hidden input
+        document.getElementById('idCartaRecompensaInput').value = id;
+
+        // Actualizar el preview
+        const preview = document.getElementById('preview-elegida');
+        const imgTag  = imagen && imagen.trim() !== ''
+            ? `<img src="${window.location.origin}/spring/img/${imagen}" style="max-height:110px; object-fit:contain;" class="img-fluid mb-1" onerror="this.style.display='none'">`
+            : `<div style="height:110px; display:flex; align-items:center; justify-content:center; color:#777;"><small>Sin imagen</small></div>`;
+
+        preview.innerHTML = `
+        ${imgTag}
+        <p style="font-family:'Cinzel',serif; margin:4px 0; font-size:0.95rem;">${nombre}</p>
+        <span style="background:transparent; border:1px solid #d4af37; color:#d4af37; font-size:0.75rem; padding:3px 8px; border-radius:4px;">${rareza}</span>
+    `;
+
+        // Habilitar botón
+        document.getElementById('btnConfirmar').disabled = false;
+        document.getElementById('textoConfirmar').textContent = `Vas a recibir: ${nombre}`;
+    }
+</script>
+</body>
+</html>
