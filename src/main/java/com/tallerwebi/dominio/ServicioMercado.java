@@ -11,7 +11,11 @@ public interface ServicioMercado {
 
   List<Carta> obtenerCartasFaltantes(Long jugadorId);
 
+  // Propuestas donde soy EMISOR (las que yo publiqué)
   List<PropuestaIntercambio> obtenerMisTrades(Long jugadorId);
+
+  // Propuestas donde soy RECEPTOR (las que yo acepté)
+  List<PropuestaIntercambio> obtenerTradesAceptados(Long jugadorId);
 
   PropuestaIntercambio buscarPorId(Long id);
 
@@ -21,4 +25,7 @@ public interface ServicioMercado {
     throws Exception;
 
   void eliminarMiTrade(Long jugadorId, Long idPropuesta) throws Exception;
+
+  // Devuelve true si el jugadorId corresponde al emisor de la propuesta
+  boolean esEmisor(Long jugadorId, PropuestaIntercambio propuesta);
 }

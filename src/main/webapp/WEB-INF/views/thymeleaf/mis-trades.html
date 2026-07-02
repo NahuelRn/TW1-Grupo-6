@@ -4,100 +4,28 @@
     <meta charset="UTF-8">
     <title>Mis Trades</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-
     <style>
-        body {
-            background-color: #120c0c;
-            color: #f0ead6;
-            font-family: 'Roboto', sans-serif;
-        }
-        .table-dark {
-            --bs-table-bg: #1a1111;
-            --bs-table-striped-bg: #221616;
-            color: #f0ead6;
-        }
-        .mythic-modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.85);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-        .mythic-modal-content {
-            background-color: #121212;
-            border: 2px solid #8b0000;
-            padding: 30px;
-            border-radius: 8px;
-            text-align: center;
-            box-shadow: 0 0 20px rgba(139, 0, 0, 0.6);
-            max-width: 420px;
-            width: 90%;
-        }
-        .mythic-modal-content h3 {
-            color: #ff3333;
-            font-family: 'Arial Black', Gadget, sans-serif;
-            margin-top: 0;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .mythic-modal-content p {
-            color: #ffffff;
-            font-size: 16px;
-            margin-bottom: 25px;
-        }
-        .mythic-modal-actions {
-            display: flex;
-            justify-content: space-evenly;
-        }
-        .mythic-btn-confirm {
-            background-color: #8b0000;
-            color: white;
-            border: none;
-            padding: 10px 24px;
-            font-weight: bold;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .mythic-btn-confirm:hover {
-            background-color: #ff3333;
-        }
-        .mythic-btn-cancel {
-            background-color: #2a2a2a;
-            color: #cccccc;
-            border: 1px solid #444444;
-            padding: 10px 24px;
-            font-weight: bold;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.2s, color 0.2s;
-        }
-        .mythic-btn-cancel:hover {
-            background-color: #444444;
-            color: white;
-        }
-        .btn-eye {
-            color: #d4af37;
-            border: 1px solid #d4af37;
-            background: transparent;
-            transition: all 0.2s ease;
-        }
-        .btn-eye:hover {
-            background-color: rgba(212, 175, 55, 0.15);
-            color: #fff;
-            box-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
-        }
+        body { background-color: #120c0c; color: #f0ead6; font-family: 'Roboto', sans-serif; }
+        .table-dark { --bs-table-bg: #1a1111; --bs-table-striped-bg: #221616; color: #f0ead6; }
+        .titulo-seccion { font-family: 'Cinzel', serif; color: #d4af37; border-bottom: 1px solid #4a1212; padding-bottom: 8px; margin-bottom: 20px; }
+        .mythic-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 9999; }
+        .mythic-modal-content { background-color: #121212; border: 2px solid #8b0000; padding: 30px; border-radius: 8px; text-align: center; box-shadow: 0 0 20px rgba(139,0,0,0.6); max-width: 420px; width: 90%; }
+        .mythic-modal-content h3 { color: #ff3333; font-family: 'Arial Black', Gadget, sans-serif; margin-top: 0; text-transform: uppercase; }
+        .mythic-modal-content p { color: #ffffff; font-size: 16px; margin-bottom: 25px; }
+        .mythic-modal-actions { display: flex; justify-content: space-evenly; }
+        .mythic-btn-confirm { background-color: #8b0000; color: white; border: none; padding: 10px 24px; font-weight: bold; border-radius: 4px; cursor: pointer; }
+        .mythic-btn-confirm:hover { background-color: #ff3333; }
+        .mythic-btn-cancel { background-color: #2a2a2a; color: #cccccc; border: 1px solid #444; padding: 10px 24px; font-weight: bold; border-radius: 4px; cursor: pointer; }
+        .mythic-btn-cancel:hover { background-color: #444; color: white; }
+        .btn-eye { color: #d4af37; border: 1px solid #d4af37; background: transparent; transition: all 0.2s ease; }
+        .btn-eye:hover { background-color: rgba(212,175,55,0.15); color: #fff; }
     </style>
 </head>
-<body class="bg-dark text-light">
+<body>
 <div class="container py-5">
+
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="text-warning">Mis Publicaciones de Intercambio</h1>
+        <h1 class="text-warning">Historial de Trades</h1>
         <div>
             <a th:href="@{/mercado}" class="btn btn-outline-info me-2">Ofertas Comunidad</a>
             <a th:href="@{/mercado(tab='publicar')}" class="btn btn-warning">Nueva Solicitud</a>
@@ -106,12 +34,18 @@
 
     <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
-    <table class="table table-dark table-striped align-middle border border-secondary">
+    <!-- ================================================================ -->
+    <!-- SECCIÓN 1: MIS PUBLICACIONES (soy el emisor)                     -->
+    <!-- ================================================================ -->
+    <h4 class="titulo-seccion">Mis Publicaciones</h4>
+
+    <table class="table table-dark table-striped align-middle border border-secondary mb-5">
         <thead>
         <tr>
-            <th>Carta Buscada</th>
+            <th>Carta que busqué</th>
             <th>Rareza</th>
             <th>Estado</th>
+            <th>Carta que entregué</th>
             <th>Acciones</th>
         </tr>
         </thead>
@@ -124,28 +58,77 @@
                       th:text="${trade.estado}">ESTADO</span>
             </td>
             <td>
+                <!-- Solo tiene carta ofrecida si el trade fue finalizado -->
+                <span th:if="${trade.cartaOfrecida != null}" th:text="${trade.cartaOfrecida.nombre}">—</span>
+                <span th:unless="${trade.cartaOfrecida != null}" class="text-muted">Pendiente</span>
+            </td>
+            <td>
                 <div class="d-flex align-items-center gap-2">
-                    <form th:if="${trade.estado == 'ACTIVA'}" th:action="@{/mercado/eliminar}" method="POST" onsubmit="abrirConfirmacionMythic(event)">
-                        <input type="hidden" name="idPropuesta" th:value="${trade.id}">
+                    <!-- Botón eliminar solo si está ACTIVA -->
+                    <form th:if="${trade.estado == 'ACTIVA'}"
+                          th:action="@{/mercado/eliminar}" method="POST"
+                          onsubmit="abrirConfirmacionMythic(event)">
+                        <input type="hidden" name="id" th:value="${trade.id}">
                         <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
                     </form>
 
-                    <a th:unless="${trade.estado == 'ACTIVA'}"
+                    <!-- Botón ver detalle solo si está FINALIZADA -->
+                    <a th:if="${trade.estado == 'FINALIZADA'}"
                        th:href="@{/mercado/mis-trades/detalle/{id}(id=${trade.id})}"
-                       class="btn btn-sm btn-eye"
-                       title="Ver resumen del intercambio">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+                       class="btn btn-sm btn-eye" title="Ver resumen del intercambio">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                             <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
-                            <path d="M0 8s3-5.5 8-5.5S16 8s16 8 16 8-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
+                            <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
                         </svg>
                     </a>
                 </div>
             </td>
         </tr>
+        <tr th:if="${misTrades == null or #lists.isEmpty(misTrades)}">
+            <td colspan="5" class="text-center text-muted">No publicaste ningún trade todavía.</td>
+        </tr>
         </tbody>
     </table>
+
+    <!-- ================================================================ -->
+    <!-- SECCIÓN 2: TRADES QUE ACEPTÉ (soy el receptor)                  -->
+    <!-- ================================================================ -->
+    <h4 class="titulo-seccion">Trades que Acepté</h4>
+
+    <table class="table table-dark table-striped align-middle border border-secondary">
+        <thead>
+        <tr>
+            <th>Carta que entregué</th>
+            <th>Carta que recibí</th>
+            <th>Solicitante</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="trade : ${tradesAceptados}">
+            <!-- El receptor entregó la cartaBuscada y recibió la cartaOfrecida -->
+            <td th:text="${trade.cartaBuscada.nombre}">—</td>
+            <td th:text="${trade.cartaOfrecida != null ? trade.cartaOfrecida.nombre : '—'}">—</td>
+            <td th:text="${trade.usuarioEmisor.email}">—</td>
+            <td>
+                <a th:href="@{/mercado/mis-trades/detalle/{id}(id=${trade.id})}"
+                   class="btn btn-sm btn-eye" title="Ver resumen del intercambio">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+                        <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
+                    </svg>
+                </a>
+            </td>
+        </tr>
+        <tr th:if="${tradesAceptados == null or #lists.isEmpty(tradesAceptados)}">
+            <td colspan="4" class="text-center text-muted">No aceptaste ningún trade todavía.</td>
+        </tr>
+        </tbody>
+    </table>
+
 </div>
 
+<!-- Modal de confirmación -->
 <div id="customConfirmModal" class="mythic-modal-overlay">
     <div class="mythic-modal-content">
         <h3>MythicStack</h3>
@@ -159,29 +142,21 @@
 
 <script>
     let formularioPorEnviar = null;
-
     function abrirConfirmacionMythic(event) {
         event.preventDefault();
         formularioPorEnviar = event.target;
         document.getElementById('customConfirmModal').style.display = 'flex';
     }
-
     function cerrarMythicModal() {
         document.getElementById('customConfirmModal').style.display = 'none';
         formularioPorEnviar = null;
     }
-
     function confirmarEliminacionMythic() {
-        if (formularioPorEnviar) {
-            formularioPorEnviar.submit();
-        }
+        if (formularioPorEnviar) formularioPorEnviar.submit();
     }
-
     window.addEventListener('click', function(event) {
         const modal = document.getElementById('customConfirmModal');
-        if (event.target === modal) {
-            cerrarMythicModal();
-        }
+        if (event.target === modal) cerrarMythicModal();
     });
 </script>
 </body>

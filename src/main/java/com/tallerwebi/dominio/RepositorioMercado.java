@@ -7,12 +7,14 @@ public interface RepositorioMercado {
   PropuestaIntercambio buscarPorId(Long id);
   void eliminar(PropuestaIntercambio propuesta);
 
-  // Busca por ID de Usuario (tabla usuario)
   Usuario buscarUsuarioPorId(Long id);
-
-  // *** NUEVO: Busca el Usuario a partir del ID de Jugador (lo que guardamos en sesión) ***
   Usuario buscarUsuarioPorJugadorId(Long jugadorId);
 
+  // Propuestas donde el usuario es EMISOR
   List<PropuestaIntercambio> listarMisTrades(Usuario usuario);
+
+  // Propuestas donde el usuario es RECEPTOR (trades que aceptó)
+  List<PropuestaIntercambio> listarTradesAceptados(Usuario usuario);
+
   List<PropuestaIntercambio> listarTodasLasActivas();
 }

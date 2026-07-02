@@ -33,28 +33,19 @@ public class RepositorioMercadoImpl implements RepositorioMercado {
     sessionFactory.getCurrentSession().delete(propuesta);
   }
 
-  /**
-   * Busca por ID de USUARIO (tabla usuario). Usado internamente si tienes el ID de usuario.
-   */
   @Override
   public Usuario buscarUsuarioPorId(Long id) {
     return sessionFactory.getCurrentSession().get(Usuario.class, id);
   }
 
-  /**
-   * Busca el Usuario a partir del ID de JUGADOR (tabla jugador).
-   * Esto es lo que necesitamos porque en sesión guardamos jugador.getId().
-   */
   @Override
   public Usuario buscarUsuarioPorJugadorId(Long jugadorId) {
-    Jugador jugador = sessionFactory.getCurrentSession().get(Jugador.class, jugadorId);
+    final Jugador jugador = sessionFactory.getCurrentSession().get(Jugador.class, jugadorId);
     if (jugador == null) return null;
     return jugador.getUsuario();
   }
 
-  /**
-   * Todas las propuestas del propio usuario (activas e históricas).
-   */
+  /** Propuestas donde el usuario es EMISOR (las que publicó). */
   @Override
   @SuppressWarnings("unchecked")
   public List<PropuestaIntercambio> listarMisTrades(Usuario usuario) {
@@ -65,10 +56,19 @@ public class RepositorioMercadoImpl implements RepositorioMercado {
       .list();
   }
 
-  /**
-   * Todas las propuestas con estado ACTIVA.
-   * El servicio filtra en memoria cuáles son compatibles para el usuario actual.
-   */
+  /** Propuestas FINALIZADAS donde el usuario es RECEPTOR (las que aceptó). */
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<PropuestaIntercambio> listarTradesAceptados(Usuario usuario) {
+    return sessionFactory
+      .getCurrentSession()
+      .createCriteria(PropuestaIntercambio.class)
+      .add(Restrictions.eq("usuarioReceptor", usuario))
+      .add(Restrictions.eq("estado", "FINALIZADA"))
+      .list();
+  }
+
+  /** Todas las propuestas ACTIVAS (de cualquier usuario). */
   @Override
   @SuppressWarnings("unchecked")
   public List<PropuestaIntercambio> listarTodasLasActivas() {
