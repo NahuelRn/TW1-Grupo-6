@@ -138,11 +138,6 @@ public class ControladorCombate {
     return armarVistaCombate(partida, manoActual, idsMazoRobo, zona, "Retomas el combate.");
   }
 
-  /**
-   * OJO: ya NO se vuelve a mezclar el mazo acá. ServicioPartida.iniciarPartida()
-   * es la única fuente de verdad: nos devuelve la Partida con manoJugador y
-   * mazoRestante ya calculados (un solo shuffle, sin pisadas).
-   */
   private ModelAndView crearNuevoCombate(Usuario usuarioReal, String zona, HttpSession session) {
     Partida partida = servicioPartida.iniciarPartida(usuarioReal, zona);
     session.setAttribute(SESSION_ID_PARTIDA, partida.getId());

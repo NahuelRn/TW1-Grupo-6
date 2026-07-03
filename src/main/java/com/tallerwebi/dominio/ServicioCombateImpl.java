@@ -76,7 +76,7 @@ public class ServicioCombateImpl implements ServicioCombate {
     } else {
       int curacion = calcularValorAleatorio(carta.getDefensaMin(), carta.getDefensaMax());
       partida.setHpJugador(Math.min(hpMaximo, partida.getHpJugador() + curacion));
-      accionJugador = "✨ Usas [" + carta.getNombre() + "] y recuperas " + curacion + " HP.";
+      accionJugador = "Usas [" + carta.getNombre() + "] y recuperas " + curacion + " HP.";
     }
 
     if (partida.getHpEnemigo() <= VALOR_NULO) {

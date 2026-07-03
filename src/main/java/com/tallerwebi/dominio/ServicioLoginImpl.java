@@ -16,7 +16,7 @@ public class ServicioLoginImpl implements ServicioLogin {
   private final RepositorioUsuario repositorioUsuario;
   private final RepositorioCarta repositorioCarta;
   private final RepositorioInventario repositorioInventario;
-  private final RepositorioMazo repositorioMazo; // ¡NUEVO: Necesitamos guardar el mazo!
+  private final RepositorioMazo repositorioMazo;
 
   @Autowired
   public ServicioLoginImpl(
@@ -52,7 +52,6 @@ public class ServicioLoginImpl implements ServicioLogin {
 
     repositorioUsuario.guardar(usuario);
 
-    // 2. Armamos el mazo balanceado con mezcla de rarezas
     List<Carta> seleccionRandom = new ArrayList<>();
 
     // -- ATAQUE (5 cartas): 3 Comunes + 1 Poco Comun + 1 Rara --
