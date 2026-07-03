@@ -7,5 +7,7 @@ public interface ServicioCombate {
 
   String jugarTurno(Long idPartida, Long idCarta);
 
-  Partida obtenerPartidaPorIdentificador(Long identificadorPartida);
+//  String jugarTurno(Partida partidaActual, Long idCarta);
+
+    Partida obtenerPartidaPorIdentificador(Long identificadorPartida);
 }

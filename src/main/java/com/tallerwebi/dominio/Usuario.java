@@ -17,6 +17,8 @@ public class Usuario {
   private Integer oro = 0;
   private Integer experiencia = 0;
 
+  private Integer nivel = 1;
+
   @ManyToOne
   @JoinColumn(name = "mazo_activo_id")
   private Mazo mazoActivo;
@@ -102,6 +104,15 @@ public class Usuario {
 
   public void setExperiencia(Integer experiencia) {
     this.experiencia = experiencia;
+  }
+
+  public Integer getNivel() {
+    //      Cada 100 puntos de experiencia sube 1 nivel.
+    return (this.experiencia / 100) + 1;
+  }
+
+  public void setNivel(Integer nivel) {
+    this.nivel = nivel;
   }
 
   public void sumarExperiencia(Integer experiencia) {

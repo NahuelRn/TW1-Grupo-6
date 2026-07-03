@@ -237,3 +237,8 @@ INSERT INTO ItemInventario (cantidad, carta_id, jugador_id) VALUES
 (1, (SELECT id FROM Carta WHERE nombre = 'Frenesi Sangriento' LIMIT 1), 1),
 (1, (SELECT id FROM Carta WHERE nombre = 'Piel de Hierro' LIMIT 1), 1),
 (1, (SELECT id FROM Carta WHERE nombre = 'Bomba' LIMIT 1), 1);
+
+-- CONFIGURACION DE RECOMPENSAS
+INSERT INTO ConfiguracionJuego (clave, valor)
+VALUES ('ORO_BASE', 20),
+       ('EXPERIENCIA_BASE', 50);

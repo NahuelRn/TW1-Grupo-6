@@ -23,7 +23,7 @@ public class ServicioHistorialImpl implements ServicioHistorial {
       throw new RuntimeException("Error, el usuario no existe.");
     }
 
-    historialPartida.setLocalDate(LocalDate.now());
+    historialPartida.setFecha(LocalDate.now());
     this.repositorioHistorialPartida.guardarHistorialPartidaRepositorio(historialPartida);
   }
 
