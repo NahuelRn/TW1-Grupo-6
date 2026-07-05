@@ -167,12 +167,20 @@
                          style="background-color: #09090b !important;">
                         <div class="d-flex justify-content-between border-bottom border-dark pb-1 mb-1">
                             <span class="text-white-50">Daño:</span>
-                            <strong class="text-white" th:text="${carta.dano}">0</strong>
+                            <strong class="text-white">
+                                <span th:text="${carta.danoMin}">0</span>
+                                -
+                                <span th:text="${carta.danoMax}">0</span>
+                            </strong>
                         </div>
 
                         <div class="d-flex justify-content-between border-bottom border-dark pb-1 mb-1">
                             <span class="text-white-50">Defensa:</span>
-                            <strong class="text-white" th:text="${carta.defensa}">0</strong>
+                            <strong class="text-white">
+                                <span th:text="${carta.defensaMin}">0</span>
+                                -
+                                <span th:text="${carta.defensaMax}">0</span>
+                            </strong>
                         </div>
 
                         <div class="d-flex justify-content-between">
