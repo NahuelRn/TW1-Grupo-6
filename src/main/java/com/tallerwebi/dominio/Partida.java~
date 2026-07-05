@@ -30,12 +30,14 @@ public class Partida {
   private List<Carta> manoJugador = new ArrayList<>();
 
   @Transient
+  private List<Carta> mazoRestante = new ArrayList<>();
+
+  @Transient
   private List<Integer> cartasEnManoJugador = new ArrayList<>();
 
   // --- CONSTRUCTORES ---
   public Partida() {}
 
-  // 2. Constructor que armó Mika para su lógica
   public Partida(Integer hpJugador, Integer hpEnemigo, Integer turno) {
     this.hpJugador = hpJugador;
     this.hpEnemigo = hpEnemigo;
@@ -113,6 +115,21 @@ public class Partida {
 
   public Partida setManoJugador(List<Carta> manoJugador) {
     this.manoJugador = manoJugador;
+    return this;
+  }
+
+  /**
+   * Cartas del mazo activo que quedaron disponibles para robar
+   * luego de armar la mano inicial. Calculado una única vez
+   * por ServicioPartida.iniciarPartida(), para evitar que otras
+   * capas (como el controlador) vuelvan a mezclar el mazo por su cuenta.
+   */
+  public List<Carta> getMazoRestante() {
+    return mazoRestante;
+  }
+
+  public Partida setMazoRestante(List<Carta> mazoRestante) {
+    this.mazoRestante = mazoRestante;
     return this;
   }
 

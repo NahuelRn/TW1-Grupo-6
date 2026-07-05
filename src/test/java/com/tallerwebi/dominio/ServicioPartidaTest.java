@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -25,6 +26,8 @@ public class ServicioPartidaTest {
 
     servicioPartida = new ServicioPartidaImpl(repoEnemigoMock, repoPartidaMock);
 
+    ReflectionTestUtils.setField(servicioPartida, "cartasIniciales", 5);
+    ReflectionTestUtils.setField(servicioPartida, "hpInicial", 100);
     ReflectionTestUtils.setField(servicioPartida, "cartasIniciales", 5);
 
     usuario = new Usuario();
@@ -53,18 +56,34 @@ public class ServicioPartidaTest {
     mazoActivo.setCartas(cartas);
 
     Partida partida = servicioPartida.iniciarPartida(usuario, zona);
-
     assertThat(partida, notNullValue());
     assertThat(partida.getUsuario(), is(usuario));
     assertThat(partida.getHpEnemigo(), is(150));
     assertThat(partida.getHpJugador(), is(100));
-    assertThat(partida.getManoJugador(), hasSize(5));
+    assertThat(partida.getManoJugador(), hasSize(5)); // Validamos que cortó exactamente en 5 cartas
+
+    // NUEVO: el servicio también debe devolver el mazo restante (1 carta de 6)
+    assertThat(partida.getMazoRestante(), hasSize(1));
+
+    // NUEVO: mano + mazo restante deben sumar el total del mazo, sin duplicados
+    List<Long> idsMano = partida
+      .getManoJugador()
+      .stream()
+      .map(Carta::getId)
+      .collect(Collectors.toList());
+    List<Long> idsMazoRestante = partida
+      .getMazoRestante()
+      .stream()
+      .map(Carta::getId)
+      .collect(Collectors.toList());
+
+    assertThat(idsMano.size() + idsMazoRestante.size(), is(6));
+    assertThat(java.util.Collections.disjoint(idsMano, idsMazoRestante), is(true));
   }
 
   @Test
   public void alIniciarPartidaSiNoHayEnemigoDisponibleEnLaZonaDebeAsignarHpPorDefecto() {
     String zona = "ZonaVacia";
-    when(repoEnemigoMock.buscarPorZona(zona)).thenReturn(null);
     when(repoEnemigoMock.obtenerEnemigoAleatorioPorZona(zona)).thenReturn(null);
 
     mazoActivo.setCartas(List.of());
@@ -72,7 +91,9 @@ public class ServicioPartidaTest {
     Partida partida = servicioPartida.iniciarPartida(usuario, zona);
 
     assertThat(partida.getEnemigo(), nullValue());
-    assertThat(partida.getHpEnemigo(), is(100));
+    assertThat(partida.getHpEnemigo(), is(100)); // El 'else' del operador ternario
+    assertThat(partida.getManoJugador(), is(empty()));
+    assertThat(partida.getMazoRestante(), is(empty())); // NUEVO
   }
 
   @Test
@@ -82,22 +103,19 @@ public class ServicioPartidaTest {
     enemigoSimulado.setHpBase(120);
     when(repoEnemigoMock.obtenerEnemigoAleatorioPorZona(zona)).thenReturn(enemigoSimulado);
 
-    // 1. Instanciá objetos REALES
     Usuario usuarioReal = new Usuario();
     Mazo mazoReal = new Mazo();
     List<Carta> cartasPocas = new ArrayList<>();
     cartasPocas.add(new Carta());
     cartasPocas.add(new Carta());
 
-    // 2. Cargá los datos como lo harías en la vida real
     mazoReal.setCartas(cartasPocas);
     usuarioReal.setMazoActivo(mazoReal);
 
-    // 3. Ejecutá con el usuario real
     Partida partida = servicioPartida.iniciarPartida(usuarioReal, zona);
 
-    // 4. Assert
     assertThat(partida.getManoJugador(), hasSize(2));
+    assertThat(partida.getMazoRestante(), is(empty())); // NUEVO: no sobró nada para robar
   }
 
   @Test
@@ -107,5 +125,6 @@ public class ServicioPartidaTest {
     Partida partida = servicioPartida.iniciarPartida(usuario, "Bosque");
 
     assertThat(partida.getManoJugador(), is(empty()));
+    assertThat(partida.getMazoRestante(), is(empty())); // NUEVO
   }
 }

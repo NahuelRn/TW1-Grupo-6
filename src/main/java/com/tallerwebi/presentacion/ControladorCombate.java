@@ -7,7 +7,6 @@ import com.tallerwebi.dominio.ServicioPartida;
 import com.tallerwebi.dominio.ServicioUsuario;
 import com.tallerwebi.dominio.Usuario;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
@@ -143,35 +142,16 @@ public class ControladorCombate {
     Partida partida = servicioPartida.iniciarPartida(usuarioReal, zona);
     session.setAttribute(SESSION_ID_PARTIDA, partida.getId());
 
-    List<Long> todosLosIds = usuarioReal
-      .getMazoActivo()
-      .getCartas()
-      .stream()
-      .map(Carta::getId)
-      .collect(Collectors.toList());
-    Collections.shuffle(todosLosIds);
+    List<Carta> manoActual = partida.getManoJugador();
+    List<Carta> mazoRestante = partida.getMazoRestante();
 
-    List<Long> idsMano = new ArrayList<>();
-    List<Long> idsMazoRobo = new ArrayList<>();
-
-    int cartasIniciales = Math.min(5, todosLosIds.size());
-    for (int i = 0; i < cartasIniciales; i++) {
-      idsMano.add(todosLosIds.get(i));
-    }
-    for (int i = cartasIniciales; i < todosLosIds.size(); i++) {
-      idsMazoRobo.add(todosLosIds.get(i));
-    }
+    List<Long> idsMano = manoActual.stream().map(Carta::getId).collect(Collectors.toList());
+    List<Long> idsMazoRobo = (mazoRestante != null)
+      ? mazoRestante.stream().map(Carta::getId).collect(Collectors.toList())
+      : new ArrayList<>();
 
     session.setAttribute(SESSION_IDS_MANO, idsMano);
     session.setAttribute(SESSION_MAZO_ROBO, idsMazoRobo);
-
-    List<Carta> manoActual = usuarioReal
-      .getMazoActivo()
-      .getCartas()
-      .stream()
-      .filter(c -> idsMano.contains(c.getId()))
-      .collect(Collectors.toList());
-    partida.setManoJugador(manoActual);
 
     return armarVistaCombate(partida, manoActual, idsMazoRobo, zona, "¡Comienza el combate!");
   }

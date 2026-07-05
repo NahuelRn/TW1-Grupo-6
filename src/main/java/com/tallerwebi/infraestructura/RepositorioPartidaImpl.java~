@@ -3,6 +3,7 @@ package com.tallerwebi.infraestructura;
 import com.tallerwebi.dominio.Partida;
 import com.tallerwebi.dominio.RepositorioPartida;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -32,13 +33,9 @@ public class RepositorioPartidaImpl implements RepositorioPartida {
   }
 
   public Partida buscarPartidaActivaPorUsuario(Long usuarioId) {
-    return sessionFactory
-      .getCurrentSession()
-      .createQuery(
-        "FROM Partida p WHERE p.usuario.id = :usuarioId AND p.estado = 'ACTIVA'",
-        Partida.class
-      )
-      .setParameter("usuarioId", usuarioId)
-      .uniqueResult();
+    return sessionFactory.getCurrentSession()
+            .createQuery("FROM Partida p WHERE p.usuario.id = :usuarioId AND p.estado = 'ACTIVA'", Partida.class)
+            .setParameter("usuarioId", usuarioId)
+            .uniqueResult();
   }
 }

@@ -4,20 +4,24 @@ spring.datasource.url=jdbc:mysql://localhost:3306/cartas_nueva_era?createDatabas
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 
 # ===============================
-# CREDENCIALES
+# CREDENCIALES (Revisá tu archivo .env)
 # ===============================
-
+# Acá van el usuario y contraseña de tu MySQL de Docker.
+# Por lo general en la facu usan root y root, o root y test.
 spring.datasource.username=root
 spring.datasource.password=rootpassword
 
 # ===============================
-# CONFIGURACIÓN DE HIBERNATE
+# CONFIGURACIÓN DE HIBERNATE (El "Motor")
 # ===============================
+# Le decimos explícitamente que estamos usando MySQL versión 8
 spring.jpa.database-platform=org.hibernate.dialect.MySQL8Dialect
 spring.jpa.show-sql=true
 
+# Crea las tablas automáticamente basandose tus clases @Entity
 spring.jpa.hibernate.ddl-auto=create
 
+# Ejecuta el archivo data.sql apenas termina de crear las tablas
 spring.sql.init.mode=always
 
 

@@ -15,6 +15,9 @@ public class ServicioPartidaImpl implements ServicioPartida {
   @Value("${partida.cartas.iniciales:5}")
   private int cartasIniciales;
 
+  @Value("${partida.hp.jugador.inicial:100}")
+  private int hpInicial;
+
   private RepositorioEnemigo repositorioEnemigo;
   private RepositorioPartida repositorioPartida;
 
@@ -29,6 +32,14 @@ public class ServicioPartidaImpl implements ServicioPartida {
 
   @Override
   public Partida iniciarPartida(Usuario usuario, String zona) {
+    // 1. Buscamos si el usuario ya tiene una partida activa (para evitar crear partidas zombis)
+    Partida partidaExistente = repositorioPartida.buscarPartidaActivaPorUsuario(usuario.getId());
+
+    if (partidaExistente != null) {
+      return partidaExistente;
+    }
+
+    // 2. Si no hay partida activa, creamos la estructura base
     Partida nuevaPartida = new Partida();
     nuevaPartida.setUsuario(usuario);
 
@@ -36,21 +47,29 @@ public class ServicioPartidaImpl implements ServicioPartida {
 
     nuevaPartida.setEnemigo(enemigoSeleccionado);
     nuevaPartida.setHpEnemigo(enemigoSeleccionado != null ? enemigoSeleccionado.getHpBase() : 100);
-    nuevaPartida.setHpJugador(100);
+    nuevaPartida.setHpJugador(hpInicial);
     nuevaPartida.setEnumEstadoPartida(EnumEstadoPartida.ACTIVA);
 
+    // 3. Obtenemos las cartas del usuario
     List<Carta> mazoCompleto = new ArrayList<>();
     if (usuario.getMazoActivo() != null && usuario.getMazoActivo().getCartas() != null) {
       mazoCompleto.addAll(usuario.getMazoActivo().getCartas());
     }
 
+    // 4. Barajamos una única vez para garantizar aleatoriedad justa
     Collections.shuffle(mazoCompleto);
 
+    // 5. Dividimos mazo en mano inicial y mazo de robo
     int cartasARobar = Math.min(cartasIniciales, mazoCompleto.size());
     List<Carta> manoInicial = new ArrayList<>(mazoCompleto.subList(0, cartasARobar));
+    List<Carta> mazoRestante = new ArrayList<>(
+      mazoCompleto.subList(cartasARobar, mazoCompleto.size())
+    );
 
     nuevaPartida.setManoJugador(manoInicial);
+    nuevaPartida.setMazoRestante(mazoRestante);
 
+    // 6. Persistimos en la base de datos
     repositorioPartida.guardar(nuevaPartida);
 
     return nuevaPartida;

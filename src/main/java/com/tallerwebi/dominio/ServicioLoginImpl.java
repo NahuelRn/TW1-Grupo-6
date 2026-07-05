@@ -54,10 +54,6 @@ public class ServicioLoginImpl implements ServicioLogin {
 
     repositorioUsuario.guardar(usuario);
 
-    // ===========================
-    // Crear mazo inicial
-    // ===========================
-
     List<Carta> seleccionRandom = new ArrayList<>();
 
     // ATAQUE
