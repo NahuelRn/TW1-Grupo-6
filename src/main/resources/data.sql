@@ -4,10 +4,7 @@
 INSERT INTO Usuario (email, password, rol, activo)
 VALUES ('jugador@unlam.edu.ar', '123456', 'USER', true);
 
--- ==========================================
--- DATA: JUGADOR ASOCIADO AL USUARIO
--- ==========================================
--- Le creamos el perfil de Jugador al Usuario ID 1 (jugador@unlam.edu.ar)
+-- Jugador asociado al Usuario 1
 INSERT INTO Jugador (id, nivel, oro, usuario_id)
 VALUES (1, 1, 0, 1);
 
@@ -94,149 +91,151 @@ INSERT INTO Carta (nombre, tipo, subtipo, valorOroBase, nivelDesbloqueo, probabi
                                                                                                                                                                     ('Ritual Oscuro',             'HECHIZO', 'ROBO',         250, 2, 100.00, 1,  'Rara',       'Efecto: Reinicia Mano', 0, 0, 0, 0),
                                                                                                                                                                     ('Piel de Obsidiana',         'HECHIZO', 'ESCUDO',       250, 2, 100.00, 2,  'Rara',       'Defensa: 10', 0, 0, 10, 10),
                                                                                                                                                                     ('Contrato Demoniaco',        'HECHIZO', 'ROBO',         1000,5, 100.00, 1,  'Legendaria', 'Efecto: -15 HP, Roba 5', 0, 0, 0, 0);
+-- ==========================================
 -- VINCULAR IMÁGENES
 -- ==========================================
-UPDATE Carta SET imagen = 'Patada_Voladora.jpg' WHERE nombre = 'Patada Voladora';
-UPDATE Carta SET imagen = 'Tajo_Basico.jpg' WHERE nombre = 'Tajo Basico';
-UPDATE Carta SET imagen = 'Puntazo.jpg' WHERE nombre = 'Puntazo';
-UPDATE Carta SET imagen = 'Golpe_Pesado.jpg' WHERE nombre = 'Golpe Pesado';
-UPDATE Carta SET imagen = 'Tajo_Cruzado.jpg' WHERE nombre = 'Tajo Cruzado';
-UPDATE Carta SET imagen = 'Cuchillo_Arrojadizo.jpg' WHERE nombre = 'Cuchillo Arrojadizo';
-
-UPDATE Carta SET imagen = 'Escudo_de_Madera.jpg' WHERE nombre = 'Escudo de Madera';
-UPDATE Carta SET imagen = 'Bloqueo_Perfecto.jpg' WHERE nombre = 'Bloqueo Perfecto';
-UPDATE Carta SET imagen = 'Postura_Defensiva.jpg' WHERE nombre = 'Postura Defensiva';
-UPDATE Carta SET imagen = 'Anticipacion.jpg' WHERE nombre = 'Anticipacion';
-UPDATE Carta SET imagen = 'Sacrificio_de_Sangre.jpg' WHERE nombre = 'Sacrificio de Sangre';
-UPDATE Carta SET imagen = 'Muro_de_Piedra.jpg' WHERE nombre = 'Muro de Piedra';
-
-UPDATE Carta SET imagen = 'Pocion_Curativa.jpg' WHERE nombre = 'Pocion Curativa';
-UPDATE Carta SET imagen = 'Preparacion.jpg' WHERE nombre = 'Preparacion';
-UPDATE Carta SET imagen = 'Afilado_de_Armas.jpg' WHERE nombre = 'Afilador de Armas';
-
--- ATAQUE
-UPDATE Carta SET imagen = 'Disparo_Rapido.jpg' WHERE nombre = 'Disparo Rapido';
-UPDATE Carta SET imagen = 'Corte_Doble.jpg' WHERE nombre = 'Corte Doble';
-UPDATE Carta SET imagen = 'Hachazo_Brutal.jpg' WHERE nombre = 'Hachazo Brutal';
-UPDATE Carta SET imagen = 'Tiro_Preciso.jpg' WHERE nombre = 'Tiro Preciso';
-UPDATE Carta SET imagen = 'Rompe_Rodillas.jpg' WHERE nombre = 'Rompe Rodillas';
-UPDATE Carta SET imagen = 'Estocada_Venenosa.jpg' WHERE nombre = 'Estocada Venenosa';
-UPDATE Carta SET imagen = 'Golpe_Bajo.jpg' WHERE nombre = 'Golpe Bajo';
-UPDATE Carta SET imagen = 'Frenesi_Sangriento.jpg' WHERE nombre = 'Frenesi Sangriento';
-UPDATE Carta SET imagen = 'Machacar.jpg' WHERE nombre = 'Machacar';
-UPDATE Carta SET imagen = 'Empujon.jpg' WHERE nombre = 'Empujon';
-UPDATE Carta SET imagen = 'Guillotina.jpg' WHERE nombre = 'Guillotina';
-UPDATE Carta SET imagen = 'Ataque_Furtivo.jpg' WHERE nombre = 'Ataque Furtivo';
-UPDATE Carta SET imagen = 'Martillazo_Sismico.jpg' WHERE nombre = 'Martillazo Sismico';
+UPDATE Carta SET imagen = 'Patada_Voladora.jpg'      WHERE nombre = 'Patada Voladora';
+UPDATE Carta SET imagen = 'Tajo_Basico.jpg'          WHERE nombre = 'Tajo Basico';
+UPDATE Carta SET imagen = 'Puntazo.jpg'              WHERE nombre = 'Puntazo';
+UPDATE Carta SET imagen = 'Golpe_Pesado.jpg'         WHERE nombre = 'Golpe Pesado';
+UPDATE Carta SET imagen = 'Tajo_Cruzado.jpg'         WHERE nombre = 'Tajo Cruzado';
+UPDATE Carta SET imagen = 'Cuchillo_Arrojadizo.jpg'  WHERE nombre = 'Cuchillo Arrojadizo';
+UPDATE Carta SET imagen = 'Disparo_Rapido.jpg'       WHERE nombre = 'Disparo Rapido';
+UPDATE Carta SET imagen = 'Corte_Doble.jpg'          WHERE nombre = 'Corte Doble';
+UPDATE Carta SET imagen = 'Hachazo_Brutal.jpg'       WHERE nombre = 'Hachazo Brutal';
+UPDATE Carta SET imagen = 'Tiro_Preciso.jpg'         WHERE nombre = 'Tiro Preciso';
+UPDATE Carta SET imagen = 'Rompe_Rodillas.jpg'       WHERE nombre = 'Rompe Rodillas';
+UPDATE Carta SET imagen = 'Estocada_Venenosa.jpg'    WHERE nombre = 'Estocada Venenosa';
+UPDATE Carta SET imagen = 'Golpe_Bajo.jpg'           WHERE nombre = 'Golpe Bajo';
+UPDATE Carta SET imagen = 'Frenesi_Sangriento.jpg'   WHERE nombre = 'Frenesi Sangriento';
+UPDATE Carta SET imagen = 'Machacar.jpg'             WHERE nombre = 'Machacar';
+UPDATE Carta SET imagen = 'Empujon.jpg'              WHERE nombre = 'Empujon';
+UPDATE Carta SET imagen = 'Guillotina.jpg'           WHERE nombre = 'Guillotina';
+UPDATE Carta SET imagen = 'Ataque_Furtivo.jpg'       WHERE nombre = 'Ataque Furtivo';
+UPDATE Carta SET imagen = 'Martillazo_Sismico.jpg'   WHERE nombre = 'Martillazo Sismico';
 UPDATE Carta SET imagen = 'Embestida_con_Escudo.jpg' WHERE nombre = 'Embestida con Escudo';
-UPDATE Carta SET imagen = 'Desgarrar.jpg' WHERE nombre = 'Desgarrar';
-UPDATE Carta SET imagen = 'Cuchillada_Toxica.jpg' WHERE nombre = 'Cuchillada Toxica';
-UPDATE Carta SET imagen = 'Golpe_de_Gracia.jpg' WHERE nombre = 'Golpe de Gracia';
+UPDATE Carta SET imagen = 'Desgarrar.jpg'            WHERE nombre = 'Desgarrar';
+UPDATE Carta SET imagen = 'Cuchillada_Toxica.jpg'    WHERE nombre = 'Cuchillada Toxica';
+UPDATE Carta SET imagen = 'Golpe_de_Gracia.jpg'      WHERE nombre = 'Golpe de Gracia';
 UPDATE Carta SET imagen = 'Lanzamiento_de_Hacha.jpg' WHERE nombre = 'Lanzamiento de Hacha';
-UPDATE Carta SET imagen = 'Ataque_Oportunista.jpg' WHERE nombre = 'Ataque Oportunista';
-UPDATE Carta SET imagen = 'Danza_de_Espadas.jpg' WHERE nombre = 'Danza de Espadas';
-UPDATE Carta SET imagen = 'Golpe_Espectral.jpg' WHERE nombre = 'Golpe Espectral';
-UPDATE Carta SET imagen = 'Granada_Sagrada.jpg' WHERE nombre = 'Granada Sagrada';
-UPDATE Carta SET imagen = 'Vampirismo.jpg' WHERE nombre = 'Vampirismo';
-
--- DEFENSA
-UPDATE Carta SET imagen = 'Instinto.jpg' WHERE nombre = 'Instinto';
-UPDATE Carta SET imagen = 'Piel_de_Hierro.jpg' WHERE nombre = 'Piel de Hierro';
-UPDATE Carta SET imagen = 'Evasion_Acrobatica.jpg' WHERE nombre = 'Evasion Acrobatica';
-UPDATE Carta SET imagen = 'Escudo_de_Pinchos.jpg' WHERE nombre = 'Escudo de Pinchos';
-UPDATE Carta SET imagen = 'Parada_Defensiva.jpg' WHERE nombre = 'Parada Defensiva';
-UPDATE Carta SET imagen = 'Reflejos_Felinos.jpg' WHERE nombre = 'Reflejos Felinos';
-UPDATE Carta SET imagen = 'Ocultarse.jpg' WHERE nombre = 'Ocultarse';
-UPDATE Carta SET imagen = 'Guardia_Absoluta.jpg' WHERE nombre = 'Guardia Absoluta';
+UPDATE Carta SET imagen = 'Ataque_Oportunista.jpg'   WHERE nombre = 'Ataque Oportunista';
+UPDATE Carta SET imagen = 'Danza_de_Espadas.jpg'     WHERE nombre = 'Danza de Espadas';
+UPDATE Carta SET imagen = 'Golpe_Espectral.jpg'      WHERE nombre = 'Golpe Espectral';
+UPDATE Carta SET imagen = 'Granada_Sagrada.jpg'      WHERE nombre = 'Granada Sagrada';
+UPDATE Carta SET imagen = 'Vampirismo.jpg'           WHERE nombre = 'Vampirismo';
+UPDATE Carta SET imagen = 'Escudo_de_Madera.jpg'     WHERE nombre = 'Escudo de Madera';
+UPDATE Carta SET imagen = 'Bloqueo_Perfecto.jpg'     WHERE nombre = 'Bloqueo Perfecto';
+UPDATE Carta SET imagen = 'Postura_Defensiva.jpg'    WHERE nombre = 'Postura Defensiva';
+UPDATE Carta SET imagen = 'Anticipacion.jpg'         WHERE nombre = 'Anticipacion';
+UPDATE Carta SET imagen = 'Sacrificio_de_Sangre.jpg' WHERE nombre = 'Sacrificio de Sangre';
+UPDATE Carta SET imagen = 'Muro_de_Piedra.jpg'       WHERE nombre = 'Muro de Piedra';
+UPDATE Carta SET imagen = 'Instinto.jpg'             WHERE nombre = 'Instinto';
+UPDATE Carta SET imagen = 'Piel_de_Hierro.jpg'       WHERE nombre = 'Piel de Hierro';
+UPDATE Carta SET imagen = 'Evasion_Acrobatica.jpg'   WHERE nombre = 'Evasion Acrobatica';
+UPDATE Carta SET imagen = 'Escudo_de_Pinchos.jpg'    WHERE nombre = 'Escudo de Pinchos';
+UPDATE Carta SET imagen = 'Parada_Defensiva.jpg'     WHERE nombre = 'Parada Defensiva';
+UPDATE Carta SET imagen = 'Reflejos_Felinos.jpg'     WHERE nombre = 'Reflejos Felinos';
+UPDATE Carta SET imagen = 'Ocultarse.jpg'            WHERE nombre = 'Ocultarse';
+UPDATE Carta SET imagen = 'Guardia_Absoluta.jpg'     WHERE nombre = 'Guardia Absoluta';
 UPDATE Carta SET imagen = 'Absorcion_de_Impacto.jpg' WHERE nombre = 'Absorcion de Impacto';
-UPDATE Carta SET imagen = 'Espejismo.jpg' WHERE nombre = 'Espejismo';
-UPDATE Carta SET imagen = 'Escudo_Torre.jpg' WHERE nombre = 'Escudo Torre';
-UPDATE Carta SET imagen = 'Venganza_Ciega.jpg' WHERE nombre = 'Venganza Ciega';
-UPDATE Carta SET imagen = 'Armadura_de_Espinas.jpg' WHERE nombre = 'Armadura de Espinas';
-UPDATE Carta SET imagen = 'Muro_de_Hielo.jpg' WHERE nombre = 'Muro de Hielo';
-
--- HECHIZOS
-UPDATE Carta SET imagen = 'Bomba.jpg' WHERE nombre = 'Bomba';
-UPDATE Carta SET imagen = 'Vendaje.jpg' WHERE nombre = 'Vendaje';
-UPDATE Carta SET imagen = 'Adrenalina.jpg' WHERE nombre = 'Adrenalina';
-UPDATE Carta SET imagen = 'Frasco_de_Acido.jpg' WHERE nombre = 'Frasco de Acido';
-UPDATE Carta SET imagen = 'Cortina_de_Humo.jpg' WHERE nombre = 'Cortina de Humo';
-UPDATE Carta SET imagen = 'Pocion_de_Fuerza.jpg' WHERE nombre = 'Pocion de Fuerza';
-UPDATE Carta SET imagen = 'Antidoto.jpg' WHERE nombre = 'Antidoto';
-UPDATE Carta SET imagen = 'Polvo_Cegador.jpg' WHERE nombre = 'Polvo Cegador';
-UPDATE Carta SET imagen = 'Concentracion.jpg' WHERE nombre = 'Concentracion';
-UPDATE Carta SET imagen = 'Brebaje_Berserker.jpg' WHERE nombre = 'Brebaje Berserker';
-UPDATE Carta SET imagen = 'Trampa_para_Osos.jpg' WHERE nombre = 'Trampa para Osos';
-UPDATE Carta SET imagen = 'Reciclar.jpg' WHERE nombre = 'Reciclar';
+UPDATE Carta SET imagen = 'Espejismo.jpg'            WHERE nombre = 'Espejismo';
+UPDATE Carta SET imagen = 'Escudo_Torre.jpg'         WHERE nombre = 'Escudo Torre';
+UPDATE Carta SET imagen = 'Venganza_Ciega.jpg'       WHERE nombre = 'Venganza Ciega';
+UPDATE Carta SET imagen = 'Armadura_de_Espinas.jpg'  WHERE nombre = 'Armadura de Espinas';
+UPDATE Carta SET imagen = 'Muro_de_Hielo.jpg'        WHERE nombre = 'Muro de Hielo';
+UPDATE Carta SET imagen = 'Pocion_Curativa.jpg'      WHERE nombre = 'Pocion Curativa';
+UPDATE Carta SET imagen = 'Preparacion.jpg'          WHERE nombre = 'Preparacion';
+UPDATE Carta SET imagen = 'Afilado_de_Armas.jpg'     WHERE nombre = 'Afilador de Armas';
+UPDATE Carta SET imagen = 'Bomba.jpg'                WHERE nombre = 'Bomba';
+UPDATE Carta SET imagen = 'Vendaje.jpg'              WHERE nombre = 'Vendaje';
+UPDATE Carta SET imagen = 'Adrenalina.jpg'           WHERE nombre = 'Adrenalina';
+UPDATE Carta SET imagen = 'Frasco_de_Acido.jpg'      WHERE nombre = 'Frasco de Acido';
+UPDATE Carta SET imagen = 'Cortina_de_Humo.jpg'      WHERE nombre = 'Cortina de Humo';
+UPDATE Carta SET imagen = 'Pocion_de_Fuerza.jpg'     WHERE nombre = 'Pocion de Fuerza';
+UPDATE Carta SET imagen = 'Antidoto.jpg'             WHERE nombre = 'Antidoto';
+UPDATE Carta SET imagen = 'Polvo_Cegador.jpg'        WHERE nombre = 'Polvo Cegador';
+UPDATE Carta SET imagen = 'Concentracion.jpg'        WHERE nombre = 'Concentracion';
+UPDATE Carta SET imagen = 'Brebaje_Berserker.jpg'    WHERE nombre = 'Brebaje Berserker';
+UPDATE Carta SET imagen = 'Trampa_para_Osos.jpg'     WHERE nombre = 'Trampa para Osos';
+UPDATE Carta SET imagen = 'Reciclar.jpg'             WHERE nombre = 'Reciclar';
 UPDATE Carta SET imagen = 'Catalizador_de_Sangre.jpg' WHERE nombre = 'Catalizador de Sangre';
-UPDATE Carta SET imagen = 'Planificacion.jpg' WHERE nombre = 'Planificacion';
-UPDATE Carta SET imagen = 'Ritual_Oscuro.jpg' WHERE nombre = 'Ritual Oscuro';
-UPDATE Carta SET imagen = 'Piel_de_Obsidiana.jpg' WHERE nombre = 'Piel de Obsidiana';
-UPDATE Carta SET imagen = 'Contrato_Demoniaco.jpg' WHERE nombre = 'Contrato Demoniaco';
+UPDATE Carta SET imagen = 'Planificacion.jpg'        WHERE nombre = 'Planificacion';
+UPDATE Carta SET imagen = 'Ritual_Oscuro.jpg'        WHERE nombre = 'Ritual Oscuro';
+UPDATE Carta SET imagen = 'Piel_de_Obsidiana.jpg'    WHERE nombre = 'Piel de Obsidiana';
+UPDATE Carta SET imagen = 'Contrato_Demoniaco.jpg'   WHERE nombre = 'Contrato Demoniaco';
 
 
 -- ==========================================
--- DATA: ENEMIGOS (Actualizado con PNGs)
+-- DATA: ENEMIGOS
 -- ==========================================
 INSERT INTO Enemigo (nombre, hpBase, zona, danoMin, danoMax, imagen, probabilidad) VALUES
--- ZONA: BOSQUE (Suman 100%)
-('Infectado', 50, 'bosque', 3, 8, 'Infectado.jpg', 45),
-('Orco Furioso', 85, 'bosque', 8, 14, 'Orco.png', 40),
-('Cíclope', 110, 'bosque', 10, 18, 'Ciclope.png', 10),
-('Minotauro', 120, 'bosque', 10, 20, 'Minotauro.png', 5),
-
--- ZONA: CAVERNA (Suman 100%)
-('Araña de Cristal', 45, 'caverna', 5, 12, 'Araña_De_Cristal.png', 45),
-('Minero No-Muerto', 60, 'caverna', 4, 9, 'Minero_No-Muerto.png', 40),
-('Dragón', 80, 'caverna', 8, 16, 'Dragon.jpg', 10),
-('Dragón Ancestral', 150, 'caverna', 15, 25, 'Dragon_Ancestral.png', 5);
+                                                                                       ('Infectado',        50,  'bosque',  3,  8,  'Infectado.jpg',          45),
+                                                                                       ('Orco Furioso',     85,  'bosque',  8,  14, 'Orco.png',               40),
+                                                                                       ('Cíclope',          110, 'bosque',  10, 18, 'Ciclope.png',            10),
+                                                                                       ('Minotauro',        120, 'bosque',  10, 20, 'Minotauro.png',           5),
+                                                                                       ('Araña de Cristal', 45,  'caverna', 5,  12, 'Araña_De_Cristal.png',  45),
+                                                                                       ('Minero No-Muerto', 60,  'caverna', 4,  9,  'Minero_No-Muerto.png',  40),
+                                                                                       ('Dragón',           80,  'caverna', 8,  16, 'Dragon.jpg',             10),
+                                                                                       ('Dragón Ancestral', 150, 'caverna', 15, 25, 'Dragon_Ancestral.png',   5);
 -- ==========================================
--- DATA: MAZO DEL JUGADOR
+-- DATA: MAZO DEL JUGADOR 1
 -- ==========================================
--- 1. Creamos un mazo vacío (Forzamos el ID 1)
 INSERT INTO Mazo (id) VALUES (1);
-
--- 2. Se lo asignamos al Usuario de prueba
 UPDATE Usuario SET mazo_activo_id = 1 WHERE email = 'jugador@unlam.edu.ar';
 
--- 3. Le metemos 15 cartas variadas a la tabla MazoCarta
 INSERT INTO MazoCarta (mazo_id, carta_id) VALUES
-    (1, (SELECT id FROM Carta WHERE nombre = 'Tajo Basico' LIMIT 1)),
-(1, (SELECT id FROM Carta WHERE nombre = 'Patada Voladora' LIMIT 1)),
-(1, (SELECT id FROM Carta WHERE nombre = 'Disparo Rapido' LIMIT 1)),
-(1, (SELECT id FROM Carta WHERE nombre = 'Golpe Pesado' LIMIT 1)),
-(1, (SELECT id FROM Carta WHERE nombre = 'Cuchillo Arrojadizo' LIMIT 1)),
-(1, (SELECT id FROM Carta WHERE nombre = 'Escudo de Madera' LIMIT 1)),
-(1, (SELECT id FROM Carta WHERE nombre = 'Bloqueo Perfecto' LIMIT 1)),
-(1, (SELECT id FROM Carta WHERE nombre = 'Evasion Acrobatica' LIMIT 1)),
-(1, (SELECT id FROM Carta WHERE nombre = 'Pocion Curativa' LIMIT 1)),
-(1, (SELECT id FROM Carta WHERE nombre = 'Vendaje' LIMIT 1)),
-(1, (SELECT id FROM Carta WHERE nombre = 'Adrenalina' LIMIT 1)),
-(1, (SELECT id FROM Carta WHERE nombre = 'Tiro Preciso' LIMIT 1)),
-(1, (SELECT id FROM Carta WHERE nombre = 'Frenesi Sangriento' LIMIT 1)),
-(1, (SELECT id FROM Carta WHERE nombre = 'Piel de Hierro' LIMIT 1)),
-(1, (SELECT id FROM Carta WHERE nombre = 'Bomba' LIMIT 1));
+    (1, (SELECT id FROM Carta WHERE nombre = 'Tajo Basico'          LIMIT 1)),
+(1, (SELECT id FROM Carta WHERE nombre = 'Patada Voladora'      LIMIT 1)),
+(1, (SELECT id FROM Carta WHERE nombre = 'Disparo Rapido'       LIMIT 1)),
+(1, (SELECT id FROM Carta WHERE nombre = 'Golpe Pesado'         LIMIT 1)),
+(1, (SELECT id FROM Carta WHERE nombre = 'Cuchillo Arrojadizo'  LIMIT 1)),
+(1, (SELECT id FROM Carta WHERE nombre = 'Escudo de Madera'     LIMIT 1)),
+(1, (SELECT id FROM Carta WHERE nombre = 'Bloqueo Perfecto'     LIMIT 1)),
+(1, (SELECT id FROM Carta WHERE nombre = 'Evasion Acrobatica'   LIMIT 1)),
+(1, (SELECT id FROM Carta WHERE nombre = 'Pocion Curativa'      LIMIT 1)),
+(1, (SELECT id FROM Carta WHERE nombre = 'Vendaje'              LIMIT 1)),
+(1, (SELECT id FROM Carta WHERE nombre = 'Adrenalina'           LIMIT 1)),
+(1, (SELECT id FROM Carta WHERE nombre = 'Tiro Preciso'         LIMIT 1)),
+(1, (SELECT id FROM Carta WHERE nombre = 'Frenesi Sangriento'   LIMIT 1)),
+(1, (SELECT id FROM Carta WHERE nombre = 'Piel de Hierro'       LIMIT 1)),
+(1, (SELECT id FROM Carta WHERE nombre = 'Bomba'                LIMIT 1));
 
 
 -- ==========================================
--- DATA: INVENTARIO DEL JUGADOR (Para la Colección)
+-- DATA: INVENTARIO DEL JUGADOR 1 (15 cartas x1)
 -- ==========================================
 INSERT INTO ItemInventario (cantidad, carta_id, jugador_id) VALUES
-                                                                (1, (SELECT id FROM Carta WHERE nombre = 'Tajo Basico' LIMIT 1), 1),
-(1, (SELECT id FROM Carta WHERE nombre = 'Patada Voladora' LIMIT 1), 1),
-(1, (SELECT id FROM Carta WHERE nombre = 'Disparo Rapido' LIMIT 1), 1),
-(1, (SELECT id FROM Carta WHERE nombre = 'Golpe Pesado' LIMIT 1), 1),
-(1, (SELECT id FROM Carta WHERE nombre = 'Cuchillo Arrojadizo' LIMIT 1), 1),
-(1, (SELECT id FROM Carta WHERE nombre = 'Escudo de Madera' LIMIT 1), 1),
-(1, (SELECT id FROM Carta WHERE nombre = 'Bloqueo Perfecto' LIMIT 1), 1),
-(1, (SELECT id FROM Carta WHERE nombre = 'Evasion Acrobatica' LIMIT 1), 1),
-(1, (SELECT id FROM Carta WHERE nombre = 'Pocion Curativa' LIMIT 1), 1),
-(1, (SELECT id FROM Carta WHERE nombre = 'Vendaje' LIMIT 1), 1),
-(1, (SELECT id FROM Carta WHERE nombre = 'Adrenalina' LIMIT 1), 1),
-(1, (SELECT id FROM Carta WHERE nombre = 'Tiro Preciso' LIMIT 1), 1),
-(1, (SELECT id FROM Carta WHERE nombre = 'Frenesi Sangriento' LIMIT 1), 1),
-(1, (SELECT id FROM Carta WHERE nombre = 'Piel de Hierro' LIMIT 1), 1),
-(1, (SELECT id FROM Carta WHERE nombre = 'Bomba' LIMIT 1), 1);
+                                                                (1, (SELECT id FROM Carta WHERE nombre = 'Tajo Basico'          LIMIT 1), 1),
+(1, (SELECT id FROM Carta WHERE nombre = 'Patada Voladora'      LIMIT 1), 1),
+(1, (SELECT id FROM Carta WHERE nombre = 'Disparo Rapido'       LIMIT 1), 1),
+(1, (SELECT id FROM Carta WHERE nombre = 'Golpe Pesado'         LIMIT 1), 1),
+(1, (SELECT id FROM Carta WHERE nombre = 'Cuchillo Arrojadizo'  LIMIT 1), 1),
+(1, (SELECT id FROM Carta WHERE nombre = 'Escudo de Madera'     LIMIT 1), 1),
+(1, (SELECT id FROM Carta WHERE nombre = 'Bloqueo Perfecto'     LIMIT 1), 1),
+(1, (SELECT id FROM Carta WHERE nombre = 'Evasion Acrobatica'   LIMIT 1), 1),
+(1, (SELECT id FROM Carta WHERE nombre = 'Pocion Curativa'      LIMIT 1), 1),
+(1, (SELECT id FROM Carta WHERE nombre = 'Vendaje'              LIMIT 1), 1),
+(1, (SELECT id FROM Carta WHERE nombre = 'Adrenalina'           LIMIT 1), 1),
+(1, (SELECT id FROM Carta WHERE nombre = 'Tiro Preciso'         LIMIT 1), 1),
+(1, (SELECT id FROM Carta WHERE nombre = 'Frenesi Sangriento'   LIMIT 1), 1),
+(1, (SELECT id FROM Carta WHERE nombre = 'Piel de Hierro'       LIMIT 1), 1),
+(1, (SELECT id FROM Carta WHERE nombre = 'Bomba'                LIMIT 1), 1);
+
+-- ==========================================
+-- DATA: USUARIO 2 (coleccionista - TODAS las cartas x5)
+-- ==========================================
+INSERT INTO Usuario (email, password, rol, activo)
+VALUES ('coleccionista@unlam.edu.ar', '123456', 'USER', true);
+
+INSERT INTO Jugador (nivel, oro, usuario_id)
+VALUES (1, 0, LAST_INSERT_ID());
+
+SET @jugador_coleccionista = LAST_INSERT_ID();
+
+-- Una fila por cada carta existente, cantidad = 5
+INSERT INTO ItemInventario (cantidad, carta_id, jugador_id)
+SELECT 5, id, @jugador_coleccionista
+FROM Carta;
 
 -- CONFIGURACION DE RECOMPENSAS
 INSERT INTO ConfiguracionJuego (clave, valor)
