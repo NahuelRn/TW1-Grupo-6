@@ -31,7 +31,7 @@ public class Usuario {
         this.mazoActivo = mazoActivo;
     }
 
-    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Jugador jugador;
 
     public Jugador getJugador() {
