@@ -31,6 +31,7 @@ public class RepositorioPartidaImpl implements RepositorioPartida {
     sessionFactory.getCurrentSession().update(partida);
   }
 
+  @Override
   public Partida buscarPartidaActivaPorUsuario(Long usuarioId) {
     return sessionFactory
       .getCurrentSession()
