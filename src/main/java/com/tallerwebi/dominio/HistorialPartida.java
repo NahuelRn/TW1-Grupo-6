@@ -10,7 +10,7 @@ public class HistorialPartida {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long identificador;
 
-  private LocalDate localDate;
+  private LocalDate fecha;
   private String resultado;
   private Integer oroGanado;
   private Integer experienciaGanada;
@@ -23,7 +23,7 @@ public class HistorialPartida {
   }
 
   public LocalDate getFecha() {
-    return this.localDate;
+    return this.fecha;
   }
 
   public String getResultado() {
@@ -46,8 +46,8 @@ public class HistorialPartida {
     this.identificador = identificador;
   }
 
-  public void setLocalDate(LocalDate localDate) {
-    this.localDate = localDate;
+  public void setFecha(LocalDate fecha) {
+    this.fecha = fecha;
   }
 
   public void setResultado(String resultado) {
