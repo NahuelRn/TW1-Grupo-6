@@ -9,7 +9,7 @@
     <style>
         body {
             background-color: #0c0c0e;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Montserrat';
             color: #ffffff;
             padding: 20px;
             text-align: center;
@@ -19,21 +19,27 @@
         }
 
         h2 {
-            color: #e63946;
-            font-weight: 800;
+            color: red;
             letter-spacing: 2px;
-            text-shadow: 0 0 10px rgba(230, 57, 70, 0.4);
-            font-size: 40px;
+            text-shadow: 0px 3px 10px #ff0000a1, 0px 0px 0px black;
+            font-size: 45px;
+        }
+
+        .resumen {
+            color: #e5a93b;
+            font-size: 20px;
+            margin-bottom: 30px;
         }
 
         .div_panel {
-            background-color: #131316;
-            border: 2px solid #e5a93b;
-            border-radius: 12px;
-            padding: 20px;
+            background-color: #101010;
+            border: 2.7px solid #e5a93b;
+            border-radius: 10px;
+            padding: 10px 5px;
             max-width: 500px;
             margin: auto;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+            margin-bottom: 40px;
+            box-shadow: 0px 3px 10px 5px rgba(0, 0, 0, 0.7);
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
@@ -42,23 +48,109 @@
             box-shadow: 0 0 20px rgba(229, 169, 59, 0.25);
         }
 
+        .titulo-partida {
+            color: white;
+            margin-bottom: 15px;
+        }
+
         .info {
-            color: #a1a1aa;
+            color: #e5a93b;
             margin: 10px 0;
-            font-size: 15px;
-            font-weight: 500;
+            font-size: 20px;
+        }
+
+        .victoria {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .derrota {
+            color: #e63946;
+            font-weight: bold;
+        }
+
+        a.btn.btn-outline-warning {
+            font-family: 'Montserrat', sans-serif;
+            border: 2.7px solid #e5a93b;
+            padding: 10px 20px;
+            font-size: 20px;
+            border-radius: 5px;
+            background-color: #131316;
+            color: #e5a93b;
+            box-shadow: 0px 0px 10px 0px rgb(229 169 59 / 16%);
+            transition: all 0.2s ease-in-out;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 35px;
+        }
+
+        a.btn.btn-outline-warning:hover {
+            background-color: #e5a93b;
+            color: #101010;
+            transform: translateY(-3px);
+            box-shadow: 0px 0px 20px rgba(229, 169, 59, 0.4);
+        }
+
+        .sin-historial {
+            color: #a1a1aa;
+            font-size: 22px;
+            margin-top: 50px;
         }
     </style>
 </head>
 
 <body>
+
 <h2>HISTORIAL DE PARTIDAS</h2>
 
-<div th:each="partida : ${historialPartidas}" class="div_panel">
-    <p class="info">Resultado: <span th:text="${partida.resultado}"></span></p>
-    <p class="info">Oro ganado: <span th:text="${partida.oroGanado}"></span></p>
-    <p class="info">Experiencia: <span th:text="${partida.experienciaGanada}"></span></p>
-    <p class="info">Fecha: <span th:text="${partida.fecha}"></span></p>
+<p class="resumen">
+    Total de partidas: <span th:text="${historialPartidas.size()}"></span>
+</p>
+
+<p class="sin-historial" th:if="${historialPartidas.isEmpty()}">
+    Aún no has jugado partidas.
+</p>
+
+<div th:each="partida, estado : ${historialPartidas}" class="div_panel">
+
+    <h3 class="titulo-partida">
+        Partida #<span th:text="${estado.count}"></span>
+    </h3>
+
+    <p class="info">
+        Resultado:
+
+        <span class="victoria"
+              th:if="${partida.resultado == 'GANADOR_JUGADOR'}"
+              th:text="${partida.resultado}">
+        </span>
+
+        <span class="derrota"
+              th:if="${partida.resultado == 'GANADOR_ENEMIGO'}"
+              th:text="${partida.resultado}">
+        </span>
+    </p>
+
+    <p class="info">
+        Oro ganado:
+        <span th:text="${partida.oroGanado}"></span>
+    </p>
+
+    <p class="info">
+        Experiencia ganada:
+        <span th:text="${partida.experienciaGanada}"></span>
+    </p>
+
+    <p class="info">
+        Fecha:
+        <span th:text="${partida.fecha}"></span>
+    </p>
+
 </div>
+
+<a th:href="@{/lobby}" class="btn btn-outline-warning">
+    Volver al lobby
+</a>
+
 </body>
 </html>

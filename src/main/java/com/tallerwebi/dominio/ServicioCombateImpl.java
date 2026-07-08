@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -29,15 +30,24 @@ public class ServicioCombateImpl implements ServicioCombate {
 
   private RepositorioPartida repositorioPartida;
   private RepositorioCarta repositorioCarta;
+  private RepositorioHistorialPartida repositorioHistorialPartida;
+  private ServicioCalculoRecompensa servicioCalculoRecompensa;
+  private final ServicioUsuario servicioUsuario;
   private Random random = new Random();
 
   @Autowired
   public ServicioCombateImpl(
     RepositorioPartida repositorioPartida,
-    RepositorioCarta repositorioCarta
+    RepositorioCarta repositorioCarta,
+    RepositorioHistorialPartida repositorioHistorialPartida,
+    ServicioUsuario servicioUsuario,
+    ServicioCalculoRecompensa servicioCalculoRecompensa
   ) {
     this.repositorioPartida = repositorioPartida;
     this.repositorioCarta = repositorioCarta;
+    this.repositorioHistorialPartida = repositorioHistorialPartida;
+    this.servicioUsuario = servicioUsuario;
+    this.servicioCalculoRecompensa = servicioCalculoRecompensa;
   }
 
   @Override
@@ -81,6 +91,20 @@ public class ServicioCombateImpl implements ServicioCombate {
 
     if (partida.getHpEnemigo() <= VALOR_NULO) {
       partida.setEnumEstadoPartida(EnumEstadoPartida.GANADOR_JUGADOR);
+
+      this.servicioUsuario.aplicarRecompensa(partida.getUsuario(), partida);
+
+      RecompensaDTO recompensaDTO = this.servicioCalculoRecompensa.obtenerRecompensa(partida);
+
+      HistorialPartida historialPartida = new HistorialPartida();
+      historialPartida.setUsuario(partida.getUsuario());
+      historialPartida.setResultado("GANADOR_JUGADOR");
+      historialPartida.setOroGanado(recompensaDTO.getOro());
+      historialPartida.setExperienciaGanada(recompensaDTO.getExperiencia());
+      historialPartida.setFecha(LocalDate.now());
+
+      this.repositorioHistorialPartida.guardarHistorialPartidaRepositorio(historialPartida);
+
       repositorioPartida.actualizar(partida);
       return accionJugador + " ¡" + nombreEnemigo.toUpperCase(Locale.ROOT) + " HA SIDO DERROTADO!";
     }
@@ -90,6 +114,16 @@ public class ServicioCombateImpl implements ServicioCombate {
 
     if (partida.getHpJugador() <= VALOR_NULO) {
       partida.setEnumEstadoPartida(EnumEstadoPartida.GANADOR_ENEMIGO);
+
+      HistorialPartida historialPartida = new HistorialPartida(); // L
+      historialPartida.setUsuario(partida.getUsuario());
+      historialPartida.setResultado("GANADOR_ENEMIGO");
+      historialPartida.setOroGanado(0);
+      historialPartida.setExperienciaGanada(10);
+      historialPartida.setFecha(LocalDate.now());
+
+      this.repositorioHistorialPartida.guardarHistorialPartidaRepositorio(historialPartida);
+
       repositorioPartida.actualizar(partida);
       return (
         accionJugador +
