@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>MythicStack - Recompensas</title>
+
+    <style>
+        body {
+            background-color: #0c0c0e;
+            font-family: 'Montserrat';
+            color: #ffffff;
+            text-align: center;
+            padding: 40px;
+        }
+
+        h2 {
+            color: red;
+            letter-spacing: 2px;
+            text-shadow: 0px 3px 10px #ff0000a1, 0px 0px 0px black;
+            font-size: 45px;
+            margin-bottom: 40px;
+        }
+
+        .box {
+            background-color: #101010;
+            border: 2.7px solid #e5a93b;
+            border-radius: 10px;
+            max-width: 550px;
+            margin: auto;
+            padding: 30px;
+            box-shadow: 0px 3px 10px 5px rgba(0, 0, 0, 0.7);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .box:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 0 20px rgba(229, 169, 59, 0.25);
+        }
+
+        .titulo {
+            color: #e5a93b;
+            font-size: 28px;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+
+        .stat {
+            color: #e5a93b;
+            font-size: 22px;
+            margin: 15px 0;
+        }
+
+        .btn {
+            font-family: 'Montserrat', sans-serif;
+            border: 2.7px solid #e5a93b;
+            padding: 12px 25px;
+            font-size: 20px;
+            border-radius: 5px;
+            background-color: #131316;
+            color: #e5a93b;
+            box-shadow: 0px 0px 10px 0px rgb(229 169 59 / 16%);
+            transition: all 0.2s ease-in-out;
+            text-decoration: none;
+            cursor: pointer;
+            margin-top: 25px;
+        }
+
+        .btn:hover {
+            background-color: #e5a93b;
+            color: #101010;
+            transform: translateY(-3px);
+            box-shadow: 0px 0px 20px rgba(229, 169, 59, 0.4);
+        }
+
+        .victoria {
+            color: #4CAF50;
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+<h2>RECOMPENSAS</h2>
+
+<div class="box">
+    <div class="victoria">¡VICTORIA!</div>
+
+    <div class="titulo">RECOMPENSA OBTENIDA</div>
+
+    <div class="stat">Oro ganado: <span th:text="${recompensa.oro}"></span></div>
+
+    <div class="stat">Experiencia ganada: <span th:text="${recompensa.experiencia}"></span></div>
+
+    <form th:action="@{/reclamar-recompensa}" method="post">
+        <button class="btn" type="submit">
+            RECLAMAR RECOMPENSA
+        </button>
+    </form>
+</div>
+
+</body>
+</html>

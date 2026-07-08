@@ -71,6 +71,7 @@ INSERT INTO Carta (nombre, tipo, subtipo, valorOroBase, nivelDesbloqueo, probabi
 -- DATA: CARTAS - HECHIZOS
 -- ==========================================
 INSERT INTO Carta (nombre, tipo, subtipo, valorOroBase, nivelDesbloqueo, probabilidad, duracion, rareza, descripcion, danoMin, danoMax, defensaMin, defensaMax) VALUES
+<<<<<<< HEAD
                                                                                                                                                                     ('Pocion Curativa',       'HECHIZO', 'CURA',         50,   1, 100.00, 1, 'Comun',      'Efecto: +15 Vida',             0,  0,  15, 15),
                                                                                                                                                                     ('Bomba',                 'HECHIZO', NULL,            150,  1, 100.00, 1, 'Exotica',    'Daño: 12-18',                  12, 18, 0,  0),
                                                                                                                                                                     ('Vendaje',               'HECHIZO', 'CURA',         50,   1, 100.00, 1, 'Comun',      'Efecto: +5 Vida',              0,  0,  5,  5),
@@ -92,6 +93,28 @@ INSERT INTO Carta (nombre, tipo, subtipo, valorOroBase, nivelDesbloqueo, probabi
                                                                                                                                                                     ('Piel de Obsidiana',     'HECHIZO', 'ESCUDO',       250,  2, 100.00, 2, 'Rara',       'Defensa: 10',                  0,  0,  10, 10),
                                                                                                                                                                     ('Contrato Demoniaco',    'HECHIZO', 'ROBO',         1000, 5, 100.00, 1, 'Legendaria', 'Efecto: -15 HP, Roba 5',       0,  0,  0,  0);
 
+=======
+                                                                                                                                                                    ('Pocion Curativa',           'HECHIZO', 'CURA',         50,  1, 100.00, 1,  'Comun',      'Efecto: +15 Vida', 0, 0, 15, 15),
+                                                                                                                                                                    ('Bomba',                     'HECHIZO', NULL,           150, 1, 100.00, 1,  'Exotica',    'Daño: 12-18', 12, 18, 0, 0),
+                                                                                                                                                                    ('Vendaje',                   'HECHIZO', 'CURA',         50,  1, 100.00, 1,  'Comun',      'Efecto: +5 Vida', 0, 0, 5, 5),
+                                                                                                                                                                    ('Afilador de Armas',         'HECHIZO', NULL,           150, 1, 100.00, 1,  'Poco Comun', 'Efecto: +3 Daño', 0, 0, 0, 0),
+                                                                                                                                                                    ('Adrenalina',                'HECHIZO', NULL,           250, 2, 100.00, 1,  'Rara',       'Efecto: Roba 4 cartas', 0, 0, 0, 0),
+                                                                                                                                                                    ('Preparacion',               'HECHIZO', 'ROBO',         150, 1, 100.00, 1,  'Poco Comun', 'Efecto: Roba 2 cartas', 0, 0, 0, 0),
+                                                                                                                                                                    ('Frasco de Acido',           'HECHIZO', NULL,           250, 2, 100.00, 1,  'Rara',       'Efecto: Rompe Armadura', 0, 0, 0, 0),
+                                                                                                                                                                    ('Cortina de Humo',           'HECHIZO', NULL,           500, 3, 100.00, 2,  'Exotica',    'Efecto: Oculto', 0, 0, 0, 0),
+                                                                                                                                                                    ('Pocion de Fuerza',          'HECHIZO', NULL,           250, 2, 100.00, 2,  'Rara',       'Efecto: +3 Daño', 0, 0, 0, 0),
+                                                                                                                                                                    ('Antidoto',                  'HECHIZO', 'CURA',         150, 1, 100.00, 3,  'Poco Comun', 'Efecto: Inmune a Veneno', 0, 0, 0, 0),
+                                                                                                                                                                    ('Polvo Cegador',             'HECHIZO', NULL,           250, 2, 75.00,  1,  'Rara',       'Efecto: Ciega al Zombi', 0, 0, 0, 0),
+                                                                                                                                                                    ('Concentracion',             'HECHIZO', 'ROBO',         500, 3, 100.00, 1,  'Exotica',    'Efecto: Elige carta', 0, 0, 0, 0),
+                                                                                                                                                                    ('Brebaje Berserker',         'HECHIZO', NULL,           500, 3, 100.00, 3,  'Exotica',    'Efecto: +50% Daño', 0, 0, 0, 0),
+                                                                                                                                                                    ('Trampa para Osos',          'HECHIZO', 'ATURDIMIENTO', 250, 2, 100.00, 1,  'Rara',       'Daño: 8-12', 8, 12, 0, 0),
+                                                                                                                                                                    ('Reciclar',                  'HECHIZO', NULL,           1000,4, 100.00, 1,  'Legendaria', 'Efecto: Descarta y Roba', 0, 0, 0, 0),
+                                                                                                                                                                    ('Catalizador de Sangre',     'HECHIZO', 'VENENO',       500, 3, 100.00, 1,  'Exotica',    'Efecto: Convierte Hemorragia', 0, 0, 0, 0),
+                                                                                                                                                                    ('Planificacion',             'HECHIZO', 'ROBO',         150, 1, 100.00, 1,  'Poco Comun', 'Efecto: Roba 1 carta', 0, 0, 0, 0),
+                                                                                                                                                                    ('Ritual Oscuro',             'HECHIZO', 'ROBO',         250, 2, 100.00, 1,  'Rara',       'Efecto: Reinicia Mano', 0, 0, 0, 0),
+                                                                                                                                                                    ('Piel de Obsidiana',         'HECHIZO', 'ESCUDO',       250, 2, 100.00, 2,  'Rara',       'Defensa: 10', 0, 0, 10, 10),
+                                                                                                                                                                    ('Contrato Demoniaco',        'HECHIZO', 'ROBO',         1000,5, 100.00, 1,  'Legendaria', 'Efecto: -15 HP, Roba 5', 0, 0, 0, 0);
+>>>>>>> test-branch2
 -- ==========================================
 -- VINCULAR IMÁGENES
 -- ==========================================
@@ -164,6 +187,10 @@ UPDATE Carta SET imagen = 'Planificacion.jpg'        WHERE nombre = 'Planificaci
 UPDATE Carta SET imagen = 'Ritual_Oscuro.jpg'        WHERE nombre = 'Ritual Oscuro';
 UPDATE Carta SET imagen = 'Piel_de_Obsidiana.jpg'    WHERE nombre = 'Piel de Obsidiana';
 UPDATE Carta SET imagen = 'Contrato_Demoniaco.jpg'   WHERE nombre = 'Contrato Demoniaco';
+<<<<<<< HEAD
+=======
+
+>>>>>>> test-branch2
 
 -- ==========================================
 -- DATA: ENEMIGOS
@@ -177,7 +204,10 @@ INSERT INTO Enemigo (nombre, hpBase, zona, danoMin, danoMax, imagen, probabilida
                                                                                        ('Minero No-Muerto', 60,  'caverna', 4,  9,  'Minero_No-Muerto.png',  40),
                                                                                        ('Dragón',           80,  'caverna', 8,  16, 'Dragon.jpg',             10),
                                                                                        ('Dragón Ancestral', 150, 'caverna', 15, 25, 'Dragon_Ancestral.png',   5);
+<<<<<<< HEAD
 
+=======
+>>>>>>> test-branch2
 -- ==========================================
 -- DATA: MAZO DEL JUGADOR 1
 -- ==========================================
@@ -200,6 +230,10 @@ INSERT INTO MazoCarta (mazo_id, carta_id) VALUES
 (1, (SELECT id FROM Carta WHERE nombre = 'Frenesi Sangriento'   LIMIT 1)),
 (1, (SELECT id FROM Carta WHERE nombre = 'Piel de Hierro'       LIMIT 1)),
 (1, (SELECT id FROM Carta WHERE nombre = 'Bomba'                LIMIT 1));
+<<<<<<< HEAD
+=======
+
+>>>>>>> test-branch2
 
 -- ==========================================
 -- DATA: INVENTARIO DEL JUGADOR 1 (15 cartas x1)
@@ -235,4 +269,13 @@ SET @jugador_coleccionista = LAST_INSERT_ID();
 -- Una fila por cada carta existente, cantidad = 5
 INSERT INTO ItemInventario (cantidad, carta_id, jugador_id)
 SELECT 5, id, @jugador_coleccionista
+<<<<<<< HEAD
 FROM Carta;
+=======
+FROM Carta;
+
+-- CONFIGURACION DE RECOMPENSAS
+INSERT INTO ConfiguracionJuego (clave, valor)
+VALUES ('ORO_BASE', 20),
+       ('EXPERIENCIA_BASE', 50);
+>>>>>>> test-branch2
