@@ -35,4 +35,13 @@ public class CartaTest {
     assertThat(carta.getRareza(), equalTo("Poco Común"));
     assertThat(carta.getDescripcion(), equalTo("Inflige daño físico"));
   }
+
+  @Test
+  public void queSePuedaAsignarYObtenerElEfectoDeUnaCarta() {
+    Carta carta = new Carta();
+
+    carta.setEfecto("BUFF_DANIO");
+
+    assertThat(carta.getEfecto(), equalTo("BUFF_DANIO"));
+  }
 }

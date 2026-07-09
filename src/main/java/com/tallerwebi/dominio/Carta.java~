@@ -21,11 +21,13 @@ public class Carta {
   private String descripcion;
   private String imagen;
 
-  // --- NUEVOS ATRIBUTOS PARA EL MVP ---
   private Integer danoMin;
   private Integer danoMax;
   private Integer defensaMin;
   private Integer defensaMax;
+
+  // NUEVO: identifica qué lógica de utilidad corre para cartas tipo HECHIZO
+  private String efecto;
 
   public Long getId() {
     return id;
@@ -145,5 +147,13 @@ public class Carta {
 
   public void setDefensaMax(Integer defensaMax) {
     this.defensaMax = defensaMax;
+  }
+
+  public String getEfecto() {
+    return efecto;
+  }
+
+  public void setEfecto(String efecto) {
+    this.efecto = efecto;
   }
 }

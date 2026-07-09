@@ -60,15 +60,15 @@ public class ServicioCombateImpl implements ServicioCombate {
   private Random random = new Random();
 
   private final Map<String, BiFunction<Partida, Carta, EfectoHechizoResultado>> efectosHechizo =
-    crearMapaDeEfectos();
+          crearMapaDeEfectos();
 
   @Autowired
   public ServicioCombateImpl(
-    RepositorioPartida repositorioPartida,
-    RepositorioCarta repositorioCarta,
-    RepositorioHistorialPartida repositorioHistorialPartida,
-    ServicioUsuario servicioUsuario,
-    ServicioCalculoRecompensa servicioCalculoRecompensa
+          RepositorioPartida repositorioPartida,
+          RepositorioCarta repositorioCarta,
+          RepositorioHistorialPartida repositorioHistorialPartida,
+          ServicioUsuario servicioUsuario,
+          ServicioCalculoRecompensa servicioCalculoRecompensa
   ) {
     this.repositorioPartida = repositorioPartida;
     this.repositorioCarta = repositorioCarta;
@@ -139,20 +139,20 @@ public class ServicioCombateImpl implements ServicioCombate {
   private EfectoHechizoResultado resolverDefensa(Carta carta) {
     int defensa = calcularValorAleatorio(carta.getDefensaMin(), carta.getDefensaMax());
     EfectoHechizoResultado resultado = new EfectoHechizoResultado(
-      "Te cubrís con [" + carta.getNombre() + "], logrando " + defensa + " de escudo."
+            "Te cubrís con [" + carta.getNombre() + "], logrando " + defensa + " de escudo."
     );
     resultado.setDefensaGenerada(defensa);
     return resultado;
   }
 
   private int aplicarContraataqueEnemigo(
-    Partida partida,
-    Enemigo enemigo,
-    EfectoHechizoResultado efecto
+          Partida partida,
+          Enemigo enemigo,
+          EfectoHechizoResultado efecto
   ) {
     int danioRecibido = efecto.isAnularAtaqueEnemigo()
-      ? VALOR_NULO
-      : Math.max(VALOR_NULO, calcularAtaqueEnemigo(enemigo) - efecto.getDefensaGenerada());
+            ? VALOR_NULO
+            : Math.max(VALOR_NULO, calcularAtaqueEnemigo(enemigo) - efecto.getDefensaGenerada());
 
     partida.setHpJugador(partida.getHpJugador() - danioRecibido);
 
@@ -181,10 +181,10 @@ public class ServicioCombateImpl implements ServicioCombate {
   }
 
   private String registrarDerrota(
-    Partida partida,
-    String accionJugador,
-    String nombreEnemigo,
-    int danioRecibido
+          Partida partida,
+          String accionJugador,
+          String nombreEnemigo,
+          int danioRecibido
   ) {
     partida.setEnumEstadoPartida(EnumEstadoPartida.GANADOR_ENEMIGO);
 
@@ -198,21 +198,21 @@ public class ServicioCombateImpl implements ServicioCombate {
 
     repositorioPartida.actualizar(partida);
     return (
-      accionJugador +
-      " " +
-      nombreEnemigo +
-      " te mató con " +
-      danioRecibido +
-      " de daño. FIN DE LA PARTIDA."
+            accionJugador +
+                    " " +
+                    nombreEnemigo +
+                    " te mató con " +
+                    danioRecibido +
+                    " de daño. FIN DE LA PARTIDA."
     );
   }
 
   private String construirMensajeFinal(
-    String accionJugador,
-    String nombreEnemigo,
-    int danioRecibido,
-    EfectoHechizoResultado efecto,
-    Carta carta
+          String accionJugador,
+          String nombreEnemigo,
+          int danioRecibido,
+          EfectoHechizoResultado efecto,
+          Carta carta
   ) {
     if (efecto.isAnularAtaqueEnemigo()) {
       return accionJugador + " " + nombreEnemigo + " quedó aturdido y no pudo atacarte.";
@@ -221,7 +221,7 @@ public class ServicioCombateImpl implements ServicioCombate {
       return accionJugador + " ¡Bloqueo perfecto! Evitaste el ataque de " + nombreEnemigo + ".";
     }
     return (
-      accionJugador + " " + nombreEnemigo + " contraataca y recibes " + danioRecibido + TXT_DANIO
+            accionJugador + " " + nombreEnemigo + " contraataca y recibes " + danioRecibido + TXT_DANIO
     );
   }
 
@@ -231,7 +231,7 @@ public class ServicioCombateImpl implements ServicioCombate {
 
   private EfectoHechizoResultado resolverEfectoHechizo(Partida partida, Carta carta) {
     BiFunction<Partida, Carta, EfectoHechizoResultado> efecto = efectosHechizo.get(
-      carta.getEfecto()
+            carta.getEfecto()
     );
     if (efecto == null) {
       return efectoCuraGenerica(partida, carta);
@@ -265,7 +265,7 @@ public class ServicioCombateImpl implements ServicioCombate {
     int curacion = calcularValorAleatorio(carta.getDefensaMin(), carta.getDefensaMax());
     partida.setHpJugador(Math.min(hpMaximo, partida.getHpJugador() + curacion));
     return new EfectoHechizoResultado(
-      TXT_USAS + carta.getNombre() + "] y recuperas " + curacion + TXT_HP
+            TXT_USAS + carta.getNombre() + "] y recuperas " + curacion + " HP."
     );
   }
 
@@ -273,7 +273,7 @@ public class ServicioCombateImpl implements ServicioCombate {
     int danio = calcularValorAleatorio(carta.getDanoMin(), carta.getDanoMax());
     partida.setHpEnemigo(partida.getHpEnemigo() - danio);
     return new EfectoHechizoResultado(
-      TXT_USAS + carta.getNombre() + "] infligiendo " + danio + " de daño directo."
+            TXT_USAS + carta.getNombre() + "] infligiendo " + danio + " de daño directo."
     );
   }
 
@@ -281,7 +281,7 @@ public class ServicioCombateImpl implements ServicioCombate {
     int buff = calcularValorAleatorio(carta.getDanoMin(), carta.getDanoMax());
     partida.setBuffDanioProximoAtaque(valorSeguro(partida.getBuffDanioProximoAtaque(), 0) + buff);
     return new EfectoHechizoResultado(
-      TXT_USAS + carta.getNombre() + "]. Tu próximo ataque hará +" + buff + TXT_DANIO
+            TXT_USAS + carta.getNombre() + "]. Tu próximo ataque hará +" + buff + TXT_DANIO
     );
   }
 
@@ -289,14 +289,14 @@ public class ServicioCombateImpl implements ServicioCombate {
     int multiplicador = Math.max(1, calcularValorAleatorio(carta.getDanoMin(), carta.getDanoMax()));
     partida.setMultiplicadorDanioProximoAtaque(multiplicador);
     return new EfectoHechizoResultado(
-      TXT_USAS + carta.getNombre() + "]. Tu próximo ataque hará x" + multiplicador + TXT_DANIO
+            TXT_USAS + carta.getNombre() + "]. Tu próximo ataque hará x" + multiplicador + TXT_DANIO
     );
   }
 
   @SuppressWarnings("PMD.UnusedFormalParameter")
   private EfectoHechizoResultado efectoAturdirEnemigo(Partida partida, Carta carta) {
     EfectoHechizoResultado resultado = new EfectoHechizoResultado(
-      TXT_USAS + carta.getNombre() + "]. El enemigo queda aturdido."
+            TXT_USAS + carta.getNombre() + "]. El enemigo queda aturdido."
     );
     resultado.setAnularAtaqueEnemigo(true);
     return resultado;
@@ -306,7 +306,7 @@ public class ServicioCombateImpl implements ServicioCombate {
     int danio = calcularValorAleatorio(carta.getDanoMin(), carta.getDanoMax());
     partida.setHpEnemigo(partida.getHpEnemigo() - danio);
     EfectoHechizoResultado resultado = new EfectoHechizoResultado(
-      TXT_USAS + carta.getNombre() + "] haciendo " + danio + " de daño y aturdiendo al enemigo."
+            TXT_USAS + carta.getNombre() + "] haciendo " + danio + " de daño y aturdiendo al enemigo."
     );
     resultado.setAnularAtaqueEnemigo(true);
     return resultado;
@@ -316,7 +316,7 @@ public class ServicioCombateImpl implements ServicioCombate {
     int hpActual = valorSeguro(partida.getHpEnemigo(), 0);
     partida.setHpEnemigo(hpActual / DIVISOR_MITAD);
     return new EfectoHechizoResultado(
-      TXT_USAS + carta.getNombre() + "]. La vida del enemigo se reduce a la mitad."
+            TXT_USAS + carta.getNombre() + "]. La vida del enemigo se reduce a la mitad."
     );
   }
 
@@ -326,13 +326,13 @@ public class ServicioCombateImpl implements ServicioCombate {
     partida.setHpEnemigo(partida.getHpEnemigo() - danioEnemigo);
     partida.setHpJugador(partida.getHpJugador() - danioPropio);
     return new EfectoHechizoResultado(
-      TXT_USAS +
-      carta.getNombre() +
-      "]. Pierdes " +
-      danioPropio +
-      " HP y el enemigo pierde " +
-      danioEnemigo +
-      TXT_HP
+            TXT_USAS +
+                    carta.getNombre() +
+                    "]. Pierdes " +
+                    danioPropio +
+                    " HP y el enemigo pierde " +
+                    danioEnemigo +
+                    " HP."
     );
   }
 
@@ -342,13 +342,13 @@ public class ServicioCombateImpl implements ServicioCombate {
     partida.setHpJugador(partida.getHpJugador() - danioPropio);
     partida.setBuffDanioProximoAtaque(valorSeguro(partida.getBuffDanioProximoAtaque(), 0) + buff);
     return new EfectoHechizoResultado(
-      TXT_USAS +
-      carta.getNombre() +
-      "]. Pierdes " +
-      danioPropio +
-      " HP, pero tu próximo ataque hará +" +
-      buff +
-      TXT_DANIO
+            TXT_USAS +
+                    carta.getNombre() +
+                    "]. Pierdes " +
+                    danioPropio +
+                    " HP, pero tu próximo ataque hará +" +
+                    buff +
+                    TXT_DANIO
     );
   }
 
@@ -358,13 +358,7 @@ public class ServicioCombateImpl implements ServicioCombate {
     partida.setHpEnemigo(partida.getHpEnemigo() - danio);
     partida.setHpJugador(Math.min(hpMaximo, partida.getHpJugador() + curacion));
     return new EfectoHechizoResultado(
-      TXT_USAS +
-      carta.getNombre() +
-      "]. Haces " +
-      danio +
-      " de daño y te curas " +
-      curacion +
-      TXT_HP
+            TXT_USAS + carta.getNombre() + "]. Haces " + danio + " de daño y te curas " + curacion + " HP."
     );
   }
 
@@ -374,13 +368,13 @@ public class ServicioCombateImpl implements ServicioCombate {
     partida.setHpJugador(Math.min(hpMaximo, partida.getHpJugador() + curacion));
     partida.setBuffDanioProximoAtaque(valorSeguro(partida.getBuffDanioProximoAtaque(), 0) + buff);
     return new EfectoHechizoResultado(
-      TXT_USAS +
-      carta.getNombre() +
-      "]. Te curas " +
-      curacion +
-      " HP y tu próximo ataque hará +" +
-      buff +
-      TXT_DANIO
+            TXT_USAS +
+                    carta.getNombre() +
+                    "]. Te curas " +
+                    curacion +
+                    " HP y tu próximo ataque hará +" +
+                    buff +
+                    TXT_DANIO
     );
   }
 
@@ -389,13 +383,13 @@ public class ServicioCombateImpl implements ServicioCombate {
     int buff = calcularValorAleatorio(carta.getDanoMin(), carta.getDanoMax());
     partida.setBuffDanioProximoAtaque(valorSeguro(partida.getBuffDanioProximoAtaque(), 0) + buff);
     EfectoHechizoResultado resultado = new EfectoHechizoResultado(
-      TXT_USAS +
-      carta.getNombre() +
-      "]. Ganas " +
-      escudo +
-      " de escudo este turno y tu próximo ataque hará +" +
-      buff +
-      TXT_DANIO
+            TXT_USAS +
+                    carta.getNombre() +
+                    "]. Ganas " +
+                    escudo +
+                    " de escudo este turno y tu próximo ataque hará +" +
+                    buff +
+                    TXT_DANIO
     );
     resultado.setDefensaGenerada(escudo);
     return resultado;
@@ -405,7 +399,7 @@ public class ServicioCombateImpl implements ServicioCombate {
     int danio = calcularValorAleatorio(carta.getDanoMin(), carta.getDanoMax());
     partida.setHpEnemigo(partida.getHpEnemigo() - danio);
     return new EfectoHechizoResultado(
-      TXT_USAS + carta.getNombre() + "] y la magia inflige " + danio + " de daño aleatorio."
+            TXT_USAS + carta.getNombre() + "] y la magia inflige " + danio + " de daño aleatorio."
     );
   }
 
@@ -415,13 +409,13 @@ public class ServicioCombateImpl implements ServicioCombate {
     partida.setHpJugador(Math.min(hpMaximo, partida.getHpJugador() + curacion));
     partida.setHpEnemigo(partida.getHpEnemigo() + vidaEnemigoExtra);
     return new EfectoHechizoResultado(
-      TXT_USAS +
-      carta.getNombre() +
-      "]. Te curas " +
-      curacion +
-      " HP, pero el enemigo recupera " +
-      vidaEnemigoExtra +
-      TXT_HP
+            TXT_USAS +
+                    carta.getNombre() +
+                    "]. Te curas " +
+                    curacion +
+                    " HP, pero el enemigo recupera " +
+                    vidaEnemigoExtra +
+                    " HP."
     );
   }
 
@@ -429,7 +423,7 @@ public class ServicioCombateImpl implements ServicioCombate {
     int curacion = calcularValorAleatorio(carta.getDefensaMin(), carta.getDefensaMax());
     partida.setHpJugador(Math.min(hpMaximo, partida.getHpJugador() + curacion));
     EfectoHechizoResultado resultado = new EfectoHechizoResultado(
-      TXT_USAS + carta.getNombre() + "]. Te curas " + curacion + " HP y el enemigo no ataca."
+            TXT_USAS + carta.getNombre() + "]. Te curas " + curacion + " HP y el enemigo no ataca."
     );
     resultado.setAnularAtaqueEnemigo(true);
     return resultado;
@@ -438,7 +432,7 @@ public class ServicioCombateImpl implements ServicioCombate {
   @SuppressWarnings("PMD.UnusedFormalParameter")
   private EfectoHechizoResultado efectoInmortalidad(Partida partida, Carta carta) {
     EfectoHechizoResultado resultado = new EfectoHechizoResultado(
-      TXT_USAS + carta.getNombre() + "]. Si el golpe fuera mortal, sobrevivís con 1 HP."
+            TXT_USAS + carta.getNombre() + "]. Si el golpe fuera mortal, sobrevivís con 1 HP."
     );
     resultado.setProteccionMortal(true);
     return resultado;
@@ -460,11 +454,11 @@ public class ServicioCombateImpl implements ServicioCombate {
 
   private int calcularAtaqueEnemigo(Enemigo enemigo) {
     int minDmg = (enemigo != null && enemigo.getDanoMin() != null)
-      ? enemigo.getDanoMin()
-      : dmgMinDefault;
+            ? enemigo.getDanoMin()
+            : dmgMinDefault;
     int maxDmg = (enemigo != null && enemigo.getDanoMax() != null)
-      ? enemigo.getDanoMax()
-      : dmgMaxDefault;
+            ? enemigo.getDanoMax()
+            : dmgMaxDefault;
 
     if (minDmg == maxDmg) return maxDmg;
     return random.nextInt((maxDmg - minDmg) + 1) + minDmg;

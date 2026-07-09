@@ -3,7 +3,6 @@ package com.tallerwebi.dominio;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -13,94 +12,102 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ServicioPartidaImpl implements ServicioPartida {
 
-    @Value("${partida.cartas.iniciales:5}")
-    private int cartasIniciales;
+  @Value("${partida.cartas.iniciales:5}")
+  private int cartasIniciales;
 
-    @Value("${partida.hp.jugador.inicial:100}")
-    private int hpInicial;
+  @Value("${partida.hp.jugador.inicial:100}")
+  private int hpInicial;
 
-    private RepositorioEnemigo repositorioEnemigo;
-    private RepositorioPartida repositorioPartida;
+  private RepositorioEnemigo repositorioEnemigo;
+  private RepositorioPartida repositorioPartida;
 
-    @Autowired
-    public ServicioPartidaImpl(RepositorioEnemigo repositorioEnemigo, RepositorioPartida repositorioPartida) {
-        this.repositorioEnemigo = repositorioEnemigo;
-        this.repositorioPartida = repositorioPartida;
+  @Autowired
+  public ServicioPartidaImpl(
+    RepositorioEnemigo repositorioEnemigo,
+    RepositorioPartida repositorioPartida
+  ) {
+    this.repositorioEnemigo = repositorioEnemigo;
+    this.repositorioPartida = repositorioPartida;
+  }
+
+  @Override
+  public Partida iniciarPartida(Usuario usuario, String zona) {
+    // 1. Buscamos si el usuario ya tiene una partida activa (para evitar crear partidas zombis)
+    Partida partidaExistente = repositorioPartida.buscarPartidaActivaPorUsuario(usuario.getId());
+
+    if (partidaExistente != null) {
+      return partidaExistente;
     }
 
-    @Override
-    public Partida iniciarPartida(Usuario usuario, String zona) {
-        // 1. Buscamos si el usuario ya tiene una partida activa (para evitar crear partidas zombis)
-        Partida partidaExistente = repositorioPartida.buscarPartidaActivaPorUsuario(usuario.getId());
+    // 2. Si no hay partida activa, creamos la estructura base
+    Partida nuevaPartida = new Partida();
+    nuevaPartida.setUsuario(usuario);
 
-        if (partidaExistente != null) {
-            return partidaExistente;
-        }
+    Enemigo enemigoSeleccionado = determinarEnemigoParaZona(zona);
 
-        // 2. Si no hay partida activa, creamos la estructura base
-        Partida nuevaPartida = new Partida();
-        nuevaPartida.setUsuario(usuario);
+    nuevaPartida.setEnemigo(enemigoSeleccionado);
+    nuevaPartida.setHpEnemigo(enemigoSeleccionado != null ? enemigoSeleccionado.getHpBase() : 100);
+    nuevaPartida.setHpJugador(hpInicial);
+    nuevaPartida.setEnumEstadoPartida(EnumEstadoPartida.ACTIVA);
 
-        Enemigo enemigoSeleccionado = determinarEnemigoParaZona(zona);
-
-        nuevaPartida.setEnemigo(enemigoSeleccionado);
-        nuevaPartida.setHpEnemigo(enemigoSeleccionado != null ? enemigoSeleccionado.getHpBase() : 100);
-        nuevaPartida.setHpJugador(hpInicial);
-        nuevaPartida.setEnumEstadoPartida(EnumEstadoPartida.ACTIVA);
-
-        // 3. Obtenemos las cartas del usuario
-        List<Carta> mazoCompleto = new ArrayList<>();
-        if (usuario.getMazoActivo() != null && usuario.getMazoActivo().getCartas() != null) {
-            mazoCompleto.addAll(usuario.getMazoActivo().getCartas());
-        }
-
-        // 4. Barajamos una única vez para garantizar aleatoriedad justa
-        Collections.shuffle(mazoCompleto);
-
-        // 5. Dividimos mazo en mano inicial y mazo de robo
-        int cartasARobar = Math.min(cartasIniciales, mazoCompleto.size());
-        List<Carta> manoInicial = new ArrayList<>(mazoCompleto.subList(0, cartasARobar));
-        List<Carta> mazoRestante = new ArrayList<>(mazoCompleto.subList(cartasARobar, mazoCompleto.size()));
-
-        nuevaPartida.setManoJugador(manoInicial);
-        nuevaPartida.setMazoRestante(mazoRestante);
-
-        // 6. Persistimos en la base de datos
-        repositorioPartida.guardar(nuevaPartida);
-
-        return nuevaPartida;
+    // 3. Obtenemos las cartas del usuario
+    List<Carta> mazoCompleto = new ArrayList<>();
+    if (usuario.getMazoActivo() != null && usuario.getMazoActivo().getCartas() != null) {
+      mazoCompleto.addAll(usuario.getMazoActivo().getCartas());
     }
 
-    @Override
-    public void gestionarRoboDeCarta(Long idCartaJugada, List<Long> idsMano, List<Long> idsMazoRobo) {
-        if (idsMano != null) {
-            idsMano.remove(idCartaJugada);
-            if (idsMazoRobo != null && !idsMazoRobo.isEmpty() && idsMano.size() < 5) {
-                Long cartaRobada = idsMazoRobo.remove(0);
-                idsMano.add(cartaRobada);
-            }
-        }
+    // 4. Barajamos una única vez para garantizar aleatoriedad justa
+    Collections.shuffle(mazoCompleto);
+
+    // 5. Dividimos mazo en mano inicial y mazo de robo
+    int cartasARobar = Math.min(cartasIniciales, mazoCompleto.size());
+    List<Carta> manoInicial = new ArrayList<>(mazoCompleto.subList(0, cartasARobar));
+    List<Carta> mazoRestante = new ArrayList<>(
+      mazoCompleto.subList(cartasARobar, mazoCompleto.size())
+    );
+
+    nuevaPartida.setManoJugador(manoInicial);
+    nuevaPartida.setMazoRestante(mazoRestante);
+
+    // 6. Persistimos en la base de datos
+    repositorioPartida.guardar(nuevaPartida);
+
+    return nuevaPartida;
+  }
+
+  @Override
+  public void gestionarRoboDeCarta(Long idCartaJugada, List<Long> idsMano, List<Long> idsMazoRobo) {
+    if (idsMano != null) {
+      idsMano.remove(idCartaJugada);
+      if (idsMazoRobo != null && !idsMazoRobo.isEmpty() && idsMano.size() < 5) {
+        Long cartaRobada = idsMazoRobo.remove(0);
+        idsMano.add(cartaRobada);
+      }
+    }
+  }
+
+  @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+  private Enemigo determinarEnemigoParaZona(String zona) {
+    List<Enemigo> enemigosZona = repositorioEnemigo.buscarPorZona(zona);
+
+    if (enemigosZona == null || enemigosZona.isEmpty()) {
+      return repositorioEnemigo.obtenerEnemigoAleatorioPorZona(zona);
     }
 
-    @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
-    private Enemigo determinarEnemigoParaZona(String zona) {
-        List<Enemigo> enemigosZona = repositorioEnemigo.buscarPorZona(zona);
+    int sumaProbabilidades = enemigosZona
+      .stream()
+      .mapToInt(e -> e.getProbabilidad() != null ? e.getProbabilidad() : 10)
+      .sum();
 
-        if (enemigosZona == null || enemigosZona.isEmpty()) {
-            return repositorioEnemigo.obtenerEnemigoAleatorioPorZona(zona);
-        }
+    int roll = new java.util.Random().nextInt(sumaProbabilidades) + 1;
+    int acumulador = 0;
 
-        int sumaProbabilidades = enemigosZona.stream().mapToInt(e -> e.getProbabilidad() != null ? e.getProbabilidad() : 10).sum();
-
-        int roll = new java.util.Random().nextInt(sumaProbabilidades) + 1;
-        int acumulador = 0;
-
-        for (Enemigo e : enemigosZona) {
-            acumulador += (e.getProbabilidad() != null ? e.getProbabilidad() : 10);
-            if (roll <= acumulador) {
-                return e;
-            }
-        }
-        return enemigosZona.get(0);
+    for (Enemigo e : enemigosZona) {
+      acumulador += (e.getProbabilidad() != null ? e.getProbabilidad() : 10);
+      if (roll <= acumulador) {
+        return e;
+      }
     }
+    return enemigosZona.get(0);
+  }
 }
