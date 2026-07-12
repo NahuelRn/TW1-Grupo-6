@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.*;
 
+@SuppressWarnings("PMD.TooManyFields")
 @Entity
 public class Partida {
 
@@ -147,5 +148,27 @@ public class Partida {
 
   public void setEnumEstadoPartida(EnumEstadoPartida enumEstadoPartida) {
     this.enumEstadoPartida = enumEstadoPartida;
+  }
+
+  // NUEVO: se acumula con cartas tipo BUFF_DANIO y se consume en el próximo ATAQUE
+  private Integer buffDanioProximoAtaque = 0;
+
+  // NUEVO: se setea con cartas tipo MULTIPLICADOR_DANIO y se consume en el próximo ATAQUE
+  private Integer multiplicadorDanioProximoAtaque = 1;
+
+  public Integer getBuffDanioProximoAtaque() {
+    return buffDanioProximoAtaque;
+  }
+
+  public void setBuffDanioProximoAtaque(Integer buffDanioProximoAtaque) {
+    this.buffDanioProximoAtaque = buffDanioProximoAtaque;
+  }
+
+  public Integer getMultiplicadorDanioProximoAtaque() {
+    return multiplicadorDanioProximoAtaque;
+  }
+
+  public void setMultiplicadorDanioProximoAtaque(Integer multiplicadorDanioProximoAtaque) {
+    this.multiplicadorDanioProximoAtaque = multiplicadorDanioProximoAtaque;
   }
 }

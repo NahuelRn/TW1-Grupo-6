@@ -164,43 +164,6 @@ UPDATE Carta SET imagen = 'Ritual_Oscuro.jpg'        WHERE nombre = 'Ritual Oscu
 UPDATE Carta SET imagen = 'Piel_de_Obsidiana.jpg'    WHERE nombre = 'Piel de Obsidiana';
 UPDATE Carta SET imagen = 'Contrato_Demoniaco.jpg'   WHERE nombre = 'Contrato Demoniaco';
 
--- ==========================================
--- ASIGNACIÓN DE EFECTOS PARA CARTAS DE UTILIDAD (HECHIZO)
--- ==========================================
-UPDATE Carta SET efecto = 'CURA', descripcion = 'Efecto: +15 Vida' WHERE nombre = 'Pocion Curativa';
-UPDATE Carta SET efecto = 'CURA', descripcion = 'Efecto: +5 Vida' WHERE nombre = 'Vendaje';
-UPDATE Carta SET efecto = 'CURA', defensaMin = 25, defensaMax = 25, descripcion = 'Efecto: Purificación. Te cura 25 HP' WHERE nombre = 'Antidoto';
-
-UPDATE Carta SET efecto = 'DANIO_DIRECTO', descripcion = 'Efecto: Daño Directo' WHERE nombre = 'Bomba';
-
-UPDATE Carta SET efecto = 'BUFF_DANIO', danoMin = 5, danoMax = 5, descripcion = 'Efecto: Tu próximo ataque hace +5 de daño' WHERE nombre = 'Afilador de Armas';
-UPDATE Carta SET efecto = 'BUFF_DANIO', danoMin = 10, danoMax = 10, descripcion = 'Efecto: Tu próximo ataque hace +10 de daño' WHERE nombre = 'Pocion de Fuerza';
-
-UPDATE Carta SET efecto = 'MULTIPLICADOR_DANIO', danoMin = 2, danoMax = 2, descripcion = 'Efecto: Tu próximo ataque hace el doble de daño' WHERE nombre = 'Brebaje Berserker';
-
-UPDATE Carta SET efecto = 'EVASION', descripcion = 'Efecto: Evasión. El enemigo falla su próximo ataque' WHERE nombre = 'Cortina de Humo';
-UPDATE Carta SET efecto = 'ATURDIR_ENEMIGO', descripcion = 'Efecto: Ciega al enemigo. Su próximo ataque no hace daño' WHERE nombre = 'Polvo Cegador';
-UPDATE Carta SET efecto = 'DANIO_Y_ATURDIR', descripcion = 'Efecto: Daño directo y el enemigo pierde su turno' WHERE nombre = 'Trampa para Osos';
-
-UPDATE Carta SET efecto = 'MITAD_VIDA_ENEMIGO', descripcion = 'Efecto: Reduce la vida actual del enemigo a la mitad' WHERE nombre = 'Frasco de Acido';
-
-UPDATE Carta SET efecto = 'SACRIFICIO', danoMin = 40, danoMax = 40, defensaMin = 20, defensaMax = 20, descripcion = 'Efecto: Pierdes 20 HP, el enemigo pierde 40 HP' WHERE nombre = 'Contrato Demoniaco';
-UPDATE Carta SET efecto = 'SACRIFICIO_BUFF', danoMin = 20, danoMax = 20, defensaMin = 10, defensaMax = 10, descripcion = 'Efecto: Pierdes 10 HP, tu próximo ataque hace +20 de daño' WHERE nombre = 'Ritual Oscuro';
-
-UPDATE Carta SET efecto = 'VAMPIRISMO', danoMin = 15, danoMax = 15, defensaMin = 15, defensaMax = 15, descripcion = 'Efecto: Robo de Vida. Hace 15 de daño y te cura 15 HP' WHERE nombre = 'Catalizador de Sangre';
-
-UPDATE Carta SET efecto = 'HIBRIDO_CURA_BUFF', danoMin = 10, danoMax = 10, defensaMin = 10, defensaMax = 10, descripcion = 'Efecto: Te curas 10 HP y tu próximo ataque hace +10 de daño' WHERE nombre = 'Adrenalina';
-UPDATE Carta SET efecto = 'HIBRIDO_ESCUDO_BUFF', danoMin = 5, danoMax = 5, defensaMin = 10, defensaMax = 10, descripcion = 'Efecto: Ganas +10 de escudo este turno y tu próximo ataque hace +5 de daño' WHERE nombre = 'Preparacion';
-
-UPDATE Carta SET efecto = 'DANIO_ALEATORIO', danoMin = 1, danoMax = 30, descripcion = 'Efecto: Magia. Hace un daño aleatorio entre 1 y 30' WHERE nombre = 'Concentracion';
-
-UPDATE Carta SET efecto = 'RECICLAR', danoMin = 5, danoMax = 5, defensaMin = 15, defensaMax = 15, descripcion = 'Efecto: Te cura 15 HP, pero el enemigo recupera 5 HP' WHERE nombre = 'Reciclar';
-
-UPDATE Carta SET efecto = 'ATURDIR_Y_CURA', defensaMin = 5, defensaMax = 5, descripcion = 'Efecto: Te curas 5 HP y el enemigo no ataca este turno' WHERE nombre = 'Planificacion';
-
-UPDATE Carta SET efecto = 'INMORTALIDAD', descripcion = 'Efecto: Si recibieras un golpe mortal, sobrevivís con 1 HP' WHERE nombre = 'Piel de Obsidiana';
-
-
 
 -- ==========================================
 -- DATA: ENEMIGOS

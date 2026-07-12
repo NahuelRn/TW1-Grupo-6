@@ -149,4 +149,24 @@ public class Partida {
   public void setEnumEstadoPartida(EnumEstadoPartida enumEstadoPartida) {
     this.enumEstadoPartida = enumEstadoPartida;
   }
+
+  private Integer buffDanioProximoAtaque = 0;
+
+  private Integer multiplicadorDanioProximoAtaque = 1;
+
+  public Integer getBuffDanioProximoAtaque() {
+    return buffDanioProximoAtaque;
+  }
+
+  public void setBuffDanioProximoAtaque(Integer buffDanioProximoAtaque) {
+    this.buffDanioProximoAtaque = buffDanioProximoAtaque;
+  }
+
+  public Integer getMultiplicadorDanioProximoAtaque() {
+    return multiplicadorDanioProximoAtaque;
+  }
+
+  public void setMultiplicadorDanioProximoAtaque(Integer multiplicadorDanioProximoAtaque) {
+    this.multiplicadorDanioProximoAtaque = multiplicadorDanioProximoAtaque;
+  }
 }
