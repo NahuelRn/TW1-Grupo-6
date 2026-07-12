@@ -3,198 +3,233 @@
 <head>
     <meta charset="UTF-8">
     <title>MythicStack - Contrato Firmado</title>
-
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/css/globals.css}">
-
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Roboto:wght@400;700&display=swap');
-
         body {
-            background-color: var(--game-void);
-            color: var(--game-text);
+            background-color: #120c0c;
+            color: #f0ead6;
             font-family: 'Roboto', sans-serif;
             min-height: 100vh;
-            margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 40px 20px;
+            background-image:
+                    radial-gradient(ellipse at 20% 10%, rgba(139,0,0,0.2) 0%, transparent 50%),
+                    radial-gradient(ellipse at 80% 90%, rgba(139,0,0,0.15) 0%, transparent 50%);
         }
 
-        .container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .contenedor-premio {
-            background: radial-gradient(
-                    circle,
-                    rgba(50,10,10,1) 0%,
-                    rgba(10,5,5,1) 100%
-            );
-            border: 2px solid #ffcc00;
+        .panel-principal {
+            background: radial-gradient(circle, rgba(50,10,10,1) 0%, rgba(10,5,5,1) 100%);
+            border: 2px solid #d4af37;
             border-radius: 16px;
-            box-shadow:
-                    0 0 30px rgba(255, 204, 0, 0.35),
-                    0 0 60px rgba(255, 204, 0, 0.15);
+            box-shadow: 0 0 30px rgba(212,175,55,0.3), 0 0 60px rgba(212,175,55,0.1);
             width: 100%;
-            max-width: 600px;
-            padding: 40px;
-        }
-
-        .icono-contrato {
-            font-size: 4rem;
-            margin-bottom: 10px;
+            max-width: 560px;
+            padding: 45px 40px;
         }
 
         .titulo-resultado {
             font-family: 'Cinzel', serif;
-            color: #ffcc00;
-            text-shadow: 0 0 15px rgba(255, 204, 0, 0.6);
-            text-align: center;
-            margin-bottom: 10px;
+            font-weight: 900;
+            color: #d4af37;
+            text-shadow: 0 0 20px rgba(212,175,55,0.5);
+            font-size: 2rem;
+            margin-bottom: 6px;
         }
 
         .subtitulo {
-            color: #b8b8b8;
-            margin-bottom: 25px;
+            color: #a09090;
+            font-size: 0.95rem;
+            margin-bottom: 30px;
         }
 
-        .carta-ganada {
-            background-color: var(--game-panel);
-            border: 2px solid var(--game-epic);
-            border-radius: 12px;
-            box-shadow: 0 0 20px rgba(163, 53, 238, 0.4);
-            padding: 25px;
-            margin-top: 20px;
+        /* ── CARD DE CARTA (mismo estilo que mercado-detalle-trade) ── */
+        .card-carta-obtenida {
+            background-color: #221515;
+            border: 2px solid #d4af37;
+            border-radius: 10px;
+            padding: 24px 20px;
+            margin-bottom: 10px;
+        }
+
+        .carta-imagen {
+            width: 160px;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #4a1212;
+            box-shadow: 0 0 20px rgba(212,175,55,0.25);
+            margin: 0 auto 16px;
+            display: block;
+        }
+
+        .carta-sin-imagen {
+            width: 160px;
+            height: 220px;
+            background-color: #1a1111;
+            border: 2px dashed #4a1212;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            color: #7a6a6a;
+            font-size: 0.8rem;
         }
 
         .nombre-carta {
-            color: #ffcc00;
             font-family: 'Cinzel', serif;
-            margin-bottom: 15px;
+            color: #d4af37;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
         }
 
-        .tipo-badge {
-            font-size: 0.8rem;
+        .badge-rareza {
+            background-color: transparent;
+            border: 1px solid #d4af37;
+            color: #d4af37;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .badge-tipo {
+            background-color: rgba(255,255,255,0.08);
+            color: #f0ead6;
+            font-size: 0.75rem;
+            padding: 4px 12px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 16px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            background-color: rgba(255,255,255,0.08);
-            padding: 6px 14px;
-            border-radius: 20px;
-            display: inline-block;
         }
 
         .descripcion-carta {
-            margin-top: 15px;
-            margin-bottom: 15px;
+            color: #a09090;
+            font-size: 0.85rem;
             line-height: 1.6;
+            border-top: 1px solid #4a1212;
+            padding-top: 12px;
+            margin-top: 8px;
         }
 
-        .datos-carta {
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            gap: 10px;
+        .dato-carta {
+            color: #f0ead6;
+            font-size: 0.85rem;
+        }
+        .dato-carta strong {
+            color: #d4af37;
         }
 
-        .btn-mejora {
+        /* ── BOTÓN ── */
+        .btn-mythic {
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #8b0000, #c41230);
+            border: none;
+            color: #fff;
+            padding: 12px 30px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
             width: 100%;
-            padding: 12px;
-            font-weight: bold;
-            margin-top: 15px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-mythic:hover {
+            background: linear-gradient(135deg, #a00000, #e01535);
+            box-shadow: 0 0 20px rgba(230,57,70,0.4);
+            color: #fff;
+            transform: translateY(-1px);
+            text-decoration: none;
         }
 
-        .alert {
-            margin-top: 20px;
-        }
-
-        @media (max-width: 576px) {
-            .contenedor-premio {
-                padding: 25px;
-            }
-
-            .titulo-resultado {
-                font-size: 1.8rem;
-            }
-
-            .icono-contrato {
-                font-size: 3rem;
-            }
+        .divider {
+            border: none;
+            border-top: 1px solid #4a1212;
+            margin: 20px 0;
         }
     </style>
 </head>
-
 <body>
 
-<div class="container">
-    <div class="contenedor-premio text-center text-white">
+<div class="panel-principal text-center">
 
-        <div class="icono-contrato">📜</div>
+    <h1 class="titulo-resultado">&#128221; Contrato Ejecutado!</h1>
+    <p class="subtitulo">Los dioses de MythicStack han aceptado tu sacrificio.</p>
 
-        <h1 class="titulo-resultado">
-            Contrato Ejecutado!
-        </h1>
+    <hr class="divider">
 
-        <p class="subtitulo">
-            Los dioses de MythicStack han aceptado tu sacrificio.
+    <!-- CARTA OBTENIDA -->
+    <div th:if="${cartaPremio}">
+
+        <p style="color:#a09090; font-size:0.85rem; text-transform:uppercase; letter-spacing:2px; margin-bottom:16px;">
+            Carta Obtenida
         </p>
 
-        <div class="carta-ganada" th:if="${cartaPremio}">
+        <div class="card-carta-obtenida">
 
-            <h2 class="nombre-carta"
-                th:text="${cartaPremio.nombre}">
-                Nombre Carta
-            </h2>
+            <!-- Imagen de la carta -->
+            <img th:if="${cartaPremio.imagen != null and not #strings.isEmpty(cartaPremio.imagen)}"
+                 th:src="@{/img/{img}(img=${cartaPremio.imagen})}"
+                 th:alt="${cartaPremio.nombre}"
+                 class="carta-imagen"/>
+            <div th:unless="${cartaPremio.imagen != null and not #strings.isEmpty(cartaPremio.imagen)}"
+                 class="carta-sin-imagen">
+                <span>Sin imagen</span>
+            </div>
 
-            <div class="mb-3">
-                <span class="tipo-badge"
-                      th:text="${cartaPremio.tipo + ' - ' + cartaPremio.subtipo}">
-                    Tipo - Subtipo
+            <!-- Nombre -->
+            <h2 class="nombre-carta" th:text="${cartaPremio.nombre}">Nombre Carta</h2>
+
+            <!-- Rareza y Tipo -->
+            <div class="d-flex justify-content-center gap-2 flex-wrap mb-2">
+                <span class="badge-rareza" th:text="${cartaPremio.rareza}">RAREZA</span>
+                <span class="badge-tipo"
+                      th:text="${cartaPremio.tipo != null and cartaPremio.subtipo != null}
+                               ? ${cartaPremio.tipo + ' · ' + cartaPremio.subtipo}
+                               : ${cartaPremio.tipo}">
+                    TIPO
                 </span>
             </div>
 
-            <p class="descripcion-carta"
-               th:text="${cartaPremio.descripcion}">
+            <!-- Descripción -->
+            <p class="descripcion-carta" th:text="${cartaPremio.descripcion}">
                 Descripción de la carta obtenida.
             </p>
 
-            <hr style="border-color: var(--game-border);">
-
-            <div class="datos-carta">
-                <span>
-                    Rareza:
-                    <strong class="text-warning"
-                            th:text="${cartaPremio.rareza}">
-                        Rara
-                    </strong>
-                </span>
-
-                <span>
-                    Valor:
-                    <strong th:text="${cartaPremio.valorOroBase + ' Oro'}">
-                        100 Oro
-                    </strong>
+            <!-- Datos adicionales -->
+            <div class="d-flex justify-content-around flex-wrap gap-2 mt-3">
+                <span class="dato-carta">
+                    Valor: <strong th:text="${cartaPremio.valorOroBase + ' Oro'}">100 Oro</strong>
                 </span>
             </div>
-
-        </div>
-
-        <div th:unless="${cartaPremio}" class="alert alert-danger">
-            No se detectó ninguna carta obtenida.
-            Vuelve a intentar el proceso.
-        </div>
-
-        <div class="mt-4">
-            <a th:href="@{/contrato-mejora(t=${#dates.createNow().getTime()})}"
-               class="btn btn-mejora btn-warning">
-                Volver a Intentar
-            </a>
         </div>
 
     </div>
+
+    <!-- ERROR: no se encontró carta -->
+    <div th:unless="${cartaPremio}" class="alert alert-danger mt-3">
+        No se detectó ninguna carta obtenida. Volvé a intentar el proceso.
+    </div>
+
+    <hr class="divider">
+
+    <!-- BOTÓN VOLVER -->
+    <a th:href="@{/contrato-mejora(t=${#dates.createNow().getTime()})}"
+       class="btn btn-mythic mt-2">
+        Volver a Intentar
+    </a>
+
 </div>
 
 </body>
