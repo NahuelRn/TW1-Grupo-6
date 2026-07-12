@@ -60,36 +60,13 @@
             font-size: 0.7rem;
             min-height: 32px;
         }
-        a.btn.btn-outline-warning {
-            font-family: 'Montserrat', sans-serif;
-            border: 2.7px solid #e5a93b;
-            padding: 10px 20px;
-            font-size: 20px;
-            border-radius: 5px;
-            background-color: #131316;
-            color: #e5a93b;
-            box-shadow: 0px 0px 10px 0px rgb(229 169 59 / 16%);
-            transition: all 0.2s ease-in-out;
-            text-decoration: none;
-            display: inline-block;
-            margin-bottom: 35px;
-        }
-
-        a.btn.btn-outline-warning:hover {
-            background-color: #e5a93b;
-            color: #101010;
-            transform: translateY(-3px);
-            box-shadow: 0px 0px 20px rgba(229, 169, 59, 0.4);
-        }
     </style>
 </head>
 <body th:style="|background-image: url('@{/img/Coleccion.jpg}'); background-size: cover; background-position: center; background-attachment: fixed;|">
 <main class="container py-5">
 
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-        <a th:href="@{/lobby}" class="btn btn-outline-warning">
-            Volver al lobby
-        </a>
+        <a th:href="@{/lobby}" class="btn btn-lobby px-4 py-2">Volver al Lobby</a>
         <h2 class="text-center flex-grow-1 mb-0 fw-bold" style="color: var(--game-epic, #d4af37);">Tu Colección</h2>
         <span class="d-none d-md-inline" style="width: 140px;"></span>
     </div>

@@ -1,19 +1,101 @@
+/* Definicion de variables globales*/
+:root {
+    /* Fondos y Estructura */
+    --game-void: #1A1A1D;
+    --game-panel: #2A2A30;
+    --game-border: #404040;
+
+    /* Textos */
+    --game-text: #EAEAEA;
+    --game-muted: #A0A0A5;
+
+    /* Acentos y Acciones */
+    --game-blood: #8A0303;
+    --game-blood-hover: #aa0404;
+    --game-epic: #D4AF37;
+    --game-epic-hover: #f3c83b;
+
+    /* Metricas UI */
+    --border-radius-general: 6px;
+    --hp-bar-height: 25px;
+
+    /* Sombras Profundas */
+    --shadow-game: 0 8px 16px rgba(0, 0, 0, 0.8);
+}
+
 body {
-  padding-top: 5rem;
-}
-.starter-template {
-  padding: 3rem 1.5rem;
-  text-align: center;
+    background-color: var(--game-void);
+    color: var(--game-text);
+    font-family: 'Roboto', sans-serif;
 }
 
-h1{
-	color:#0000FF;
+/* Clases reutilizables para el juego */
+.mythic-panel {
+    background-color: var(--game-panel);
+    border: 1px solid var(--game-border);
+    border-radius: var(--border-radius-general);
+    box-shadow: var(--shadow-game);
+    padding: 2.5rem;
 }
 
-h2{
-	color:#FF0000;
+.mythic-input {
+    background-color: var(--game-void) !important;
+    color: var(--game-text) !important;
+    border: 1px solid var(--game-border);
+    border-radius: var(--border-radius-general);
 }
 
-.navbar-brand{
-    margin:0 2rem;
+.mythic-input:focus {
+    border-color: var(--game-epic);
+    box-shadow: 0 0 5px var(--game-epic);
+}
+
+.btn-mythic-blood {
+    background-color: var(--game-blood);
+    color: var(--game-text);
+    border: none;
+    border-radius: var(--border-radius-general);
+    transition: 0.3s;
+}
+
+.btn-mythic-blood:not(:disabled):hover {
+    background-color: var(--game-blood-hover);
+    color: white;
+}
+
+.btn-mythic-blood:disabled {
+    background-color: var(--game-border);
+    color: var(--game-muted);
+}
+
+.btn-mythic-epic {
+    background-color: transparent;
+    color: var(--game-epic);
+    border: 1px solid var(--game-epic);
+    border-radius: var(--border-radius-general);
+    transition: 0.3s;
+    text-decoration: none;
+    text-align: center;
+}
+
+.btn-mythic-epic:hover {
+    background-color: var(--game-epic);
+    color: var(--game-void);
+}
+
+.btn-lobby {
+    font-family: 'Cinzel', serif;
+    letter-spacing: 1px;
+    background-color: transparent;
+    color: #d4af37 !important;
+    border: 1px solid #d4af37 !important;
+    transition: 0.3s;
+}
+
+.btn-lobby:hover,
+.btn-lobby:focus,
+.btn-lobby:active {
+    background-color: rgba(212, 175, 55, 0.15) !important;
+    color: #d4af37 !important;
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
 }

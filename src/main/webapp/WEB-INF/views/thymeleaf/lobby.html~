@@ -9,54 +9,88 @@
     <link rel="stylesheet" th:href="@{/css/main.css}" />
 
     <style>
-        /* Mantiene el color dorado del texto y el borde en cualquier estado del botón */
-        .btn-intercambio-dropdown,
-        .btn-intercambio-dropdown:hover,
-        .btn-intercambio-dropdown:focus,
-        .btn-intercambio-dropdown:active,
-        .show > .btn-intercambio-dropdown.dropdown-toggle {
-            color: #d4af37 !important;
-            border-color: #d4af37 !important;
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&display=swap');
+
+        .mythic-panel {
+            background-color: rgba(42, 42, 48, 0.45);
+            backdrop-filter: blur(6px);
         }
 
-        /* Cambia el color de fondo sutilmente al pasar el mouse o activarlo para dar feedback visual */
-        .btn-intercambio-dropdown:hover,
-        .btn-intercambio-dropdown:focus,
-        .btn-intercambio-dropdown:active,
-        .show > .btn-intercambio-dropdown.dropdown-toggle {
+        .titulo-lobby {
+            font-family: 'Cinzel', serif;
+            font-weight: 800;
+            letter-spacing: 4px;
+            color: var(--game-epic);
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+        }
+
+        .btn-lobby {
+            font-family: 'Cinzel', serif;
+            letter-spacing: 1px;
+            background-color: transparent;
+            color: #d4af37 !important;
+            border: 1px solid #d4af37 !important;
+            transition: 0.3s;
+        }
+        .btn-lobby:hover,
+        .btn-lobby:focus,
+        .btn-lobby:active,
+        .show > .btn-lobby.dropdown-toggle {
             background-color: rgba(212, 175, 55, 0.15) !important;
+            color: #d4af37 !important;
             box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
         }
+        /* BOTÓN PRINCIPAL ROJO SANGRE */
+        .btn-comenzar {
+            font-family: 'Cinzel', serif;
+            font-weight: 800;
+            letter-spacing: 2px;
+            background-color: #8a0303; /* Rojo sangre oscuro */
+            color: white !important;
+            border: 1px solid #ff4d4d !important;
+            box-shadow: 0 0 15px rgba(138, 3, 3, 0.5); /* Resplandor rojo */
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .btn-comenzar:hover {
+            transform: scale(1.05); /* Se agranda apenitas */
+            background-color: #b30000; /* Rojo más vivo al pasar el mouse */
+            box-shadow: 0 0 25px rgba(255, 77, 77, 0.6); /* Estalla el resplandor */
+            color: white !important;
+            border-color: white !important; /* Borde blanco para máximo contraste */
+        }
+
     </style>
 </head>
-<body th:style="'background-image: url(' + @{/img/LobbyFondo.jpg} + '); background-size: cover; background-position: center; background-attachment: fixed;'">
+<body th:style="|background-image: url('@{/img/LobbyFondo.jpg}'); background-size: cover; background-position: center; background-attachment: fixed;|">
 <main role="main" class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
     <div class="col-md-8 col-sm-10 mythic-panel text-center">
 
-        <h1 class="mb-3" style="color: var(--game-epic);">Bienvenido a MythicStack</h1>
-        <h4 class="mb-5" style="color: var(--game-muted);">Que deseas hacer, guerrero?</h4>
+        <h1 class="mb-3 titulo-lobby">MythicStack</h1>
+        <h4 class="mb-5" style="color: var(--game-muted);">Te Hospedaste en la Taberna, ¿Qué vas a hacer ahora?</h4>
 
         <div class="d-grid gap-3 col-6 mx-auto mt-4">
 
-            <a th:href="@{/deckbuilding}" class="btn btn-danger btn-lg" style="background-color: #8b0000; border-color: #8b0000;">Comenzar</a>
+            <a th:href="@{/deckbuilding}" class="btn btn-lg btn-lobby">Comenzar Aventura</a>
 
-            <a th:href="@{/coleccion}" class="btn btn-danger btn-lg" style="background-color: #8b0000; border-color: #8b0000;">Ver Inventario</a>
+            <a th:href="@{/coleccion}" class="btn btn-lg btn-lobby">Ver Inventario</a>
 
-            <a th:href="@{/historialPartida}" class="btn btn-outline-warning btn-lg">
-                Historial de Partidas
-            </a><!-- L -->
+            <a th:href="@{/historialPartida}" class="btn btn-lg btn-lobby">
+                Historial de Aventuras
+            </a>
 
-            <a th:href="@{/tienda}" class="btn btn-warning btn-lg fw-bold shadow-sm">
-                Ir a la Tienda
+            <a th:href="@{/tienda}" class="btn btn-lg btn-lobby">
+                Ir a la Tienda del Gremio
             </a>
 
             <div class="dropdown">
-                <button class="btn btn-outline-warning btn-lg dropdown-toggle w-100 btn-intercambio-dropdown" type="button" id="dropdownIntercambio" data-bs-toggle="dropdown" aria-expanded="false" style="color: #d4af37; border-color: #d4af37;">
-                    Intercambio de cartas
+                <button class="btn btn-lg dropdown-toggle w-100 btn-lobby" type="button" id="dropdownIntercambio" data-bs-toggle="dropdown" aria-expanded="false">
+                    Contratos e Intercambios
                 </button>
                 <ul class="dropdown-menu w-100 dropdown-menu-dark" aria-labelledby="dropdownIntercambio">
                     <li><a class="dropdown-item" th:href="@{/contrato-mejora}">Contrato de Mejora</a></li>
-                    <li><a class="dropdown-item" th:href="@{/mercado}">Intercambio con Jugadores</a></li>
+                    <li><a class="dropdown-item" th:href="@{/mercado}">Intercambio con Aventureros</a></li>
                 </ul>
             </div>
 

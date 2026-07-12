@@ -10,16 +10,24 @@
         integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
 
   <link rel="stylesheet" th:href="@{/css/main.css}" />
+
+  <style>
+    .mythic-panel {
+      background-color: rgba(42, 42, 48, 0.45) !important;
+      backdrop-filter: blur(6px) !important;
+      border-radius: 12px;
+      padding: 2rem;
+    }
+  </style>
 </head>
 
-<body th:style="|background-image: url('@{/img/LoginFondo.jpg}'); background-size: cover; background-position: center; background-attachment: fixed;|">
+<body th:style="|background-image: url('@{/img/NuevoUsuarioFondo.jpg}'); background-size: cover; background-position: center; background-attachment: fixed;|">
 
 <main role="main" class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
 
   <div class="col-md-6 col-sm-8 mythic-panel text-center">
     <form action="#" th:action="@{/registrarme}" method="POST" th:object="${usuario}">
-      <h2 class="mb-4" style="color: var(--game-epic);">Registro de Guerrero</h2>
-      <hr style="border-color: var(--game-border);">
+      <h2 class="mb-4" style="color: var(--game-epic);">Tu nueva vida como Aventurero comienza...</Avent> </h2>
 
       <div class="mb-3">
         <input th:field="*{email}" id="email" type="email" class="form-control mythic-input" placeholder="Correo electronico" required />
@@ -28,13 +36,14 @@
         <input th:field="*{password}" type="password" id="password" class="form-control mythic-input" placeholder="Contrasena" required />
       </div>
 
-      <button id="btn-registrarme" class="btn btn-lg btn-mythic-blood w-100" type="submit">Confirmar Registro</button>
+      <button id="btn-registrarme" class="btn btn-lg btn-mythic-blood w-100" type="submit">Confirmar registro en el gremio</button>
 
-      <p th:if="${error != null}" class="alert alert-danger mt-3" style="background-color: var(--game-blood); color: white; border: none;" th:text="'Error: ' + ${error}"></p>
+      <div th:if="${error != null}" class="alert alert-danger mt-3 mb-0" style="background-color: var(--game-blood); color: white; border: none;" th:text="'Error: ' + ${error}"></div>
     </form>
 
-    <div class="mt-3">
-      <a href="login" class="btn w-100 btn-mythic-epic">Volver al Login</a>
+    <hr class="my-4" style="border-color: #a1a1aa; opacity: 0.3;">
+
+    <a href="login" class="btn w-100 btn-mythic-epic">Volver ante los guardias</a>
     </div>
   </div>
 

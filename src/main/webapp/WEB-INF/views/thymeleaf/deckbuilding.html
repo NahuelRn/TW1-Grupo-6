@@ -7,21 +7,21 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { background-color: #0c0c0e !important; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #ffffff; }
-        .titulo-seccion { color: #e63946; font-weight: 800; letter-spacing: 2px; text-shadow: 0 0 10px rgba(230,57,70,0.4); }
+        .titulo-seccion { color: #8a0303; font-weight: 800; letter-spacing: 2px; text-shadow: 0 0 10px rgba(230,57,70,0.4); }
         .mythic-card { background-color: #131316 !important; border: 2px solid #e5a93b !important; border-radius: 12px !important; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.7); transition: transform 0.2s, box-shadow 0.2s; }
         .mythic-card:hover { transform: translateY(-5px); box-shadow: 0 0 20px rgba(229,169,59,0.4); }
-        .mythic-card.seleccionada { border-color: #e63946 !important; box-shadow: 0 0 20px rgba(230,57,70,0.6) !important; }
-        .quantity-badge { position: absolute; top: -12px; right: -12px; background-color: #ff4d6d !important; color: white !important; font-weight: bold; font-size: 0.75rem; padding: 4px 8px; border-radius: 50%; border: 2px solid #e5a93b; box-shadow: 0 2px 5px rgba(0,0,0,0.5); z-index: 10; }
+        .mythic-card.seleccionada { border-color: #8a0303 !important; box-shadow: 0 0 20px rgba(230,57,70,0.6) !important; }
+        .quantity-badge { position: absolute; top: -10px; right: -10px; background-color: #ff4d6d !important; color: white !important; font-weight: bold; font-size: 0.65rem; padding: 3px 6px; border-radius: 50%; border: 2px solid #e5a93b; box-shadow: 0 2px 5px rgba(0,0,0,0.5); z-index: 10; }
         .card-img-container { width: 100%; aspect-ratio: 7 / 10; background-color: #09090b; border-radius: 8px; overflow: hidden; border: 1px solid #27272a; }
         .card-img-container img { width: 100%; height: 100%; object-fit: cover; }
         .no-art { color: #52525b; font-size: 0.8rem; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; border: 2px dashed #27272a; width: 90%; height: 90%; display: flex; align-items: center; justify-content: center; border-radius: 6px; }
-        .card-title-mythic { font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 8px; color: #ffffff; }
-        .badge-rarity { background-color: transparent !important; border: 1px solid #e5a93b !important; color: #e5a93b !important; font-size: 0.65rem; font-weight: 700; padding: 3px 6px; }
-        .badge-type { background-color: #27272a !important; color: #ffffff !important; font-size: 0.65rem; font-weight: 700; padding: 3px 6px; }
-        .card-desc-mythic { color: #a1a1aa !important; font-size: 0.75rem; margin-top: 8px; min-height: 35px; }
-        .mythic-checkbox { width: 20px; height: 20px; accent-color: #e63946; cursor: pointer; }
+        .card-title-mythic { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 8px; color: #ffffff; }
+        .badge-rarity { background-color: transparent !important; border: 1px solid #e5a93b !important; color: #e5a93b !important; font-size: 0.6rem; font-weight: 700; padding: 3px 6px; }
+        .badge-type { background-color: #27272a !important; color: #ffffff !important; font-size: 0.6rem; font-weight: 700; padding: 3px 6px; }
+        .card-desc-mythic { color: #a1a1aa !important; font-size: 0.7rem; margin-top: 8px; min-height: 32px; }
+        .mythic-checkbox { width: 20px; height: 20px; accent-color: #8a0303; cursor: pointer; }
         .contador-box { background-color: #131316; border: 2px solid #e5a93b; border-radius: 10px; padding: 10px 24px; display: inline-block; font-size: 1rem; font-weight: 700; color: #e5a93b; letter-spacing: 1px; }
-        .contador-box.listo { border-color: #e63946; color: #e63946; box-shadow: 0 0 12px rgba(230,57,70,0.4); }
+        .contador-box.listo { border-color: #8a0303; color: #8a0303; box-shadow: 0 0 12px rgba(230,57,70,0.4); }
         .instruccion { color: #a1a1aa; font-size: 0.95rem; margin-top: 6px; }
     </style>
 </head>
@@ -40,11 +40,11 @@
     <div th:if="${error}" class="alert alert-danger text-center shadow" th:text="${error}"></div>
 
     <form th:action="@{/mazo/guardar}" method="POST">
-        <div id="contenedor-cartas" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4 px-3">
+        <div id="contenedor-cartas" class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3 px-3">
 
             <div class="col card-item-node" th:each="item : ${inventario}"
                  th:attr="data-rareza=${item.carta.rareza}">
-                <div class="card h-100 mythic-card p-3">
+                <div class="card h-100 mythic-card p-2">
 
                     <span class="quantity-badge" th:text="'x' + ${item.cantidad}">x1</span>
 
@@ -81,7 +81,6 @@
 
         </div>
 
-        <!-- Botón bloqueado hasta exactamente 15 -->
         <div class="text-center mt-5">
             <button type="submit" id="btn-guardar"
                     class="btn btn-danger btn-lg px-5 fw-bold shadow"
@@ -111,7 +110,7 @@
                 contador.classList.add("listo");
                 btnGuardar.disabled = false;
                 msgMazo.textContent = "Mazo completo! Ya podes guardarlo";
-                msgMazo.style.color = "#e63946";
+                msgMazo.style.color = "#8a0303";
             } else {
                 contador.classList.remove("listo");
                 btnGuardar.disabled = true;
@@ -120,7 +119,6 @@
             }
         }
 
-        // Click en la card completa
         document.querySelectorAll(".mythic-card").forEach(function (card) {
             card.addEventListener("click", function () {
                 const checkbox = card.querySelector(".checkbox-mazo");
@@ -139,7 +137,6 @@
             cb.addEventListener("change", actualizarContador);
         });
 
-        // Ordenar por rareza al cargar
         const contenedor  = document.getElementById("contenedor-cartas");
         const nodos       = Array.from(contenedor.querySelectorAll(".card-item-node"));
         const pesosRareza = { "Comun": 1, "Poco Comun": 2, "Rara": 3, "Exotica": 4, "Legendaria": 5 };

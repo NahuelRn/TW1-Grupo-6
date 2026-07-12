@@ -1,4 +1,6 @@
 /* Definicion de variables globales*/
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&display=swap');
+
 :root {
     /* Fondos y Estructura */
     --game-void: #1A1A1D;
@@ -81,4 +83,21 @@ body {
 .btn-mythic-epic:hover {
     background-color: var(--game-epic);
     color: var(--game-void);
+}
+
+.btn-lobby {
+    font-family: 'Cinzel', serif;
+    letter-spacing: 1px;
+    background-color: transparent;
+    color: #d4af37 !important;
+    border: 1px solid #d4af37 !important;
+    transition: 0.3s;
+}
+
+.btn-lobby:hover,
+.btn-lobby:focus,
+.btn-lobby:active {
+    background-color: rgba(212, 175, 55, 0.15) !important;
+    color: #d4af37 !important;
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
 }
