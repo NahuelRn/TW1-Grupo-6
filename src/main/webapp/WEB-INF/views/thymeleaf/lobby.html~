@@ -29,7 +29,7 @@
         }
     </style>
 </head>
-<body th:style="|background-image: url('@{/img/LobbyFondo.jpg}'); background-size: cover; background-position: center; background-attachment: fixed;|">
+<body th:style="'background-image: url(' + @{/img/LobbyFondo.jpg} + '); background-size: cover; background-position: center; background-attachment: fixed;'">
 <main role="main" class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
     <div class="col-md-8 col-sm-10 mythic-panel text-center">
 

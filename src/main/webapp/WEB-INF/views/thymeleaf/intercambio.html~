@@ -24,7 +24,7 @@
         .badge-rarity { background-color: transparent !important; border: 1px solid #d4af37 !important; color: #d4af37 !important; font-size: 0.75rem; font-weight: 700; padding: 4px 8px; }
     </style>
 </head>
-<body th:style="|background-image: url('@{/img/IntercambioFondo.jpg}'); background-size: cover; background-position: center; background-attachment: fixed;|">
+<body th:style="'background-image: url(' + @{/img/IntercambioFondo.jpg} + '); background-size: cover; background-position: center; background-attachment: fixed;'">
 <div class="container d-flex flex-column align-items-center py-5" style="min-height: 90vh;">
 
     <h1 class="titulo-mercado display-4 text-center">Mercado de Intercambio</h1>

@@ -138,7 +138,7 @@
         }
     </style>
 </head>
-<body th:style="|background-image: url('@{/img/ContratoFondo.jpg}'); background-size: cover; background-position: center; background-attachment: fixed;|">
+<body th:style="'background-image: url(' + @{/img/ContratoFondo.jpg} + '); background-size: cover; background-position: center; background-attachment: fixed;'">
 
 <div class="container my-5">
     <div class="text-center mb-4">

@@ -12,8 +12,8 @@
         .mythic-card:hover { transform: translateY(-5px); box-shadow: 0 0 20px rgba(229,169,59,0.4); }
         .mythic-card.seleccionada { border-color: #e63946 !important; box-shadow: 0 0 20px rgba(230,57,70,0.6) !important; }
         .quantity-badge { position: absolute; top: -12px; right: -12px; background-color: #ff4d6d !important; color: white !important; font-weight: bold; font-size: 0.75rem; padding: 4px 8px; border-radius: 50%; border: 2px solid #e5a93b; box-shadow: 0 2px 5px rgba(0,0,0,0.5); z-index: 10; }
-        .card-img-container { height: 150px; background-color: #09090b; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #27272a; }
-        .card-img-container img { max-height: 100%; max-width: 100%; object-fit: contain; }
+        .card-img-container { width: 100%; aspect-ratio: 7 / 10; background-color: #09090b; border-radius: 8px; overflow: hidden; border: 1px solid #27272a; }
+        .card-img-container img { width: 100%; height: 100%; object-fit: cover; }
         .no-art { color: #52525b; font-size: 0.8rem; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; border: 2px dashed #27272a; width: 90%; height: 90%; display: flex; align-items: center; justify-content: center; border-radius: 6px; }
         .card-title-mythic { font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 8px; color: #ffffff; }
         .badge-rarity { background-color: transparent !important; border: 1px solid #e5a93b !important; color: #e5a93b !important; font-size: 0.65rem; font-weight: 700; padding: 3px 6px; }
@@ -25,7 +25,7 @@
         .instruccion { color: #a1a1aa; font-size: 0.95rem; margin-top: 6px; }
     </style>
 </head>
-<body>
+<body th:style="'background-image: url(' + @{/img/MazoFondo.jpg} + '); background-size: cover; background-position: center; background-attachment: fixed;'">
 
 <div class="container my-5">
     <div class="text-center mb-5">
