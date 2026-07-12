@@ -6,6 +6,9 @@ import static org.mockito.Mockito.when;
 
 import com.tallerwebi.dominio.*;
 import java.util.ArrayList;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import org.junit.Test;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -24,11 +27,16 @@ public class ControladorHistorialTest {
       this.servicioHistorial
     );
 
-    ArrayList<HistorialPartida> lista = new ArrayList<>();
+    HttpServletRequest requestMock = mock(HttpServletRequest.class);
+    HttpSession sessionMock = mock(HttpSession.class);
 
-    when(this.repositorioHistorialPartida.listarPorUsuario(1L)).thenReturn(lista);
+    when(requestMock.getSession()).thenReturn(sessionMock);
+    when(sessionMock.getAttribute("USUARIO_ID")).thenReturn(1L);
 
-    ModelAndView modelAndView = controladorHistorialPartida.mostrarHistorialPartida(1L);
+    List<HistorialPartida> lista = new ArrayList<>();
+    when(this.servicioHistorial.listarHistorialPorUsuario(1L)).thenReturn(lista);
+
+    ModelAndView modelAndView = controladorHistorialPartida.mostrarHistorialPartida(requestMock);
 
     assertEquals("historial", modelAndView.getViewName());
   }

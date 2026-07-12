@@ -21,17 +21,26 @@ public class RepositorioPartidaImpl implements RepositorioPartida {
     return sessionFactory.getCurrentSession().get(Partida.class, identificador);
   }
 
+  //    @Override
+  //    public Partida buscarPartidaPorIdentificador(Long identificador) {
+  //        return (Partida) this.sessionFactory.getCurrentSession().createCriteria(Partida.class).add(Restrictions.eq("id", identificador)).uniqueResult();
+  //    }
+
   @Override
   public void guardar(Partida partida) {
-    sessionFactory.getCurrentSession().save(partida);
+    this.sessionFactory.getCurrentSession().save(partida);
   }
 
   @Override
   public void actualizar(Partida partida) {
-    sessionFactory.getCurrentSession().update(partida);
+    this.sessionFactory.getCurrentSession().update(partida);
   }
 
-  @Override
+  //    @Override
+  //    public void modificar(Partida partida) {
+  //        this.sessionFactory.getCurrentSession().update(partida);s
+  //    }
+
   public Partida buscarPartidaActivaPorUsuario(Long usuarioId) {
     return sessionFactory
       .getCurrentSession()

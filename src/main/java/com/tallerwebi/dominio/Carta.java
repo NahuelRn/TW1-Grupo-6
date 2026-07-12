@@ -26,6 +26,8 @@ public class Carta {
   private Integer defensaMin;
   private Integer defensaMax;
 
+  private String efecto;
+
   public Long getId() {
     return id;
   }
@@ -144,5 +146,13 @@ public class Carta {
 
   public void setDefensaMax(Integer defensaMax) {
     this.defensaMax = defensaMax;
+  }
+
+  public String getEfecto() {
+    return efecto;
+  }
+
+  public void setEfecto(String efecto) {
+    this.efecto = efecto;
   }
 }
