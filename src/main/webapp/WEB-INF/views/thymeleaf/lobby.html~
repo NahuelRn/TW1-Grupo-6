@@ -72,7 +72,7 @@
 
         <div class="d-grid gap-3 col-6 mx-auto mt-4">
 
-            <a th:href="@{/deckbuilding}" class="btn btn-lg btn-comenzar mb-2">Comenzar Aventura</a>
+            <a th:href="@{/deckbuilding}" class="btn btn-lg btn-lobby">Comenzar Aventura</a>
 
             <a th:href="@{/coleccion}" class="btn btn-lg btn-lobby">Ver Inventario</a>
 

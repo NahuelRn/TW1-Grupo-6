@@ -136,23 +136,9 @@
             color: white !important;
             box-shadow: 0 0 10px rgba(230, 57, 70, 0.4);
         }
-        .btn-lobby {
-            border: 2px solid #e5a93b;
-            color: #e5a93b;
-            background: transparent;
-            font-weight: 700;
-            letter-spacing: 1px;
-            transition: all .25s ease;
-        }
-
-        .btn-lobby:hover {
-            background: #e5a93b;
-            color: #111;
-            box-shadow: 0 0 18px rgba(229,169,59,.45);
-        }
     </style>
 </head>
-<body th:style="|background-image: url('@{/img/ContratoFondo.jpg}'); background-size: cover; background-position: center; background-attachment: fixed;|">
+<body th:style="'background-image: url(' + @{/img/ContratoFondo.jpg} + '); background-size: cover; background-position: center; background-attachment: fixed;'">
 
 <div class="container my-5">
     <div class="text-center mb-4">
@@ -216,19 +202,7 @@
         </div>
 
         <div class="text-center mt-5">
-
-            <button
-                    type="submit"
-                    id="btn-submit-intercambio"
-                    class="btn btn-danger btn-lg px-5 fw-bold shadow"
-                    disabled>
-                REALIZAR INTERCAMBIO
-            </button>
-
-            <div class="mt-3">
-                <a th:href="@{/lobby}" class="btn btn-lobby px-4 py-2">Volver al Lobby</a>
-            </div>
-
+            <button type="submit" id="btn-submit-intercambio" class="btn btn-danger btn-lg px-5 fw-bold shadow" disabled>REALIZAR INTERCAMBIO</button>
         </div>
     </form>
 </div>

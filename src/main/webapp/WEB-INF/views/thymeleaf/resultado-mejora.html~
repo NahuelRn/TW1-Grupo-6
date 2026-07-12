@@ -160,8 +160,12 @@
         }
     </style>
 </head>
+<<<<<<< HEAD
+<body>
+=======
 
 <body th:style="|background-image: url('@{/img/ContratoFondo.jpg}'); background-size: cover; background-position: center; background-attachment: fixed;|">
+>>>>>>> main
 
 <div class="panel-principal text-center">
 

@@ -204,8 +204,7 @@
         }
     </style>
 </head>
-<body>
-
+<body th:style="|background-image: url('@{/img/MazoFondo.jpg}'); background-size: cover; background-position: center; background-attachment: fixed;|">
 <div class="container my-5">
 
     <!-- BOTÓN VOLVER AL LOBBY (arriba a la izquierda) -->
@@ -241,7 +240,7 @@
             <div class="col card-item-node"
                  th:each="item : ${inventario}"
                  th:attr="data-rareza=${item.carta.rareza}">
-                <div class="card h-100 mythic-card p-3">
+                <div class="card h-100 mythic-card p-2">
 
                     <span class="quantity-badge" th:text="'x' + ${item.cantidad}">x1</span>
 
@@ -272,17 +271,19 @@
                                    type="checkbox" name="cartasIds" th:value="${item.carta.id}">
                         </div>
                     </div>
+
                 </div>
             </div>
 
         </div>
 
-        <!-- BOTÓN GUARDAR -->
-        <div class="text-center mt-5 mb-3">
-            <button type="submit" id="btn-guardar" class="btn text-white btn-guardar-mazo" disabled>
+        <div class="text-center mt-5">
+            <button type="submit" id="btn-guardar"
+                    class="btn btn-danger btn-lg px-5 fw-bold shadow"
+                    disabled>
                 GUARDAR MAZO
             </button>
-            <p class="instruccion" id="msg-mazo">
+            <p class="instruccion mt-2" id="msg-mazo">
                 Selecciona exactamente 15 cartas para habilitar el botón
             </p>
         </div>
@@ -307,7 +308,7 @@
                 contador.classList.add("listo");
                 btnGuardar.disabled = false;
                 msgMazo.textContent = "Mazo completo! Ya podes guardarlo";
-                msgMazo.style.color = "#e63946";
+                msgMazo.style.color = "#8a0303";
             } else {
                 contador.classList.remove("listo");
                 btnGuardar.disabled = true;
@@ -316,12 +317,14 @@
             }
         };
 
-        // Click en la card completa
         document.querySelectorAll(".mythic-card").forEach(function (card) {
             card.addEventListener("click", function () {
                 const checkbox = card.querySelector(".checkbox-mazo");
                 const seleccionadas = document.querySelectorAll(".checkbox-mazo:checked").length;
+
+                // Bloquear si ya hay 15 y esta no está marcada
                 if (!checkbox.checked && seleccionadas >= MAX_CARTAS) return;
+
                 checkbox.checked = !checkbox.checked;
                 card.classList.toggle("seleccionada", checkbox.checked);
                 actualizarContador();
@@ -332,7 +335,6 @@
             cb.addEventListener("change", actualizarContador);
         });
 
-        // Ordenar por rareza al cargar
         const contenedor  = document.getElementById("contenedor-cartas");
         const nodos       = Array.from(contenedor.querySelectorAll(".card-item-node"));
         const pesosRareza = { "Comun": 1, "Poco Comun": 2, "Rara": 3, "Exotica": 4, "Legendaria": 5 };

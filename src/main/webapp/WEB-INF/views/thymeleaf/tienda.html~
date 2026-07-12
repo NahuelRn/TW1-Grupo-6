@@ -9,10 +9,9 @@
 
     <style>
         body {
+            background-color: #0c0c0e !important;
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             color: #ffffff;
-            background-image: radial-gradient(circle at 15% 20%, rgba(229, 169, 59, 0.07) 0%, transparent 45%), radial-gradient(circle at 85% 80%, rgba(230, 57, 70, 0.06) 0%, transparent 50%), linear-gradient(rgba(229, 169, 59, 0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(229, 169, 59, 0.015) 1px, transparent 1px), radial-gradient(circle at center, transparent 40%, #040405 110%);
-            background-size: 100% 100%, 100% 100%, 45px 45px, 45px 45px, 100% 100%;
         }
 
         .titulo-seccion {
@@ -25,10 +24,10 @@
         .mythic-card {
             background-color: #131316 !important;
             border: 2px solid #e5a93b !important;
-            border-radius: 10px !important;
+            border-radius: 12px !important;
             position: relative;
-            box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.7);
-            transition: transform 0.3s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .mythic-card:hover {
@@ -37,13 +36,14 @@
         }
 
         .card-img-container {
+            height: 150px;
+            background-color: #09090b;
+            border-radius: 8px;
             display: flex;
-            overflow: hidden;
-            border: 3px solid #27272a;
-            width: 100%;
             align-items: center;
             justify-content: center;
-            box-shadow: 0px 10px 15px 0px #00000080;
+            overflow: hidden;
+            border: 1px solid #27272a;
         }
 
         .card-img-custom {
@@ -68,37 +68,29 @@
         }
 
         .card-title-mythic {
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-top: 14px;
-            color: white;
-            text-shadow: 0px 5px 5px black, 0.5px 0px 0px white;
+            margin-top: 8px;
+            color: #ffffff;
         }
 
         .badge-rarity {
             background-color: transparent !important;
             border: 1px solid #e5a93b !important;
             color: #e5a93b !important;
-            font-size: 1rem;
+            font-size: 0.65rem;
             font-weight: 700;
-            padding: 5px 15px;
-            box-shadow: 0px 5px 5px 0px #00000050;
+            padding: 3px 6px;
         }
 
         .badge-type {
             background-color: #27272a !important;
             color: #ffffff !important;
-            font-size: 1rem;
+            font-size: 0.65rem;
             font-weight: 700;
-            text-align: center;
-            padding: 5px 15px;
-            display: flex;
-            align-items: center;
-            border: 1px solid #fffffa;
-            justify-content: center;
-            text-shadow: 0.3px 0px 0px white;
+            padding: 3px 6px;
         }
 
         .card-desc-mythic {
@@ -106,85 +98,10 @@
             font-size: 0.75rem;
             margin-top: 8px;
             min-height: 35px;
-        }
-
-        .gap-1 {
-            gap: 0.7rem !important;
-        }
-
-        button.btn.btn-danger.w-100.fw-bold.shadow-sm {
-            background-color: #e63946;
-            border-color: #e63946;
-            text-transform: uppercase;
-            border-radius: 5px;
-            text-shadow: 0.3px 0px 0px white, 3px 0px 0px #000000;
-            font-size: 20px;
-        }
-
-        form {
-            box-shadow: 0px 0px 10px 0px #e63946a8;
-        }
-
-        .bg-dark.p-2.rounded.mb-3.small.border.border-secondary {
-            text-transform: uppercase;
-            box-shadow: 0px 5px 15px 0px #00000080;
-            text-shadow: 0.3px 0px 0px #f0c10750;
-        }
-
-        .text-warning {
-            --bs-text-opacity: 1;
-            color: rgba(var(--bs-warning-rgb), var(--bs-text-opacity)) !important;
-            text-transform: uppercase;
-        }
-
-        a.btn.btn-outline-light.btn-sm.ms-4 {
-            text-transform: uppercase;
-            padding: 5px 20px 5px 20px;
-            border-radius: 5px;
-            border: 2px solid black;
-            box-shadow: 3px 3px 0px black;
-            background-color: #e4a83b;
-            text-shadow: 0.3px 0px 0px black;
-            font-size: 15px;
-            text-align: center;
-            font-family: 'Montserrat';
-            color: black;
-        }
-
-        span.navbar-text.text-info.fw-bold.fs-5.ms-4 {
-            text-transform: uppercase;
-        }
-
-        h2.titulo-seccion.m-0 {
-            text-align: center;
-            width: 100%;
-            font-size: 50px;
-            padding: 20px 0px 20px 0px;
-            text-shadow: 0px 0px 50px #e63946;
-        }
-
-        span.navbar-text.text-warning.fw-bold.fs-5 {
-            text-shadow: 0px 0px 15px #ffc107, 3px 3px 0px black;
-        }
-
-        span.navbar-text.text-info.fw-bold.fs-5.ms-4 {
-            text-shadow: 0px 0px 15px #0dcaf0, 3px 3px 0px black;
-        }
-
-        .card-desc-mythic {
-            color: #a1a1aa !important;
-            font-size: 0.75rem;
-            margin-top: 8px;
-            min-height: 35px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 17px;
-            text-shadow: 3px 3px 5px black;
         }
     </style>
 </head>
-<body th:style="|background-image: url('@{/img/TiendaFondo.jpg}'); background-size: cover; background-position: center; background-attachment: fixed;|">
+<body th:style="'background-image: url(' + @{/img/TiendaFondo.jpg} + '); background-size: cover; background-position: center; background-attachment: fixed;'">
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 shadow-sm border-bottom border-secondary">
     <div class="container">
@@ -224,9 +141,8 @@
             <div class="card h-100 mythic-card p-3"
                  th:with="rangoJugador=${session.USUARIO != null ? session.USUARIO.nivel : 0}">
                 <div class="card-img-container rounded">
-                    <!--                    <img th:if="${carta.imagen != null}" th:src="@{/img/{img}(img=${carta.imagen})}" class="card-img-custom" alt="Imagen de la carta">-->
                     <img th:if="${carta.imagen != null}"
-                         th:src="@{/img/{img}(img=${carta.imagen})}"
+                         th:src="@{'/images/' + ${carta.imagen}}"
                          class="card-img-custom"
                          alt="Imagen de la carta">
                     <div th:if="${carta.imagen == null}" class="no-art">
