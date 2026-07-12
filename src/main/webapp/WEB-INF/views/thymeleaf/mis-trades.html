@@ -19,6 +19,9 @@
         .mythic-btn-cancel:hover { background-color: #444; color: white; }
         .btn-eye { color: #d4af37; border: 1px solid #d4af37; background: transparent; transition: all 0.2s ease; }
         .btn-eye:hover { background-color: rgba(212,175,55,0.15); color: #fff; }
+        /* Textos que antes eran casi invisibles */
+        .texto-blanco { color: #ffffff !important; }
+        .tabla-vacia { color: #ffffff !important; font-style: italic; }
     </style>
 </head>
 <body>
@@ -34,9 +37,7 @@
 
     <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
-    <!-- ================================================================ -->
-    <!-- SECCIÓN 1: MIS PUBLICACIONES (soy el emisor)                     -->
-    <!-- ================================================================ -->
+    <!-- SECCIÓN 1: MIS PUBLICACIONES -->
     <h4 class="titulo-seccion">Mis Publicaciones</h4>
 
     <table class="table table-dark table-striped align-middle border border-secondary mb-5">
@@ -58,13 +59,15 @@
                       th:text="${trade.estado}">ESTADO</span>
             </td>
             <td>
-                <!-- Solo tiene carta ofrecida si el trade fue finalizado -->
-                <span th:if="${trade.cartaOfrecida != null}" th:text="${trade.cartaOfrecida.nombre}">—</span>
-                <span th:unless="${trade.cartaOfrecida != null}" class="text-muted">Pendiente</span>
+                <!-- "Pendiente" ahora en blanco -->
+                <span th:if="${trade.cartaOfrecida != null}"
+                      class="texto-blanco"
+                      th:text="${trade.cartaOfrecida.nombre}">—</span>
+                <span th:unless="${trade.cartaOfrecida != null}"
+                      class="texto-blanco">Pendiente</span>
             </td>
             <td>
                 <div class="d-flex align-items-center gap-2">
-                    <!-- Botón eliminar solo si está ACTIVA -->
                     <form th:if="${trade.estado == 'ACTIVA'}"
                           th:action="@{/mercado/eliminar}" method="POST"
                           onsubmit="abrirConfirmacionMythic(event)">
@@ -72,7 +75,6 @@
                         <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
                     </form>
 
-                    <!-- Botón ver detalle solo si está FINALIZADA -->
                     <a th:if="${trade.estado == 'FINALIZADA'}"
                        th:href="@{/mercado/mis-trades/detalle/{id}(id=${trade.id})}"
                        class="btn btn-sm btn-eye" title="Ver resumen del intercambio">
@@ -84,15 +86,14 @@
                 </div>
             </td>
         </tr>
+        <!-- Fila vacía en blanco -->
         <tr th:if="${misTrades == null or #lists.isEmpty(misTrades)}">
-            <td colspan="5" class="text-center text-muted">No publicaste ningún trade todavía.</td>
+            <td colspan="5" class="text-center tabla-vacia">No publicaste ningún trade todavía.</td>
         </tr>
         </tbody>
     </table>
 
-    <!-- ================================================================ -->
-    <!-- SECCIÓN 2: TRADES QUE ACEPTÉ (soy el receptor)                  -->
-    <!-- ================================================================ -->
+    <!-- SECCIÓN 2: TRADES QUE ACEPTÉ -->
     <h4 class="titulo-seccion">Trades que Acepté</h4>
 
     <table class="table table-dark table-striped align-middle border border-secondary">
@@ -106,7 +107,6 @@
         </thead>
         <tbody>
         <tr th:each="trade : ${tradesAceptados}">
-            <!-- El receptor entregó la cartaBuscada y recibió la cartaOfrecida -->
             <td th:text="${trade.cartaBuscada.nombre}">—</td>
             <td th:text="${trade.cartaOfrecida != null ? trade.cartaOfrecida.nombre : '—'}">—</td>
             <td th:text="${trade.usuarioEmisor.email}">—</td>
@@ -120,8 +120,9 @@
                 </a>
             </td>
         </tr>
+        <!-- Fila vacía en blanco -->
         <tr th:if="${tradesAceptados == null or #lists.isEmpty(tradesAceptados)}">
-            <td colspan="4" class="text-center text-muted">No aceptaste ningún trade todavía.</td>
+            <td colspan="4" class="text-center tabla-vacia">No aceptaste ningún trade todavía.</td>
         </tr>
         </tbody>
     </table>
