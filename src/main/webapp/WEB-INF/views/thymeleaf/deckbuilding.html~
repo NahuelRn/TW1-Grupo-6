@@ -6,9 +6,8 @@
     <title>MythicStack - Armado de Mazo</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/main.css}" />
     <style>
-<<<<<<< HEAD
-        /* ── FONDO ── */
         body {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             color: #ffffff;
@@ -20,8 +19,6 @@
                     radial-gradient(ellipse at 50% 50%, rgba(229,169,59,0.04) 0%, transparent 70%);
             background-attachment: fixed;
         }
-
-        /* ── PARTÍCULAS decorativas (pseudo-elementos) ── */
         body::before {
             content: '';
             position: fixed;
@@ -203,25 +200,38 @@
             border-top: 1px solid rgba(74, 18, 18, 0.5);
             margin: 30px 0;
         }
-=======
-        body { background-color: #0c0c0e !important; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #ffffff; }
-        .titulo-seccion { color: #8a0303; font-weight: 800; letter-spacing: 2px; text-shadow: 0 0 10px rgba(230,57,70,0.4); }
-        .mythic-card { background-color: #131316 !important; border: 2px solid #e5a93b !important; border-radius: 12px !important; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.7); transition: transform 0.2s, box-shadow 0.2s; }
-        .mythic-card:hover { transform: translateY(-5px); box-shadow: 0 0 20px rgba(229,169,59,0.4); }
-        .mythic-card.seleccionada { border-color: #8a0303 !important; box-shadow: 0 0 20px rgba(230,57,70,0.6) !important; }
-        .quantity-badge { position: absolute; top: -10px; right: -10px; background-color: #ff4d6d !important; color: white !important; font-weight: bold; font-size: 0.65rem; padding: 3px 6px; border-radius: 50%; border: 2px solid #e5a93b; box-shadow: 0 2px 5px rgba(0,0,0,0.5); z-index: 10; }
-        .card-img-container { width: 100%; aspect-ratio: 7 / 10; background-color: #09090b; border-radius: 8px; overflow: hidden; border: 1px solid #27272a; }
-        .card-img-container img { width: 100%; height: 100%; object-fit: cover; }
-        .no-art { color: #52525b; font-size: 0.8rem; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; border: 2px dashed #27272a; width: 90%; height: 90%; display: flex; align-items: center; justify-content: center; border-radius: 6px; }
-        .card-title-mythic { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 8px; color: #ffffff; }
-        .badge-rarity { background-color: transparent !important; border: 1px solid #e5a93b !important; color: #e5a93b !important; font-size: 0.6rem; font-weight: 700; padding: 3px 6px; }
-        .badge-type { background-color: #27272a !important; color: #ffffff !important; font-size: 0.6rem; font-weight: 700; padding: 3px 6px; }
-        .card-desc-mythic { color: #a1a1aa !important; font-size: 0.7rem; margin-top: 8px; min-height: 32px; }
-        .mythic-checkbox { width: 20px; height: 20px; accent-color: #8a0303; cursor: pointer; }
-        .contador-box { background-color: #131316; border: 2px solid #e5a93b; border-radius: 10px; padding: 10px 24px; display: inline-block; font-size: 1rem; font-weight: 700; color: #e5a93b; letter-spacing: 1px; }
-        .contador-box.listo { border-color: #8a0303; color: #8a0303; box-shadow: 0 0 12px rgba(230,57,70,0.4); }
-        .instruccion { color: #a1a1aa; font-size: 0.95rem; margin-top: 6px; }
->>>>>>> main
+
+        .carta-marco {
+            width: 100%;
+            aspect-ratio: 7 / 10;
+            background-color: #2A2A30;
+            border: 1px solid #404040;
+            border-radius: 6px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .carta-marco img { width: 100%; height: 100%; object-fit: contain; }
+        .carta-sin-arte {
+            color: #A0A0A5;
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            padding: 8px;
+        }
+        .grilla-cartas {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 1rem;
+        }
+        @media (max-width: 991.98px) { .grilla-cartas { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+        @media (max-width: 767.98px) { .grilla-cartas { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+        @media (max-width: 575.98px) { .grilla-cartas { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+
     </style>
 </head>
 <body th:style="|background-image: url('@{/img/MazoFondo.jpg}'); background-size: cover; background-position: center; background-attachment: fixed;|">
@@ -254,35 +264,23 @@
 
     <!-- FORMULARIO -->
     <form th:action="@{/mazo/guardar}" method="POST">
-<<<<<<< HEAD
-        <div id="contenedor-cartas"
-             class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4 px-3">
-=======
-        <div id="contenedor-cartas" class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3 px-3">
->>>>>>> main
-
-            <div class="col card-item-node"
-                 th:each="item : ${inventario}"
-                 th:attr="data-rareza=${item.carta.rareza}">
+        <div id="contenedor-cartas" class="grilla-cartas">
+            <div class="card-item-node" th:each="item : ${inventario}" th:attr="data-rareza=${item.carta.rareza}">
                 <div class="card h-100 mythic-card p-2">
-
                     <span class="quantity-badge" th:text="'x' + ${item.cantidad}">x1</span>
 
-                    <div class="card-img-container">
+                    <div class="carta-marco">
                         <img th:if="${item.carta.imagen != null and not #strings.isEmpty(item.carta.imagen)}"
-                             th:src="@{/img/{img}(img=${item.carta.imagen})}"
-                             th:alt="${item.carta.nombre}">
-                        <div th:unless="${item.carta.imagen != null and not #strings.isEmpty(item.carta.imagen)}"
-                             class="no-art d-flex align-items-center justify-content-center w-100 h-100">
-                            <span>Sin imagen</span>
-                        </div>
+                             th:src="@{/img/{img}(img=${item.carta.imagen})}" th:alt="${item.carta.nombre}">
+                        <span th:unless="${item.carta.imagen != null and not #strings.isEmpty(item.carta.imagen)}"
+                              class="carta-sin-arte">Sin imagen</span>
                     </div>
 
                     <div class="text-center mt-2">
                         <h5 class="card-title-mythic" th:text="${item.carta.nombre}">NOMBRE</h5>
                         <div class="d-flex justify-content-center gap-1 my-2">
-                            <span class="badge badge-rarity"
-                                  th:text="${item.carta.rareza != null} ? ${item.carta.rareza} : 'COMÚN'">COMÚN</span>
+                <span class="badge badge-rarity"
+                      th:text="${item.carta.rareza != null} ? ${item.carta.rareza} : 'COMÚN'">COMÚN</span>
                             <span class="badge badge-type"
                                   th:text="${item.carta.tipo != null} ? ${item.carta.tipo} : 'TIPO'">ATAQUE</span>
                         </div>
@@ -298,23 +296,16 @@
                 </div>
             </div>
 
-        </div>
-
-<<<<<<< HEAD
-        <!-- BOTÓN GUARDAR -->
-        <div class="text-center mt-5 mb-3">
-            <button type="submit" id="btn-guardar" class="btn text-white btn-guardar-mazo" disabled>
-=======
         <div class="text-center mt-5">
             <button type="submit" id="btn-guardar"
                     class="btn btn-danger btn-lg px-5 fw-bold shadow"
                     disabled>
->>>>>>> main
                 GUARDAR MAZO
             </button>
-            <p class="instruccion" id="msg-mazo">
+            <p class="instruccion mt-2" id="msg-mazo">
                 Selecciona exactamente 15 cartas para habilitar el botón
             </p>
+        </div>
         </div>
     </form>
 
@@ -350,7 +341,10 @@
             card.addEventListener("click", function () {
                 const checkbox = card.querySelector(".checkbox-mazo");
                 const seleccionadas = document.querySelectorAll(".checkbox-mazo:checked").length;
+
+                // Bloquear si ya hay 15 y esta no está marcada
                 if (!checkbox.checked && seleccionadas >= MAX_CARTAS) return;
+
                 checkbox.checked = !checkbox.checked;
                 card.classList.toggle("seleccionada", checkbox.checked);
                 actualizarContador();

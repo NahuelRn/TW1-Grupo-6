@@ -101,3 +101,49 @@ body {
     color: #d4af37 !important;
     box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
 }
+
+/* ============================================================
+   CARTA ESTANDAR
+   ============================================================ */
+
+.carta-marco {
+    width: 100%;
+    aspect-ratio: 7 / 10;
+    background-color: var(--game-panel);
+    border: 1px solid var(--game-border);
+    border-radius: var(--border-radius-general);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.carta-marco img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.carta-sin-arte {
+    color: var(--game-muted);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+    padding: 8px;
+}
+
+.carta-marco--grande {
+    max-width: 220px;
+    margin: 0 auto;
+}
+
+.grilla-cartas {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1rem;
+}
+@media (max-width: 991.98px) { .grilla-cartas { grid-template-columns: repeat(5, 1fr); } }
+@media (max-width: 767.98px) { .grilla-cartas { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 575.98px) { .grilla-cartas { grid-template-columns: repeat(2, 1fr); } }

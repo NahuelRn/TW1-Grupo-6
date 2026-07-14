@@ -32,26 +32,6 @@
             filter: grayscale(100%);
         }
 
-        .carta-img {
-            width: 100%;
-            height: auto;
-            aspect-ratio: 7 / 10;
-            object-fit: cover;
-            border-radius: 6px;
-            border: 1px solid #000;
-        }
-
-        .placeholder-arte {
-            height: 130px;
-            background-color: #1a1a1a;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px dashed #555;
-            color: #666;
-        }
-
         .carta-nombre {
             font-size: 0.8rem;
         }
@@ -81,6 +61,37 @@
             transform: translateY(-3px);
             box-shadow: 0px 0px 20px rgba(229, 169, 59, 0.4);
         }
+
+        .carta-marco {
+            width: 100%;
+            aspect-ratio: 7 / 10;
+            background-color: #2A2A30;
+            border: 1px solid #404040;
+            border-radius: 6px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .carta-marco img { width: 100%; height: 100%; object-fit: contain; }
+        .carta-sin-arte {
+            color: #A0A0A5;
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            padding: 8px;
+        }
+        .grilla-cartas {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 1rem;
+        }
+        @media (max-width: 991.98px) { .grilla-cartas { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+        @media (max-width: 767.98px) { .grilla-cartas { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+        @media (max-width: 575.98px) { .grilla-cartas { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
     </style>
 </head>
 <body th:style="|background-image: url('@{/img/Coleccion.jpg}'); background-size: cover; background-position: center; background-attachment: fixed;|">
@@ -94,29 +105,25 @@
         <span class="d-none d-md-inline" style="width: 140px;"></span>
     </div>
 
-    <div class="row">
-        <div th:each="carta : ${todasLasCartas}" class="col-6 col-sm-4 col-md-3 col-lg-2 mb-4 d-flex">
+    <div class="grilla-cartas">
+        <div th:each="carta : ${todasLasCartas}">
 
             <div th:with="cantidad=${misCantidades.get(carta.id) != null ? misCantidades.get(carta.id) : 0}"
                  th:classappend="${cantidad > 0} ? 'carta-activa' : 'carta-apagada'"
-                 class="mythic-panel text-center position-relative w-100">
+                 class="mythic-panel text-center position-relative">
 
-        <span th:if="${cantidad > 0}"
-              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-              style="z-index: 10; box-shadow: 0 0 5px #000; font-size: 0.65rem;"
-              th:text="'x' + ${cantidad}">
-        </span>
+            <span th:if="${cantidad > 0}"
+                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                  style="z-index: 10; box-shadow: 0 0 5px #000; font-size: 0.65rem;"
+                  th:text="'x' + ${cantidad}">
+            </span>
 
-                <div class="mb-2 w-100">
+                <div class="carta-marco mb-2 shadow">
                     <img th:if="${carta.imagen != null and not #strings.isEmpty(carta.imagen)}"
-                         th:src="@{'/img/' + ${carta.imagen}}"
-                         th:alt="${carta.nombre}"
-                         class="carta-img shadow">
-
-                    <div th:unless="${carta.imagen != null and not #strings.isEmpty(carta.imagen)}"
-                         class="placeholder-arte shadow w-100">
-                        <small>Arte no disponible</small>
-                    </div>
+                         th:src="@{/img/{img}(img=${carta.imagen})}"
+                         th:alt="${carta.nombre}">
+                    <span th:unless="${carta.imagen != null and not #strings.isEmpty(carta.imagen)}"
+                          class="carta-sin-arte">Arte no disponible</span>
                 </div>
 
                 <h5 class="text-uppercase fw-bold mb-1 carta-nombre" th:text="${carta.nombre}">Nombre</h5>

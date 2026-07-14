@@ -5,6 +5,7 @@
     <title>MythicStack - Contrato Firmado</title>
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/css/globals.css}">
+    <link rel="stylesheet" th:href="@{/css/main.css}" />
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -53,31 +54,6 @@
             border-radius: 10px;
             padding: 24px 20px;
             margin-bottom: 10px;
-        }
-
-        .carta-imagen {
-            width: 160px;
-            height: 220px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 1px solid #4a1212;
-            box-shadow: 0 0 20px rgba(212,175,55,0.25);
-            margin: 0 auto 16px;
-            display: block;
-        }
-
-        .carta-sin-imagen {
-            width: 160px;
-            height: 220px;
-            background-color: #1a1111;
-            border: 2px dashed #4a1212;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 16px;
-            color: #7a6a6a;
-            font-size: 0.8rem;
         }
 
         .nombre-carta {
@@ -158,6 +134,37 @@
             border-top: 1px solid #4a1212;
             margin: 20px 0;
         }
+
+        .carta-marco {
+            width: 100%;
+            aspect-ratio: 7 / 10;
+            background-color: #2A2A30;
+            border: 1px solid #404040;
+            border-radius: 6px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .carta-marco img { width: 100%; height: 100%; object-fit: contain; }
+        .carta-sin-arte {
+            color: #A0A0A5;
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            padding: 8px;
+        }
+        .grilla-cartas {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 1rem;
+        }
+        @media (max-width: 991.98px) { .grilla-cartas { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+        @media (max-width: 767.98px) { .grilla-cartas { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+        @media (max-width: 575.98px) { .grilla-cartas { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
     </style>
 </head>
 
@@ -180,13 +187,11 @@
         <div class="card-carta-obtenida">
 
             <!-- Imagen de la carta -->
-            <img th:if="${cartaPremio.imagen != null and not #strings.isEmpty(cartaPremio.imagen)}"
-                 th:src="@{/img/{img}(img=${cartaPremio.imagen})}"
-                 th:alt="${cartaPremio.nombre}"
-                 class="carta-imagen"/>
-            <div th:unless="${cartaPremio.imagen != null and not #strings.isEmpty(cartaPremio.imagen)}"
-                 class="carta-sin-imagen">
-                <span>Sin imagen</span>
+            <div class="carta-marco carta-marco--grande mb-3">
+                <img th:if="${cartaPremio.imagen != null and not #strings.isEmpty(cartaPremio.imagen)}"
+                     th:src="@{/img/{img}(img=${cartaPremio.imagen})}" th:alt="${cartaPremio.nombre}"/>
+                <span th:unless="${cartaPremio.imagen != null and not #strings.isEmpty(cartaPremio.imagen)}"
+                      class="carta-sin-arte">Sin imagen</span>
             </div>
 
             <!-- Nombre -->
