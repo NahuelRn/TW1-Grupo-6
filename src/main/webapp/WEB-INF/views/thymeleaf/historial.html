@@ -121,12 +121,12 @@
         Resultado:
 
         <span class="victoria"
-              th:if="${partida.resultado == 'GANADOR_JUGADOR'}"
+              th:if="${partida.resultado == 'VICTORIA'}"
               th:text="${partida.resultado}">
         </span>
 
         <span class="derrota"
-              th:if="${partida.resultado == 'GANADOR_ENEMIGO'}"
+              th:if="${partida.resultado == 'DERROTA'}"
               th:text="${partida.resultado}">
         </span>
     </p>

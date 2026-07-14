@@ -3,9 +3,11 @@ package com.tallerwebi.presentacion;
 import com.tallerwebi.dominio.Partida;
 import com.tallerwebi.dominio.RecompensaDTO;
 import com.tallerwebi.dominio.ServicioCalculoRecompensa;
+import com.tallerwebi.dominio.ServicioCombate;
 import com.tallerwebi.dominio.ServicioUsuario;
 import com.tallerwebi.dominio.Usuario;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -21,6 +23,9 @@ public class ControladorRecompensas {
 
   @Autowired
   private ServicioCalculoRecompensa servicioCalculoRecompensa;
+
+  @Autowired
+  private ServicioCombate servicioCombate;
 
   @RequestMapping("/recompensas")
   public ModelAndView recompensas(HttpServletRequest request) {
@@ -41,17 +46,42 @@ public class ControladorRecompensas {
 
   @RequestMapping(value = "/reclamar-recompensa", method = RequestMethod.POST)
   public ModelAndView reclamar(HttpServletRequest httpServletRequest) {
-    Usuario usuario = (Usuario) httpServletRequest.getSession().getAttribute("USUARIO");
+    HttpSession session = httpServletRequest.getSession();
 
-    if (usuario == null) {
+    Long idUsuario = (Long) session.getAttribute("USUARIO_ID");
+    if (idUsuario == null) {
       return new ModelAndView("redirect:/login");
     }
 
-    Partida partida = (Partida) httpServletRequest.getSession().getAttribute("PARTIDA_ACTUAL");
+    Long idPartida = (Long) session.getAttribute("idPartidaActiva");
+    if (idPartida == null) {
+      return new ModelAndView("redirect:/lobby");
+    }
+
+    Usuario usuario = servicioUsuario.buscarPorId(idUsuario);
+    Partida partida = servicioCombate.obtenerPartidaPorIdentificador(idPartida);
+
     this.servicioUsuario.aplicarRecompensa(usuario, partida);
 
-    httpServletRequest.getSession().setAttribute("USUARIO", usuario);
+    session.setAttribute("USUARIO", usuario);
+
+    session.removeAttribute("idPartidaActiva");
 
     return new ModelAndView("redirect:/lobby");
   }
+  //  @RequestMapping(value = "/reclamar-recompensa", method = RequestMethod.POST)
+  //  public ModelAndView reclamar(HttpServletRequest httpServletRequest) {
+  //    Usuario usuario = (Usuario) httpServletRequest.getSession().getAttribute("USUARIO");
+  //
+  //    if (usuario == null) {
+  //      return new ModelAndView("redirect:/login");
+  //    }
+  //
+  //    Partida partida = (Partida) httpServletRequest.getSession().getAttribute("PARTIDA_ACTUAL");
+  //    this.servicioUsuario.aplicarRecompensa(usuario, partida);
+  //
+  //    httpServletRequest.getSession().setAttribute("USUARIO", usuario);
+  //
+  //    return new ModelAndView("redirect:/lobby");
+  //  }
 }
