@@ -133,34 +133,19 @@ public class ControladorCombate {
 
         modelMap.put("recompensa", recompensaDTO);
         return new ModelAndView("recompensas", modelMap);
-      } else if (partida.getHpJugador() <= 0) {
+      } else {
         RecompensaDTO recompensaDTO = this.servicioCalculoRecompensa.obtenerRecompensa(partida);
-
         guardarPartidaEnHistorial(partida, usuarioReal, "DERROTA", recompensaDTO);
 
-        return new ModelAndView("game-over", modelMap);
-      } else if (sinCartas) {
-        if (partida.getHpEnemigo() >= partida.getHpJugador()) {
-          RecompensaDTO recompensaDTO = servicioCalculoRecompensa.obtenerRecompensa(partida);
-          guardarPartidaEnHistorial(partida, usuarioReal, "DERROTA", recompensaDTO);
-
-          modelMap.put(
-            "logCombate",
-            "¡Te quedaste sin cartas y el enemigo resistió! Fin de la partida."
-          );
-          return new ModelAndView("game-over", modelMap);
+        String mensaje;
+        if (sinCartas) {
+          mensaje = "¡Te quedaste sin cartas y el enemigo resistió!";
         } else {
-          RecompensaDTO recompensaDTO = this.servicioCalculoRecompensa.obtenerRecompensa(partida);
-
-          guardarPartidaEnHistorial(partida, usuarioReal, "VICTORIA", recompensaDTO);
-
-          modelMap.put(
-            "logCombate",
-            "Te quedaste sin cartas pero lograste sobrevivir con ventaja. ¡Victoria!"
-          );
-          modelMap.put("recompensa", servicioCalculoRecompensa.obtenerRecompensa(partida));
-          return new ModelAndView("recompensas", modelMap);
+          mensaje = "¡Tus puntos de vida llegaron a cero!";
         }
+
+        modelMap.put("logCombate", mensaje);
+        return new ModelAndView("game-over", modelMap);
       }
     }
 
