@@ -1,8 +1,12 @@
 package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.Carta;
+import com.tallerwebi.dominio.HistorialPartida;
 import com.tallerwebi.dominio.Partida;
+import com.tallerwebi.dominio.RecompensaDTO;
+import com.tallerwebi.dominio.ServicioCalculoRecompensa;
 import com.tallerwebi.dominio.ServicioCombate;
+import com.tallerwebi.dominio.ServicioHistorial;
 import com.tallerwebi.dominio.ServicioPartida;
 import com.tallerwebi.dominio.ServicioUsuario;
 import com.tallerwebi.dominio.Usuario;
@@ -13,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,6 +30,8 @@ public class ControladorCombate {
   private final ServicioCombate servicioCombate;
   private final ServicioPartida servicioPartida;
   private final ServicioUsuario servicioUsuario;
+  private final ServicioCalculoRecompensa servicioCalculoRecompensa;
+  private final ServicioHistorial servicioHistorial;
 
   private static final String SESSION_IDS_MANO = "idsMano";
   private static final String SESSION_MAZO_ROBO = "idsMazoRobo";
@@ -35,11 +42,15 @@ public class ControladorCombate {
   public ControladorCombate(
     ServicioCombate servicioCombate,
     ServicioPartida servicioPartida,
-    ServicioUsuario servicioUsuario
+    ServicioUsuario servicioUsuario,
+    ServicioCalculoRecompensa servicioCalculoRecompensa,
+    ServicioHistorial servicioHistorial
   ) {
     this.servicioCombate = servicioCombate;
     this.servicioPartida = servicioPartida;
     this.servicioUsuario = servicioUsuario;
+    this.servicioCalculoRecompensa = servicioCalculoRecompensa;
+    this.servicioHistorial = servicioHistorial;
   }
 
   @RequestMapping(path = "/combate", method = RequestMethod.GET)
@@ -74,7 +85,8 @@ public class ControladorCombate {
     @RequestParam Long idCarta,
     @RequestParam Long idPartida,
     @RequestParam String zona,
-    HttpServletRequest request
+    HttpServletRequest request,
+    Model model
   ) {
     HttpSession session = request.getSession();
     Long idUsuario = (Long) session.getAttribute(SESSION_USUARIO_ID);
@@ -105,10 +117,51 @@ public class ControladorCombate {
       manoActual = new ArrayList<>();
     }
 
-    if (partida.getHpJugador() <= 0 || partida.getHpEnemigo() <= 0) {
-      session.removeAttribute(SESSION_ID_PARTIDA);
+    Boolean sinCartas = manoActual.isEmpty() && (idsMazoRobo == null || idsMazoRobo.isEmpty());
+
+    if (partida.getHpJugador() <= 0 || partida.getHpEnemigo() <= 0 || sinCartas) {
+      //      session.removeAttribute(SESSION_ID_PARTIDA);
       session.removeAttribute(SESSION_IDS_MANO);
       session.removeAttribute(SESSION_MAZO_ROBO);
+
+      ModelMap modelMap = new ModelMap();
+      modelMap.put("partida", partida);
+
+      if (partida.getHpEnemigo() <= 0) {
+        RecompensaDTO recompensaDTO = this.servicioCalculoRecompensa.obtenerRecompensa(partida);
+        guardarPartidaEnHistorial(partida, usuarioReal, "VICTORIA", recompensaDTO);
+
+        modelMap.put("recompensa", recompensaDTO);
+        return new ModelAndView("recompensas", modelMap);
+      } else if (partida.getHpJugador() <= 0) {
+        RecompensaDTO recompensaDTO = this.servicioCalculoRecompensa.obtenerRecompensa(partida);
+
+        guardarPartidaEnHistorial(partida, usuarioReal, "DERROTA", recompensaDTO);
+
+        return new ModelAndView("game-over", modelMap);
+      } else if (sinCartas) {
+        if (partida.getHpEnemigo() >= partida.getHpJugador()) {
+          RecompensaDTO recompensaDTO = servicioCalculoRecompensa.obtenerRecompensa(partida);
+          guardarPartidaEnHistorial(partida, usuarioReal, "DERROTA", recompensaDTO);
+
+          modelMap.put(
+            "logCombate",
+            "¡Te quedaste sin cartas y el enemigo resistió! Fin de la partida."
+          );
+          return new ModelAndView("game-over", modelMap);
+        } else {
+          RecompensaDTO recompensaDTO = this.servicioCalculoRecompensa.obtenerRecompensa(partida);
+
+          guardarPartidaEnHistorial(partida, usuarioReal, "VICTORIA", recompensaDTO);
+
+          modelMap.put(
+            "logCombate",
+            "Te quedaste sin cartas pero lograste sobrevivir con ventaja. ¡Victoria!"
+          );
+          modelMap.put("recompensa", servicioCalculoRecompensa.obtenerRecompensa(partida));
+          return new ModelAndView("recompensas", modelMap);
+        }
+      }
     }
 
     return armarVistaCombate(partida, manoActual, idsMazoRobo, zona, logCombate);
@@ -171,5 +224,27 @@ public class ControladorCombate {
     modelo.put("configZona", servicioCombate.obtenerConfiguracionZona(zona));
     modelo.put("zona", zona);
     return new ModelAndView("combate", modelo);
+  }
+
+  @SuppressWarnings("PMD.UnusedFormalParameter")
+  private void guardarPartidaEnHistorial(
+    Partida partida,
+    Usuario usuario,
+    String resultado,
+    RecompensaDTO recompensaDTO
+  ) {
+    HistorialPartida historialPartida = new HistorialPartida();
+    historialPartida.setUsuario(usuario);
+    historialPartida.setResultado(resultado);
+
+    if (recompensaDTO != null) {
+      historialPartida.setOroGanado(recompensaDTO.getOro());
+      historialPartida.setExperienciaGanada(recompensaDTO.getExperiencia());
+    } else {
+      historialPartida.setOroGanado(0);
+      historialPartida.setExperienciaGanada(0);
+    }
+
+    this.servicioHistorial.guardarHistorialPartidaServicio(historialPartida);
   }
 }
