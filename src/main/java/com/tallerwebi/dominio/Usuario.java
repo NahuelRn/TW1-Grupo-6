@@ -14,8 +14,8 @@ public class Usuario {
   private String rol;
   private Boolean activo = false;
 
-  private Integer oro = 0;
-  private Integer experiencia = 0;
+  private Integer oro = 150;
+  private Integer experiencia = 50;
 
   private Integer nivel = 1;
 
