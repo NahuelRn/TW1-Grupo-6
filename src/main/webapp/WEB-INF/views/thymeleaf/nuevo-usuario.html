@@ -30,6 +30,10 @@
       <h2 class="mb-4" style="color: var(--game-epic);">Tu nueva vida como Aventurero comienza...</Avent> </h2>
 
       <div class="mb-3">
+        <input th:field="*{nombre}" id="nombre" type="text" class="form-control mythic-input" placeholder="Nombre de tu Aventurero" required maxlength="30" />
+      </div>
+
+      <div class="mb-3">
         <input th:field="*{email}" id="email" type="email" class="form-control mythic-input" placeholder="Correo electronico" required />
       </div>
       <div class="mb-4">

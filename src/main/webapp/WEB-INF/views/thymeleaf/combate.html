@@ -79,8 +79,11 @@
 <div class="log-box" th:text="${logCombate}">Preparando combate...</div>
 
 <div class="arena">
-    <div class="personaje jugador">
-        <h3>TU PERSONAJE</h3>
+    <div class="personaje jugador"
+         th:with="nombreJugador=${partida.usuario != null and !#strings.isEmpty(partida.usuario.nombre)} ? ${partida.usuario.nombre} : 'Aventurero',
+              imagenJugador=${partida.usuario != null and !#strings.isEmpty(partida.usuario.imagen)} ? ${partida.usuario.imagen} : 'Aventurero_Default.png'">
+        <h3 th:text="${nombreJugador}">TU PERSONAJE</h3>
+        <img th:src="@{/img/{img}(img=${imagenJugador})}" class="retrato-pj" alt="Jugador">
         <div class="hp-bar hp-jugador">HP: <span th:text="${partida.hpJugador}"></span></div>
     </div>
 
