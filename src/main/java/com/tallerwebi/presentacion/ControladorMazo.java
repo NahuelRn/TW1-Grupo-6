@@ -67,7 +67,7 @@ public class ControladorMazo {
         nuevoMazo.getMazoCartas().add(nexo);
       }
 
-      servicioMazo.validarYGuardarMazo(nuevoMazo);
+      servicioMazo.validarYGuardarMazo(nuevoMazo, jugadorId);
       return new ModelAndView("redirect:/seleccion-zona");
     } catch (Exception e) {
       ModelMap modeloErrorCatch = new ModelMap();
