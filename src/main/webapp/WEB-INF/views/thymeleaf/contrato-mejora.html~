@@ -213,7 +213,7 @@
         <div id="contenedor-cartas" class="grilla-cartas">
             <div class="card-item-node" th:each="item : ${inventario}">
                 <div class="card h-100 mythic-card p-3">
-                    <span class="quantity-badge">x[[${item.cantidad}]]</span>
+                    <span class="quantity-badge">...</span>
                     <div class="carta-marco">
                         <img th:if="${item.carta.imagen != null and not #strings.isEmpty(item.carta.imagen)}"
                              th:src="@{/img/{img}(img=${item.carta.imagen})}" th:alt="${item.carta.nombre}">

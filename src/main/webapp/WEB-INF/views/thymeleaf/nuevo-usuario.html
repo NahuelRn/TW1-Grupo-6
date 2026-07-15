@@ -21,13 +21,17 @@
   </style>
 </head>
 
-<body th:style="|background-image: url('@{/img/NuevoUsuarioFondo.jpg}'); background-size: cover; background-position: center; background-attachment: fixed;|">
+<body th:style="|background-image: url('@{/img/NuevoUsuarioFondo.jpg}'); background-size: cover; background-position: center; background-attachment: fixed;font-family: 'Courier New', Courier, monospace;|">
 
 <main role="main" class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
 
   <div class="col-md-6 col-sm-8 mythic-panel text-center">
     <form action="#" th:action="@{/registrarme}" method="POST" th:object="${usuario}">
       <h2 class="mb-4" style="color: var(--game-epic);">Tu nueva vida como Aventurero comienza...</Avent> </h2>
+
+      <div class="mb-3">
+        <input th:field="*{nombre}" id="nombre" type="text" class="form-control mythic-input" placeholder="Nombre de tu Aventurero" required maxlength="30" />
+      </div>
 
       <div class="mb-3">
         <input th:field="*{email}" id="email" type="email" class="form-control mythic-input" placeholder="Correo electronico" required />

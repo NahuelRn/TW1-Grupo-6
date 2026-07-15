@@ -16,9 +16,10 @@
             border-radius: 12px;
             padding: 2rem;
         }
+
     </style>
 </head>
-<body th:style="|background-image: url('@{/img/LoginFondo.jpg}'); background-size: cover; background-position: center; background-attachment: fixed;|">
+<body th:style="|background-image: url('@{/img/LoginFondo.jpg}'); background-size: cover; background-position: center; background-attachment: fixed;font-family: 'Courier New', Courier, monospace;|">
 <main role="main" class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
     <div class="col-md-6 col-sm-8 mythic-panel text-center">
         <form action="#" th:action="@{/validar-login}" method="POST" th:object="${datosLogin}">

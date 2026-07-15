@@ -9,7 +9,7 @@
     <link rel="stylesheet" th:href="@{/css/main.css}" />
     <style>
         body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Courier New', Courier, monospace;
             color: #ffffff;
             min-height: 100vh;
             background-color: #0c0c0e;
@@ -36,39 +36,42 @@
         .container { position: relative; z-index: 1; }
 
         /* ── BOTÓN VOLVER ── */
-        .btn-volver {
-            font-family: 'Cinzel', serif;
-            color: #d4af37;
-            border: 1px solid #d4af37;
-            background-color: transparent;
-            padding: 8px 20px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
+        a.btn.btn-outline-warning {
+            font-family: 'Courier New', Courier, monospace;
+            border: 2.7px solid #e5a93b;
+            padding: 10px 20px;
+            font-size: 20px;
+            border-radius: 5px;
+            background-color: #131316;
+            color: #e5a93b;
+            box-shadow: 0px 0px 10px 0px rgb(229 169 59 / 16%);
+            transition: all 0.2s ease-in-out;
             text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
+            display: inline-block;
+            margin-bottom: 35px;
         }
-        .btn-volver:hover {
-            background-color: rgba(212,175,55,0.15);
-            box-shadow: 0 0 10px rgba(212,175,55,0.3);
-            color: #d4af37;
+
+        a.btn.btn-outline-warning:hover {
+            background-color: #e5a93b;
+            color: #101010;
+            transform: translateY(-3px);
+            box-shadow: 0px 0px 20px rgba(229, 169, 59, 0.4);
         }
 
         /* ── TÍTULOS ── */
         .titulo-seccion {
             font-family: 'Cinzel', serif;
-            color: #e63946;
+            color: #ff2d3d;
             font-weight: 900;
-            letter-spacing: 3px;
-            text-shadow: 0 0 20px rgba(230,57,70,0.5), 0 0 40px rgba(230,57,70,0.2);
+            font-size: 3rem;
+            letter-spacing: 5px;
+            text-shadow: 0 0 25px rgba(230,57,70,0.75), 0 0 55px rgba(230,57,70,0.35), 0 0 90px rgba(230,57,70,0.2);
         }
         .subtitulo {
-            color: #a09090;
-            font-size: 1rem;
-            letter-spacing: 1px;
+            color: #d4c4c4;
+            font-size: 1.2rem;
+            font-weight: 500;
+            letter-spacing: 1.5px;
         }
 
         /* ── CARDS ── */
@@ -159,21 +162,39 @@
         }
 
         /* ── BOTÓN RANDOM ── */
+        @keyframes pulso-random {
+            0%, 100% { box-shadow: 0 0 8px rgba(229,169,59,0.25); }
+            50% { box-shadow: 0 0 18px rgba(229,169,59,0.55); }
+        }
         .btn-random {
-            background-color: transparent;
+            background: linear-gradient(135deg, rgba(229,169,59,0.08), transparent);
             border: 2px solid #e5a93b;
             color: #e5a93b;
             font-family: 'Cinzel', serif;
-            font-weight: 700; letter-spacing: 1px;
+            font-weight: 700; letter-spacing: 1.5px;
             padding: 10px 22px; border-radius: 8px;
-            transition: all 0.2s ease; font-size: 0.85rem;
+            transition: all 0.25s ease; font-size: 0.85rem;
+            animation: pulso-random 2.2s ease-in-out infinite;
+        }
+        .btn-random .dado {
+            display: inline-block;
+            transition: transform 0.4s ease;
         }
         .btn-random:hover {
-            background-color: rgba(229,169,59,0.15);
-            color: #e5a93b;
-            box-shadow: 0 0 14px rgba(229,169,59,0.35);
+            background: linear-gradient(135deg, #e5a93b, #ff7a3d);
+            color: #131316;
+            border-color: #ffdca0;
+            box-shadow: 0 0 25px rgba(229,169,59,0.7);
+            transform: translateY(-2px) scale(1.03);
+            animation: none;
         }
-        .btn-random:active { transform: scale(0.97); }
+        .btn-random:hover .dado {
+            transform: rotate(360deg) scale(1.2);
+        }
+        .btn-random:active {
+            transform: scale(0.95);
+            box-shadow: 0 0 10px rgba(229,169,59,0.4);
+        }
 
         /* ── BOTÓN GUARDAR ── */
         .btn-guardar-mazo {
@@ -238,11 +259,9 @@
 <div class="container my-5">
 
     <!-- BOTÓN VOLVER AL LOBBY (arriba a la izquierda) -->
-    <div class="mb-4">
-        <a th:href="@{/lobby}" class="btn-volver">
-            &#8592; Volver al Lobby
-        </a>
-    </div>
+    <a th:href="@{/lobby}" class="btn btn-outline-warning">
+        Volver al lobby
+    </a>
 
     <!-- ENCABEZADO -->
     <div class="text-center mb-4">
@@ -253,9 +272,8 @@
         <hr class="divisor-mythic" style="max-width:400px; margin:20px auto;">
         <div class="d-flex align-items-center justify-content-center gap-3 flex-wrap">
             <span class="contador-box" id="contador-mazo">0 / 15 cartas seleccionadas</span>
-            <button type="button" class="btn-ran
-            dom" id="btn-random" onclick="seleccionarRandom()">
-                &#127922; SELECCIONAR 15 AL AZAR
+            <button type="button" class="btn-random" id="btn-random" onclick="seleccionarRandom()">
+                <span class="dado">&#127922;</span> SELECCIONAR 15 AL AZAR
             </button>
         </div>
     </div>
