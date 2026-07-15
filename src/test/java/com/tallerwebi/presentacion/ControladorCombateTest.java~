@@ -282,11 +282,8 @@ public class ControladorCombateTest {
     when(sessionMock.getAttribute("USUARIO_ID")).thenReturn(idUsuario);
 
     Usuario usuarioSimulado = new Usuario();
-    List<Carta> cartasDelMazo = new ArrayList<>();
-    cartasDelMazo.add(new Carta());
-
     Mazo mazoSimulado = new Mazo();
-    mazoSimulado.setCartas(cartasDelMazo);
+    mazoSimulado.setCartas(new ArrayList<>());
     usuarioSimulado.setMazoActivo(mazoSimulado);
     when(servicioUsuarioMock.buscarPorId(idUsuario)).thenReturn(usuarioSimulado);
 
@@ -297,11 +294,8 @@ public class ControladorCombateTest {
     when(servicioCombateMock.jugarTurno(idPartida, idCarta)).thenReturn("Fuiste derrotado");
     when(servicioCombateMock.obtenerPartidaPorIdentificador(idPartida)).thenReturn(partidaPerdida);
 
-    List<Long> idsManoSimulada = new ArrayList<>(Arrays.asList(1L, 2L));
-    when(sessionMock.getAttribute("idsMano")).thenReturn(idsManoSimulada);
-
-    List<Long> idsMazoRoboSimulado = new ArrayList<>(Arrays.asList(3L, 4L));
-    when(sessionMock.getAttribute("idsMazoRobo")).thenReturn(idsMazoRoboSimulado);
+    when(sessionMock.getAttribute("idsMano")).thenReturn(null);
+    when(sessionMock.getAttribute("idsMazoRobo")).thenReturn(null);
 
     when(servicioCalculoRecompensaMock.obtenerRecompensa(partidaPerdida))
             .thenReturn(new RecompensaDTO());
