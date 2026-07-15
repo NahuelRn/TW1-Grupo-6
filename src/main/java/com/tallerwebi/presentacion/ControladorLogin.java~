@@ -22,11 +22,16 @@ public class ControladorLogin {
     this.servicioLogin = servicioLogin;
   }
 
-  @RequestMapping("/login")
-  public ModelAndView irALogin() {
+  @RequestMapping(path = "/login", method = RequestMethod.GET)
+  public ModelAndView irALogin(HttpServletRequest request) {
+    // 1. Limpiamos la sesión por seguridad (el "botón de pánico")
+    request.getSession().invalidate();
+
+    // 2. Preparamos el modelo con el objeto necesario para el formulario
     ModelMap modelo = new ModelMap();
-    // ¡Aquí está la magia! Creamos el objeto vacío y se lo mandamos a la vista
     modelo.put("datosLogin", new DatosLogin());
+
+    // 3. Devolvemos la vista
     return new ModelAndView("login", modelo);
   }
 
@@ -43,6 +48,7 @@ public class ControladorLogin {
     if (usuarioBuscado != null) {
       request.getSession().setAttribute("ROL", usuarioBuscado.getRol());
       request.getSession().setAttribute("USUARIO_ID", usuarioBuscado.getId());
+      request.getSession().setAttribute("USUARIO", usuarioBuscado); // L
 
       if (usuarioBuscado.getJugador() != null) {
         request.getSession().setAttribute("jugadorId", usuarioBuscado.getJugador().getId());
@@ -81,11 +87,5 @@ public class ControladorLogin {
   @RequestMapping(path = "/", method = RequestMethod.GET)
   public ModelAndView inicio() {
     return new ModelAndView("redirect:/login");
-  }
-
-  @RequestMapping(path = "/login", method = RequestMethod.GET)
-  public String login(HttpServletRequest request) {
-    request.getSession().invalidate();
-    return "login";
   }
 }

@@ -52,7 +52,7 @@
         }
 
         .btn {
-            font-family: 'Courier New', Courier, monospace;
+            font-family: 'Montserrat', sans-serif;
             border: 2.7px solid #e5a93b;
             padding: 12px 25px;
             font-size: 20px;
