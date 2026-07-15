@@ -15,19 +15,41 @@ public class ServicioMazoImpl implements ServicioMazo {
   private final RepositorioMazo repositorioMazo;
   private final RepositorioCarta repositorioCarta;
   private final RepositorioInventario repositorioInventario;
+  private final RepositorioUsuario repositorioUsuario;
 
   public ServicioMazoImpl(
     RepositorioMazo repositorioMazo,
     RepositorioCarta repositorioCarta,
-    RepositorioInventario repositorioInventario
+    RepositorioInventario repositorioInventario,
+    RepositorioUsuario repositorioUsuario
   ) {
     this.repositorioMazo = repositorioMazo;
     this.repositorioCarta = repositorioCarta;
     this.repositorioInventario = repositorioInventario;
+    this.repositorioUsuario = repositorioUsuario;
   }
 
   @Override
-  public void validarYGuardarMazo(Mazo mazo) throws Exception {
+  public void validarYGuardarMazo(Mazo mazo, Long jugadorId) throws Exception {
+    validarEstructuraMazo(mazo);
+
+    repositorioMazo.guardar(mazo);
+
+    vincularMazoAlUsuario(mazo, jugadorId);
+  }
+
+  private void vincularMazoAlUsuario(Mazo mazo, Long jugadorId) throws Exception {
+    Usuario usuario = repositorioUsuario.buscarPorId(jugadorId);
+
+    if (usuario != null) {
+      usuario.setMazoActivo(mazo);
+      repositorioUsuario.modificar(usuario);
+    } else {
+      throw new Exception("No se encontró el usuario para asignarle el mazo.");
+    }
+  }
+
+  private static void validarEstructuraMazo(Mazo mazo) throws Exception {
     List<MazoCarta> nexos = mazo.getMazoCartas();
 
     if (nexos.size() != MAX_CARTAS) {
@@ -46,8 +68,6 @@ public class ServicioMazoImpl implements ServicioMazo {
     if (idsUnicos.size() != MAX_CARTAS) {
       throw new Exception("Error de validación interna con las cartas");
     }
-
-    repositorioMazo.guardar(mazo);
   }
 
   @Override
