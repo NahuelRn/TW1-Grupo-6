@@ -128,6 +128,9 @@ public class ControladorCombate {
       session.removeAttribute(SESSION_IDS_MANO);
       session.removeAttribute(SESSION_MAZO_ROBO);
 
+      Usuario usuarioActualizado = servicioUsuario.buscarPorId(idUsuario);
+      session.setAttribute("USUARIO", usuarioActualizado);
+
       ModelMap modelMap = new ModelMap();
       modelMap.put("partida", partida);
 
