@@ -14,21 +14,24 @@ public class ServicioMazoTest {
   private RepositorioCarta repoCartaMock;
   private RepositorioInventario repoInventarioMock;
   private ServicioMazo servicio;
+  private RepositorioUsuario repoUsuarioMock;
 
   @BeforeEach
   public void setUp() {
     repoMazoMock = mock(RepositorioMazo.class);
     repoCartaMock = mock(RepositorioCarta.class);
     repoInventarioMock = mock(RepositorioInventario.class);
+    repoUsuarioMock = mock(RepositorioUsuario.class);
 
-    servicio = new ServicioMazoImpl(repoMazoMock, repoCartaMock, repoInventarioMock);
+    servicio =
+      new ServicioMazoImpl(repoMazoMock, repoCartaMock, repoInventarioMock, repoUsuarioMock);
   }
 
   @Test
   public void siElMazoNoTiene15CartasDebeLanzarExcepcion() {
     Mazo mazo = new Mazo(); // Nace con 0 cartas en su lista de MazoCarta
 
-    Exception ex = assertThrows(Exception.class, () -> servicio.validarYGuardarMazo(mazo));
+    Exception ex = assertThrows(Exception.class, () -> servicio.validarYGuardarMazo(mazo, 1L));
     assertThat(ex.getMessage(), containsString("exactamente 15 cartas"));
   }
 
@@ -41,7 +44,7 @@ public class ServicioMazoTest {
     }
     mazo.getMazoCartas().add(crearNexo(mazo, 1L, "Carta Repetida"));
 
-    Exception ex = assertThrows(Exception.class, () -> servicio.validarYGuardarMazo(mazo));
+    Exception ex = assertThrows(Exception.class, () -> servicio.validarYGuardarMazo(mazo, 1L));
     assertThat(ex.getMessage(), containsString("repetidas"));
   }
 
@@ -52,7 +55,11 @@ public class ServicioMazoTest {
       mazo.getMazoCartas().add(crearNexo(mazo, i, "Carta " + i));
     }
 
-    servicio.validarYGuardarMazo(mazo);
+    Usuario usuarioMock = mock(Usuario.class);
+
+    when(repoUsuarioMock.buscarPorId(anyLong())).thenReturn(usuarioMock);
+
+    servicio.validarYGuardarMazo(mazo, 1L);
     verify(repoMazoMock, times(1)).guardar(mazo);
   }
 

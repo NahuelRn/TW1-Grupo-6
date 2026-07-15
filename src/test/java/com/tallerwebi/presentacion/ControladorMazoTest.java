@@ -41,13 +41,15 @@ public class ControladorMazoTest {
 
     // Then
     assertThat(modelAndView.getViewName(), is("redirect:/seleccion-zona"));
-    verify(servicioMock, times(1)).validarYGuardarMazo(any());
+    verify(servicioMock, times(1)).validarYGuardarMazo(any(), anyLong());
   }
 
   @Test
   public void siElServicioLanzaExcepcionDebeVolverADeckbuildingConError() throws Exception {
     // Given
-    doThrow(new Exception("Error de validación")).when(servicioMock).validarYGuardarMazo(any());
+    doThrow(new Exception("Error de validación"))
+      .when(servicioMock)
+      .validarYGuardarMazo(any(), anyLong());
 
     List<Long> cartasIds = new ArrayList<>();
     for (long i = 1; i <= 15; i++) {
