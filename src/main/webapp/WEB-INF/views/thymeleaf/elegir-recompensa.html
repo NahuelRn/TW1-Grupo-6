@@ -63,10 +63,8 @@
         Elegí qué carta quieres recibir a cambio del inventario del solicitante.
     </p>
 
-    <!-- Resumen del intercambio -->
     <div class="d-flex align-items-center justify-content-center gap-4 mb-5 flex-wrap">
 
-        <!-- Lo que VOS entregás -->
         <div class="carta-solicitada-box text-center">
             <p class="small mb-2" style="color:#a09090;">VOS ENTREGÁS:</p>
             <div class="carta-marco carta-marco--grande mb-2">
@@ -79,7 +77,6 @@
 
         <div class="flecha-intercambio">⇄</div>
 
-        <!-- Lo que vas a RECIBIR (a elegir) -->
         <div class="carta-solicitada-box text-center" style="border-color: #d4af37; min-width:180px;">
             <p class="small mb-2" style="color:#d4af37;">VOS RECIBÍS:</p>
             <div id="preview-elegida" style="min-height:130px; display:flex; align-items:center; justify-content:center;">
@@ -90,7 +87,6 @@
 
     <hr style="border-color:#4a1212; margin-bottom: 2rem;">
 
-    <!-- Aviso de regla de rareza -->
     <div class="text-center mb-4">
         <p style="color:#a09090; font-size:0.9rem;">
             Solo puedes elegir cartas de rareza igual o superior a
@@ -98,7 +94,6 @@
         </p>
     </div>
 
-    <!-- Grilla de cartas elegibles -->
     <div th:if="${opciones == null or #lists.isEmpty(opciones)}" class="text-center py-4">
         <div class="p-4 rounded" style="background-color:rgba(26,17,17,0.6); border:1px dashed #4a1212; max-width:500px; margin:0 auto;">
             <p class="lead mb-0" style="color:#a09090; font-style:italic;">
@@ -110,7 +105,6 @@
     <form th:unless="${opciones == null or #lists.isEmpty(opciones)}"
           th:action="@{/mercado/confirmar}" method="POST" id="formConfirmar">
         <input type="hidden" name="idTrade" th:value="${trade.id}">
-        <!-- Este campo se completa con JS al seleccionar una carta -->
         <input type="hidden" name="idCartaRecompensa" id="idCartaRecompensaInput" value="">
 
         <div class="row justify-content-center m-0 mb-5">
@@ -155,10 +149,8 @@
         crossorigin="anonymous"></script>
 <script>
     function seleccionarCarta(el) {
-        // Deseleccionar todas
         document.querySelectorAll('.carta-opcion').forEach(c => c.classList.remove('seleccionada'));
 
-        // Marcar la seleccionada
         el.classList.add('seleccionada');
 
         const id      = el.getAttribute('data-id');
@@ -166,10 +158,8 @@
         const rareza  = el.getAttribute('data-rareza');
         const imagen  = el.getAttribute('data-imagen');
 
-        // Actualizar el hidden input
         document.getElementById('idCartaRecompensaInput').value = id;
 
-        // Actualizar el preview
         const preview = document.getElementById('preview-elegida');
         const imgTag  = imagen && imagen.trim() !== ''
             ? `<img src="${window.location.origin}/spring/img/${imagen}" style="max-height:110px; object-fit:contain;" class="img-fluid mb-1" onerror="this.style.display='none'">`
@@ -181,7 +171,6 @@
         <span style="background:transparent; border:1px solid #d4af37; color:#d4af37; font-size:0.75rem; padding:3px 8px; border-radius:4px;">${rareza}</span>
     `;
 
-        // Habilitar botón
         document.getElementById('btnConfirmar').disabled = false;
         document.getElementById('textoConfirmar').textContent = `Vas a recibir: ${nombre}`;
     }

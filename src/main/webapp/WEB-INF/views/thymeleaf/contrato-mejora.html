@@ -292,7 +292,6 @@
 
         cartasNodes.forEach(nodo => contenedor.appendChild(nodo));
 
-        // CORRECCIÓN PROFESORA: Control dinámico de checkboxes (Bloqueo si != 4)
         const checkboxes = contenedor.querySelectorAll(".mythic-checkbox");
         checkboxes.forEach(cb => {
             cb.addEventListener("change", function() {

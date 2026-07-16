@@ -70,29 +70,29 @@ INSERT INTO Carta (nombre, tipo, subtipo, valorOroBase, nivelDesbloqueo, probabi
 -- ==========================================
 -- DATA: CARTAS - HECHIZOS
 -- ==========================================
-INSERT INTO Carta (nombre, tipo, subtipo, valorOroBase, nivelDesbloqueo, probabilidad, duracion, rareza, descripcion, danoMin, danoMax, defensaMin, defensaMax) VALUES
-                                                                                                                                                                    ('Pocion Curativa',           'HECHIZO', 'CURA',         50,  1, 100.00, 1,  'Comun',      'Efecto: +25 Vida', 0, 0, 25, 25),
-                                                                                                                                                                    ('Bomba',                     'HECHIZO', NULL,           150, 1, 100.00, 1,  'Exotica',    'Daño: 20-30', 20, 30, 0, 0),
-                                                                                                                                                                    ('Vendaje',                   'HECHIZO', 'CURA',         50,  1, 100.00, 1,  'Comun',      'Efecto: +15 Vida', 0, 0, 15, 15),
-                                                                                                                                                                    ('Afilador de Armas',         'HECHIZO', NULL,           150, 1, 100.00, 1,  'Poco Comun', 'Efecto: +15 Daño', 0, 0, 0, 0),
-                                                                                                                                                                    ('Adrenalina',                'HECHIZO', NULL,           250, 2, 100.00, 1,  'Rara',       'Efecto: Roba 4 cartas', 0, 0, 0, 0),
-                                                                                                                                                                    ('Preparacion',               'HECHIZO', 'ROBO',         150, 1, 100.00, 1,  'Poco Comun', 'Efecto: Roba 2 cartas', 0, 0, 0, 0),
-                                                                                                                                                                    ('Frasco de Acido',           'HECHIZO', NULL,           250, 2, 100.00, 1,  'Rara',       'Efecto: Rompe Armadura', 0, 0, 0, 0),
-                                                                                                                                                                    ('Cortina de Humo',           'HECHIZO', NULL,           500, 3, 100.00, 2,  'Exotica',    'Efecto: Oculto', 0, 0, 0, 0),
-                                                                                                                                                                    ('Pocion de Fuerza',          'HECHIZO', NULL,           250, 2, 100.00, 2,  'Rara',       'Efecto: +25 Daño', 0, 0, 0, 0),
-                                                                                                                                                                    ('Antidoto',                  'HECHIZO', 'CURA',         150, 1, 100.00, 3,  'Poco Comun', 'Efecto: Inmune a Veneno', 0, 0, 0, 0),
-                                                                                                                                                                    ('Polvo Cegador',             'HECHIZO', NULL,           250, 2, 75.00,  1,  'Rara',       'Efecto: Ciega al Zombi', 0, 0, 0, 0),
-                                                                                                                                                                    ('Concentracion',             'HECHIZO', 'ROBO',         500, 3, 100.00, 1,  'Exotica',    'Efecto: Elige carta', 0, 0, 0, 0),
-                                                                                                                                                                    ('Brebaje Berserker',         'HECHIZO', NULL,           500, 3, 100.00, 3,  'Exotica',    'Efecto: +50% Daño', 0, 0, 0, 0),
-                                                                                                                                                                    ('Trampa para Osos',          'HECHIZO', 'ATURDIMIENTO', 250, 2, 100.00, 1,  'Rara',       'Daño: 8-12', 8, 12, 0, 0),
-                                                                                                                                                                    ('Reciclar',                  'HECHIZO', NULL,           1000,4, 100.00, 1,  'Legendaria', 'Efecto: Descarta y Roba', 0, 0, 0, 0),
-                                                                                                                                                                    ('Catalizador de Sangre',     'HECHIZO', 'VENENO',       500, 3, 100.00, 1,  'Exotica',    'Efecto: Convierte Hemorragia', 0, 0, 0, 0),
-                                                                                                                                                                    ('Planificacion',             'HECHIZO', 'ROBO',         150, 1, 100.00, 1,  'Poco Comun', 'Efecto: Roba 1 carta', 0, 0, 0, 0),
-                                                                                                                                                                    ('Ritual Oscuro',             'HECHIZO', 'ROBO',         250, 2, 100.00, 1,  'Rara',       'Efecto: Reinicia Mano', 0, 0, 0, 0),
-                                                                                                                                                                    ('Piel de Obsidiana',         'HECHIZO', 'ESCUDO',       250, 2, 100.00, 2,  'Rara',       'Defensa: 20', 0, 0, 20, 20),
-                                                                                                                                                                    ('Contrato Demoniaco',        'HECHIZO', 'ROBO',         1000,5, 100.00, 1,  'Legendaria', 'Efecto: -15 HP, Roba 5', 0, 0, 0, 0);
+INSERT INTO Carta (nombre, tipo, subtipo, valorOroBase, nivelDesbloqueo, probabilidad, duracion, rareza, descripcion, danoMin, danoMax, defensaMin, defensaMax, efecto) VALUES
+                                                                                                                                                                            ('Pocion Curativa',       'HECHIZO', 'CURA',         50,  1, 100.00, 1, 'Comun',      'Efecto: +25 Vida', 0, 0, 25, 25, 'CURA'),
+                                                                                                                                                                            ('Bomba',                 'HECHIZO', NULL,           150, 1, 100.00, 1, 'Exotica',    'Efecto: Daño Directo', 20, 30, 0, 0, 'DANIO_DIRECTO'),
+                                                                                                                                                                            ('Vendaje',               'HECHIZO', 'CURA',         50,  1, 100.00, 1, 'Comun',      'Efecto: +15 Vida', 0, 0, 15, 15, 'CURA'),
+                                                                                                                                                                            ('Afilador de Armas',     'HECHIZO', NULL,           150, 1, 100.00, 1, 'Poco Comun', 'Efecto: Tu próximo ataque hace +15 de daño', 15, 15, 0, 0, 'BUFF_DANIO'),
+                                                                                                                                                                            ('Adrenalina',            'HECHIZO', NULL,           250, 2, 100.00, 1, 'Rara',       'Efecto: Te curas 15 HP y tu próximo ataque hace +15 de daño', 15, 15, 15, 15, 'HIBRIDO_CURA_BUFF'),
+                                                                                                                                                                            ('Preparacion',           'HECHIZO', 'ROBO',         150, 1, 100.00, 1, 'Poco Comun', 'Efecto: Ganas +15 de escudo este turno y tu próximo ataque hace +10 de daño', 10, 10, 15, 15, 'HIBRIDO_ESCUDO_BUFF'),
+                                                                                                                                                                            ('Frasco de Acido',       'HECHIZO', NULL,           250, 2, 100.00, 1, 'Rara',       'Efecto: Reduce la vida actual del enemigo a la mitad', 0, 0, 0, 0, 'MITAD_VIDA_ENEMIGO'),
+                                                                                                                                                                            ('Cortina de Humo',       'HECHIZO', NULL,           500, 3, 100.00, 2, 'Exotica',    'Efecto: Evasión. El enemigo falla su próximo ataque', 0, 0, 0, 0, 'EVASION'),
+                                                                                                                                                                            ('Pocion de Fuerza',      'HECHIZO', NULL,           250, 2, 100.00, 2, 'Rara',       'Efecto: Tu próximo ataque hace +25 de daño', 25, 25, 0, 0, 'BUFF_DANIO'),
+                                                                                                                                                                            ('Antidoto',              'HECHIZO', 'CURA',         150, 1, 100.00, 3, 'Poco Comun', 'Efecto: Purificación. Te cura 35 HP', 0, 0, 35, 35, 'CURA'),
+                                                                                                                                                                            ('Polvo Cegador',         'HECHIZO', NULL,           250, 2, 75.00,  1, 'Rara',       'Efecto: Ciega al enemigo. Su próximo ataque no hace daño', 0, 0, 0, 0, 'ATURDIR_ENEMIGO'),
+                                                                                                                                                                            ('Concentracion',         'HECHIZO', 'ROBO',         500, 3, 100.00, 1, 'Exotica',    'Efecto: Magia. Hace un daño aleatorio entre 5 y 45', 5, 45, 0, 0, 'DANIO_ALEATORIO'),
+                                                                                                                                                                            ('Brebaje Berserker',     'HECHIZO', NULL,           500, 3, 100.00, 3, 'Exotica',    'Efecto: Tu próximo ataque hace el doble de daño', 2, 2, 0, 0, 'MULTIPLICADOR_DANIO'),
+                                                                                                                                                                            ('Trampa para Osos',      'HECHIZO', 'ATURDIMIENTO', 250, 2, 100.00, 1, 'Rara',       'Efecto: Daño directo y el enemigo pierde su turno', 8, 12, 0, 0, 'DANIO_Y_ATURDIR'),
+                                                                                                                                                                            ('Reciclar',              'HECHIZO', NULL,           1000,4, 100.00, 1, 'Legendaria', 'Efecto: Te cura 25 HP, pero el enemigo recupera 15 HP', 15, 15, 25, 25, 'RECICLAR'),
+                                                                                                                                                                            ('Catalizador de Sangre', 'HECHIZO', 'VENENO',       500, 3, 100.00, 1, 'Exotica',    'Efecto: Robo de Vida. Hace 25 de daño y te cura 25 HP', 25, 25, 25, 25, 'VAMPIRISMO'),
+                                                                                                                                                                            ('Planificacion',         'HECHIZO', 'ROBO',         150, 1, 100.00, 1, 'Poco Comun', 'Efecto: Te curas 10 HP y el enemigo no ataca este turno', 0, 0, 10, 10, 'ATURDIR_Y_CURA'),
+                                                                                                                                                                            ('Ritual Oscuro',         'HECHIZO', 'ROBO',         250, 2, 100.00, 1, 'Rara',       'Efecto: Pierdes 20 HP, tu próximo ataque hace +30 de daño', 30, 30, 20, 20, 'SACRIFICIO_BUFF'),
+                                                                                                                                                                            ('Piel de Obsidiana',     'HECHIZO', 'ESCUDO',       250, 2, 100.00, 2, 'Rara',       'Efecto: Si recibieras un golpe mortal, sobrevivís con 1 HP', 0, 0, 0, 0, 'INMORTALIDAD'),
+                                                                                                                                                                            ('Contrato Demoniaco',    'HECHIZO', 'ROBO',         1000,5, 100.00, 1, 'Legendaria', 'Efecto: Pierdes 30 HP, el enemigo pierde 60 HP', 60, 60, 30, 30, 'SACRIFICIO');
 -- ==========================================
--- VINCULAR IMÁGENES
+-- VINCULOS PARA LAS IMÁGENES
 -- ==========================================
 UPDATE Carta SET imagen = 'Patada_Voladora.jpg'      WHERE nombre = 'Patada Voladora';
 UPDATE Carta SET imagen = 'Tajo_Basico.jpg'          WHERE nombre = 'Tajo Basico';
@@ -163,43 +163,6 @@ UPDATE Carta SET imagen = 'Planificacion.jpg'        WHERE nombre = 'Planificaci
 UPDATE Carta SET imagen = 'Ritual_Oscuro.jpg'        WHERE nombre = 'Ritual Oscuro';
 UPDATE Carta SET imagen = 'Piel_de_Obsidiana.jpg'    WHERE nombre = 'Piel de Obsidiana';
 UPDATE Carta SET imagen = 'Contrato_Demoniaco.jpg'   WHERE nombre = 'Contrato Demoniaco';
-
--- ==========================================
--- ASIGNACIÓN DE EFECTOS PARA CARTAS DE UTILIDAD (HECHIZO)
--- ==========================================
-UPDATE Carta SET efecto = 'CURA', descripcion = 'Efecto: +25 Vida' WHERE nombre = 'Pocion Curativa';
-UPDATE Carta SET efecto = 'CURA', descripcion = 'Efecto: +15 Vida' WHERE nombre = 'Vendaje';
-UPDATE Carta SET efecto = 'CURA', defensaMin = 35, defensaMax = 35, descripcion = 'Efecto: Purificación. Te cura 35 HP' WHERE nombre = 'Antidoto';
-
-UPDATE Carta SET efecto = 'DANIO_DIRECTO', descripcion = 'Efecto: Daño Directo' WHERE nombre = 'Bomba';
-
-UPDATE Carta SET efecto = 'BUFF_DANIO', danoMin = 15, danoMax = 15, descripcion = 'Efecto: Tu próximo ataque hace +15 de daño' WHERE nombre = 'Afilador de Armas';
-UPDATE Carta SET efecto = 'BUFF_DANIO', danoMin = 25, danoMax = 25, descripcion = 'Efecto: Tu próximo ataque hace +25 de daño' WHERE nombre = 'Pocion de Fuerza';
-
-UPDATE Carta SET efecto = 'MULTIPLICADOR_DANIO', danoMin = 2, danoMax = 2, descripcion = 'Efecto: Tu próximo ataque hace el doble de daño' WHERE nombre = 'Brebaje Berserker';
-
-UPDATE Carta SET efecto = 'EVASION', descripcion = 'Efecto: Evasión. El enemigo falla su próximo ataque' WHERE nombre = 'Cortina de Humo';
-UPDATE Carta SET efecto = 'ATURDIR_ENEMIGO', descripcion = 'Efecto: Ciega al enemigo. Su próximo ataque no hace daño' WHERE nombre = 'Polvo Cegador';
-UPDATE Carta SET efecto = 'DANIO_Y_ATURDIR', descripcion = 'Efecto: Daño directo y el enemigo pierde su turno' WHERE nombre = 'Trampa para Osos';
-
-UPDATE Carta SET efecto = 'MITAD_VIDA_ENEMIGO', descripcion = 'Efecto: Reduce la vida actual del enemigo a la mitad' WHERE nombre = 'Frasco de Acido';
-
-UPDATE Carta SET efecto = 'SACRIFICIO', danoMin = 60, danoMax = 60, defensaMin = 30, defensaMax = 30, descripcion = 'Efecto: Pierdes 30 HP, el enemigo pierde 60 HP' WHERE nombre = 'Contrato Demoniaco';
-UPDATE Carta SET efecto = 'SACRIFICIO_BUFF', danoMin = 30, danoMax = 30, defensaMin = 20, defensaMax = 20, descripcion = 'Efecto: Pierdes 20 HP, tu próximo ataque hace +30 de daño' WHERE nombre = 'Ritual Oscuro';
-
-UPDATE Carta SET efecto = 'VAMPIRISMO', danoMin = 25, danoMax = 25, defensaMin = 25, defensaMax = 25, descripcion = 'Efecto: Robo de Vida. Hace 25 de daño y te cura 25 HP' WHERE nombre = 'Catalizador de Sangre';
-
-UPDATE Carta SET efecto = 'HIBRIDO_CURA_BUFF', danoMin = 15, danoMax = 15, defensaMin = 15, defensaMax = 15, descripcion = 'Efecto: Te curas 15 HP y tu próximo ataque hace +15 de daño' WHERE nombre = 'Adrenalina';
-UPDATE Carta SET efecto = 'HIBRIDO_ESCUDO_BUFF', danoMin = 10, danoMax = 10, defensaMin = 15, defensaMax = 15, descripcion = 'Efecto: Ganas +15 de escudo este turno y tu próximo ataque hace +10 de daño' WHERE nombre = 'Preparacion';
-
-UPDATE Carta SET efecto = 'DANIO_ALEATORIO', danoMin = 5, danoMax = 45, descripcion = 'Efecto: Magia. Hace un daño aleatorio entre 5 y 45' WHERE nombre = 'Concentracion';
-
-UPDATE Carta SET efecto = 'RECICLAR', danoMin = 15, danoMax = 15, defensaMin = 25, defensaMax = 25, descripcion = 'Efecto: Te cura 25 HP, pero el enemigo recupera 15 HP' WHERE nombre = 'Reciclar';
-
-UPDATE Carta SET efecto = 'ATURDIR_Y_CURA', defensaMin = 10, defensaMax = 10, descripcion = 'Efecto: Te curas 10 HP y el enemigo no ataca este turno' WHERE nombre = 'Planificacion';
-
-UPDATE Carta SET efecto = 'INMORTALIDAD', descripcion = 'Efecto: Si recibieras un golpe mortal, sobrevivís con 1 HP' WHERE nombre = 'Piel de Obsidiana';
-
 
 
 -- ==========================================

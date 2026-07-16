@@ -35,7 +35,6 @@
 
         .container { position: relative; z-index: 1; }
 
-        /* ── BOTÓN VOLVER ── */
         a.btn.btn-outline-warning {
             font-family: 'Courier New', Courier, monospace;
             border: 2.7px solid #e5a93b;
@@ -58,7 +57,6 @@
             box-shadow: 0px 0px 20px rgba(229, 169, 59, 0.4);
         }
 
-        /* ── TÍTULOS ── */
         .titulo-seccion {
             font-family: 'Cinzel', serif;
             color: #ff2d3d;
@@ -74,7 +72,6 @@
             letter-spacing: 1.5px;
         }
 
-        /* ── CARDS ── */
         .mythic-card {
             background: linear-gradient(160deg, #1a1111 0%, #131316 100%) !important;
             border: 2px solid #e5a93b !important;
@@ -144,7 +141,6 @@
             accent-color: #e63946; cursor: pointer;
         }
 
-        /* ── CONTADOR ── */
         .contador-box {
             background: linear-gradient(135deg, #1a1111, #131316);
             border: 2px solid #e5a93b;
@@ -161,7 +157,6 @@
             box-shadow: 0 0 15px rgba(230,57,70,0.4);
         }
 
-        /* ── BOTÓN RANDOM ── */
         @keyframes pulso-random {
             0%, 100% { box-shadow: 0 0 8px rgba(229,169,59,0.25); }
             50% { box-shadow: 0 0 18px rgba(229,169,59,0.55); }
@@ -196,7 +191,6 @@
             box-shadow: 0 0 10px rgba(229,169,59,0.4);
         }
 
-        /* ── BOTÓN GUARDAR ── */
         .btn-guardar-mazo {
             font-family: 'Cinzel', serif;
             font-weight: 700; letter-spacing: 2px;
@@ -258,12 +252,10 @@
 <body th:style="|background-image: url('@{/img/MazoFondo.jpg}'); background-size: cover; background-position: center; background-attachment: fixed;|">
 <div class="container my-5">
 
-    <!-- BOTÓN VOLVER AL LOBBY (arriba a la izquierda) -->
     <a th:href="@{/lobby}" class="btn btn-outline-warning">
         Volver al lobby
     </a>
 
-    <!-- ENCABEZADO -->
     <div class="text-center mb-4">
         <h1 class="titulo-seccion mb-2">ARMADO DE MAZO</h1>
         <p class="subtitulo">
@@ -280,7 +272,6 @@
 
     <div th:if="${error}" class="alert alert-danger text-center shadow" th:text="${error}"></div>
 
-    <!-- FORMULARIO -->
     <form th:action="@{/mazo/guardar}" method="POST">
         <div id="contenedor-cartas" class="grilla-cartas">
             <div class="card-item-node" th:each="item : ${inventario}" th:attr="data-rareza=${item.carta.rareza}">
@@ -358,7 +349,6 @@
                 const checkbox = card.querySelector(".checkbox-mazo");
                 const seleccionadas = document.querySelectorAll(".checkbox-mazo:checked").length;
 
-                // Bloquear si ya hay 15 y esta no está marcada
                 if (!checkbox.checked && seleccionadas >= MAX_CARTAS) return;
 
                 checkbox.checked = !checkbox.checked;
@@ -388,14 +378,12 @@
     function seleccionarRandom() {
         var MAX_CARTAS = 15;
 
-        // 1. Deseleccionar todo
         document.querySelectorAll(".checkbox-mazo").forEach(function (cb) {
             cb.checked = false;
             var card = cb.closest(".mythic-card");
             if (card) card.classList.remove("seleccionada");
         });
 
-        // 2. Obtener todos los checkboxes
         var todos = Array.from(document.querySelectorAll(".checkbox-mazo"));
 
         if (todos.length < MAX_CARTAS) {
@@ -403,7 +391,6 @@
             return;
         }
 
-        // 3. Fisher-Yates shuffle
         for (var i = todos.length - 1; i > 0; i--) {
             var j = Math.floor(Math.random() * (i + 1));
             var temp = todos[i];
@@ -411,14 +398,12 @@
             todos[j] = temp;
         }
 
-        // 4. Marcar los primeros 15
         for (var k = 0; k < MAX_CARTAS; k++) {
             todos[k].checked = true;
             var card = todos[k].closest(".mythic-card");
             if (card) card.classList.add("seleccionada");
         }
 
-        // 5. Actualizar contador
         actualizarContador();
     }
 </script>

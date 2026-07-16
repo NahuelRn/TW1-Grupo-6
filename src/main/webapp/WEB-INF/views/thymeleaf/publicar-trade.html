@@ -18,7 +18,6 @@
     <div class="row">
         <div th:each="carta : ${cartasFaltantes}" class="col-md-3 mb-4">
             <div class="card bg-secondary text-white text-center p-3 h-100 border-light">
-                <!-- CORREGIDO: Imagen vinculada mediante th:src a /img/ -->
                 <div class="carta-marco mb-2">
                     <img th:if="${carta.imagen != null and not #strings.isEmpty(carta.imagen)}"
                          th:src="@{/img/{img}(img=${carta.imagen})}" alt="Carta">
@@ -38,7 +37,7 @@
             </div>
         </div>
         <div th:if="${#lists.isEmpty(cartasFaltantes)}" class="col-12 text-center text-muted py-5">
-            <h3>¡Felicitaciones! Posees todas las cartas del juego en este momento.</h3>
+            <h3>¡Bien ahí! Tenés todas las cartas del juego en este momento.</h3>
         </div>
     </div>
 </div>
