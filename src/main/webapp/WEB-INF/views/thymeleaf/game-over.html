@@ -9,7 +9,7 @@
     <style>
 
         body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Cinzel', serif;
             color: #ffffff;
             background-image: radial-gradient(circle at 15% 20%, rgba(229, 169, 59, 0.07) 0%, transparent 45%), radial-gradient(circle at 85% 80%, rgba(230, 57, 70, 0.06) 0%, transparent 50%), linear-gradient(rgba(229, 169, 59, 0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(229, 169, 59, 0.015) 1px, transparent 1px), radial-gradient(circle at center, transparent 40%, #040405 110%);
             background-size: 100% 100%, 100% 100%, 45px 45px, 45px 45px, 100% 100%;
@@ -20,36 +20,39 @@
         }
 
         .game-over-container {
-            background-color: #131316 !important;
-            border: 2px solid #ff0013 !important;
-            border-radius: 10px !important;
-            box-shadow: 0 0 100px rgb(255 0 19);
+            background: linear-gradient(180deg, #19191dd6 35%, #101013);
+            border: 3px solid #8b0000;
+            border-radius: 10px;
             width: 100%;
-            max-width: 500px;
-            padding: 30px;
+            max-width: 560px;
+            padding: 40px;
+            box-shadow: 0 0 50px 0px rgba(255, 0, 0, .5), 0 0 200px rgb(255 0 0 / 50%), inset 0 0 20px rgba(255, 0, 0, .05);
+            max-height: 920px;
+            padding: 17px 40px 40px 40px;
         }
 
         .titulo-derrota {
-            color: #e63946;
-            font-weight: 800;
+            font-size: 55px;
+            font-weight: 900;
+            letter-spacing: 5px;
+            color: #e31212;
+            text-shadow: 0 0 0px #700, 0 0 50px red;
+            margin-bottom: 5px;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            text-shadow: 0 0 15px rgba(230, 57, 70, 0.6);
-            margin-bottom: 20px;
-            font-size: 50px;
         }
 
         .stats-box {
-            background-color: #09090b !important;
-            border: 2px solid #74848552;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: left;
-            margin: 30px 0;
-            box-shadow: 0px 7px 10px 0px #0000007a;
+            background: #0d0d11;
+            border: 2px solid #730000;
+            border-radius: 10px;
+            padding: 22px;
+            box-shadow: 0px 10px 20px rgb(0 0 0 / 30%);
+            margin: 35px 0;
             display: flex;
             flex-direction: column;
             align-items: center;
+            background: linear-gradient(#0d0d11 50%, #ff000040 100%);
+            margin-top: -3px !important;
         }
 
         .stat-row {
@@ -57,18 +60,24 @@
             margin-bottom: 5px;
             align-items: baseline;
             padding: 5px 0px 5px 0px;
+            gap: 10px;
         }
 
         .carta-marco {
-            width: 150px;
-            aspect-ratio: 7 / 10;
-            background-color: #2A2A30;
-            border: 1px solid #e5a93b;
-            border-radius: 7px;
-            overflow: hidden;
-            margin: 0 auto 25px auto;
-            box-shadow: 0px 10px 15px 0px black;
-            zoom: 1.1;
+            width: 175px;
+            border: 2px solid #b7832c;
+            transition: .3s;
+            box-shadow: 0 0 20px rgba(255, 0, 0, .2), 0px 10px 15px black;
+            margin: auto;
+            margin-bottom: 20px;
+        }
+
+        .carta-marco:hover {
+
+            transform: scale(1.05);
+
+            box-shadow: 0 0 30px red,
+            0 10px 25px black;
         }
 
         .carta-marco img {
@@ -78,14 +87,36 @@
         }
 
         .btn-lobby {
-            background-color: #e63946;
-            color: white;
-            border: none;
+            background: linear-gradient(red, #cb0000);
+            border: 1.5px solid yellow;
+            font-size: 25px;
+            transition: .25s;
+            box-shadow: 0px 7px 0px 0px rgba(0, 0, 0, .5);
+            color: yellow;
+            text-shadow: 0px 2px 0px black, 0px 0px 15px #ffff0059;
+            font-weight: 900;
             text-transform: uppercase;
-            font-weight: bold;
-            padding: 10px 20px;
-            border-radius: 5px;
-            transition: 0.3s;
+        }
+
+
+        .btn-lobby:hover {
+
+            transform: translateY(-2px);
+
+            box-shadow: 0 0 20px red,
+            0 0 35px rgba(255, 0, 0, .4);
+
+            background: linear-gradient(#ff4444, #b00000);
+        }
+
+        .btn-lobby:hover {
+
+            transform: translateY(-2px);
+
+            box-shadow: 0 0 20px red,
+            0 0 35px rgba(255, 0, 0, .4);
+
+            background: linear-gradient(#ff4444, #b00000);
         }
 
         .btn-lobby:hover {
@@ -96,13 +127,38 @@
             --bs-text-opacity: 1;
             color: rgba(255, 255, 255, .5) !important;
             font-size: 20px;
-            text-shadow: 0px 5px 3px black;
+            text-shadow: 0px 5px 0px black;
         }
 
         .text-white.mb-3 {
             text-align: center;
             text-shadow: 0.3px 0px 0px white, 0px 2px 0px black;
             font-size: 17px !important;
+        }
+
+        .skull {
+
+            position: absolute;
+
+            top: -25px;
+
+            left: 50%;
+
+            transform: translateX(-50%);
+
+            font-size: 42px;
+
+            color: #d60000;
+
+            text-shadow: 0 0 15px red,
+            0 0 30px red;
+        }
+
+        .divider {
+            width: 330px;
+            height: 3px;
+            margin: -5px auto 30px;
+            background: linear-gradient(to right, transparent, #d40000, transparent);
         }
     </style>
 </head>
@@ -112,6 +168,8 @@
 
 <div class="game-over-container text-center">
     <h1 class="titulo-derrota">Derrota</h1>
+
+    <div class="divider"></div>
 
     <h4 class="text-warning mb-4" th:text="${motivoDerrota}">¡Motivo de la derrota!</h4>
 
