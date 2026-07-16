@@ -12,119 +12,124 @@ import org.mockito.MockitoAnnotations;
 
 public class ServicioUsuarioRecompensaTest {
 
-    @Mock
-    private RepositorioUsuario repositorioUsuarioMock;
-    @Mock
-    private RepositorioCarta repositorioCartaMock;
-    @Mock
-    private RepositorioInventario repositorioInventarioMock;
+  @Mock
+  private RepositorioUsuario repositorioUsuarioMock;
 
-    // ¡ACÁ AGREGAMOS EL SERVICIO QUE FALTABA!
-    @Mock
-    private ServicioCalculoRecompensa servicioCalculoRecompensaMock;
+  @Mock
+  private RepositorioCarta repositorioCartaMock;
 
-    @InjectMocks
-    private ServicioUsuarioImpl servicioUsuario;
+  @Mock
+  private RepositorioInventario repositorioInventarioMock;
 
-    @BeforeEach
-    public void inicializarMocks() {
-        MockitoAnnotations.openMocks(this);
-    }
+  @Mock
+  private ServicioCalculoRecompensa servicioCalculoRecompensaMock;
 
-    @Test
-    public void deberiaSumarOroYExperienciaAlUsuario() {
-        Usuario usuario = new Usuario();
-        usuario.setOro(100);
-        usuario.setExperiencia(200);
+  @InjectMocks
+  private ServicioUsuarioImpl servicioUsuario;
 
-        Partida partida = new Partida();
+  @BeforeEach
+  public void inicializarMocks() {
+    MockitoAnnotations.openMocks(this);
+  }
 
-        // Creamos la recompensa y mockeamos el nuevo servicio
-        RecompensaDTO recompensaDTO = new RecompensaDTO();
-        recompensaDTO.setOro(50);
-        recompensaDTO.setExperiencia(100);
-        when(servicioCalculoRecompensaMock.obtenerRecompensa(partida)).thenReturn(recompensaDTO);
+  @Test
+  public void deberiaSumarOroYExperienciaAlUsuario() {
+    Usuario usuario = new Usuario();
+    usuario.setOro(100);
+    usuario.setExperiencia(200);
 
+    Partida partida = new Partida();
+
+    RecompensaDTO recompensaDTO = new RecompensaDTO();
+    recompensaDTO.setOro(50);
+    recompensaDTO.setExperiencia(100);
+    when(servicioCalculoRecompensaMock.obtenerRecompensa(partida)).thenReturn(recompensaDTO);
+
+    servicioUsuario.aplicarRecompensa(usuario, partida);
+
+    assertEquals(150, usuario.getOro());
+    assertEquals(300, usuario.getExperiencia());
+  }
+
+  @Test
+  public void deberiaAgregarCartaAlInventarioSiNoExisteDelUsuario() {
+    Usuario usuario = new Usuario();
+    usuario.setId(1L);
+
+    Carta carta = new Carta();
+    carta.setId(10L);
+
+    Partida partida = new Partida();
+
+    RecompensaDTO recompensaDTO = new RecompensaDTO();
+    recompensaDTO.setIdCarta(10L);
+    when(servicioCalculoRecompensaMock.obtenerRecompensa(partida)).thenReturn(recompensaDTO);
+
+    when(repositorioCartaMock.buscarPorId(10L)).thenReturn(carta);
+    when(repositorioInventarioMock.buscarItemDeJugador(1L, 10L)).thenReturn(null);
+
+    servicioUsuario.aplicarRecompensa(usuario, partida);
+
+    verify(repositorioInventarioMock, times(1)).guardar(any(ItemInventario.class));
+  }
+
+  @Test
+  public void deberiaLanzarExcepcionSiElUsuarioNoExiste() {
+    Partida partida = new Partida();
+
+    RuntimeException excepcion = assertThrows(
+      RuntimeException.class,
+      () -> {
+        servicioUsuario.aplicarRecompensa(null, partida);
+      }
+    );
+
+    assertEquals("Error, usuario inválido.", excepcion.getMessage());
+  }
+
+  @Test
+  public void deberiaLanzarExcepcionSiLaCartaNoExiste() {
+    Usuario usuario = new Usuario();
+    Partida partida = new Partida();
+
+    RecompensaDTO recompensaDTO = new RecompensaDTO();
+    recompensaDTO.setIdCarta(10L);
+    when(servicioCalculoRecompensaMock.obtenerRecompensa(partida)).thenReturn(recompensaDTO);
+
+    when(repositorioCartaMock.buscarPorId(10L)).thenReturn(null);
+
+    RuntimeException excepcion = assertThrows(
+      RuntimeException.class,
+      () -> {
         servicioUsuario.aplicarRecompensa(usuario, partida);
+      }
+    );
 
-        assertEquals(150, usuario.getOro());
-        assertEquals(300, usuario.getExperiencia());
-    }
+    assertEquals("Error, carta no encontrada.", excepcion.getMessage());
+  }
 
-    @Test
-    public void deberiaAgregarCartaAlInventarioSiNoExisteDelUsuario() {
-        Usuario usuario = new Usuario();
-        usuario.setId(1L);
+  @Test
+  public void deberiaSumarUnaCantidadSiElUsuarioYaPoseeLaCarta() {
+    Usuario usuario = new Usuario();
+    usuario.setId(1L);
 
-        Carta carta = new Carta();
-        carta.setId(10L);
+    Carta carta = new Carta();
+    carta.setId(10L);
 
-        Partida partida = new Partida();
+    ItemInventario itemInventario = new ItemInventario();
+    itemInventario.setCantidad(1);
 
-        RecompensaDTO recompensaDTO = new RecompensaDTO();
-        recompensaDTO.setIdCarta(10L);
-        when(servicioCalculoRecompensaMock.obtenerRecompensa(partida)).thenReturn(recompensaDTO);
+    Partida partida = new Partida();
 
-        when(repositorioCartaMock.buscarPorId(10L)).thenReturn(carta);
-        when(repositorioInventarioMock.buscarItemDeJugador(1L, 10L)).thenReturn(null);
+    RecompensaDTO recompensaDTO = new RecompensaDTO();
+    recompensaDTO.setIdCarta(10L);
+    when(servicioCalculoRecompensaMock.obtenerRecompensa(partida)).thenReturn(recompensaDTO);
 
-        servicioUsuario.aplicarRecompensa(usuario, partida);
+    when(repositorioCartaMock.buscarPorId(10L)).thenReturn(carta);
+    when(repositorioInventarioMock.buscarItemDeJugador(1L, 10L)).thenReturn(itemInventario);
 
-        verify(repositorioInventarioMock, times(1)).guardar(any(ItemInventario.class));
-    }
+    servicioUsuario.aplicarRecompensa(usuario, partida);
 
-    @Test
-    public void deberiaLanzarExcepcionSiElUsuarioNoExiste() {
-        Partida partida = new Partida();
-
-        RuntimeException excepcion = assertThrows(RuntimeException.class, () -> {
-            servicioUsuario.aplicarRecompensa(null, partida);
-        });
-
-        // ¡ACTUALIZAMOS EL MENSAJE ESPERADO!
-        assertEquals("Error, usuario inválido.", excepcion.getMessage());
-    }
-
-    @Test
-    public void deberiaLanzarExcepcionSiLaCartaNoExiste() {
-        Usuario usuario = new Usuario();
-        Partida partida = new Partida();
-
-        RecompensaDTO recompensaDTO = new RecompensaDTO();
-        recompensaDTO.setIdCarta(10L);
-        when(servicioCalculoRecompensaMock.obtenerRecompensa(partida)).thenReturn(recompensaDTO);
-
-        when(repositorioCartaMock.buscarPorId(10L)).thenReturn(null);
-
-        RuntimeException excepcion = assertThrows(RuntimeException.class, () -> {
-            servicioUsuario.aplicarRecompensa(usuario, partida);
-        });
-
-        assertEquals("Error, carta no encontrada.", excepcion.getMessage());
-    }
-
-    @Test
-    public void deberiaSumarUnaCantidadSiElUsuarioYaPoseeLaCarta() {
-        Usuario usuario = new Usuario();
-        usuario.setId(1L);
-
-        Carta carta = new Carta();
-        carta.setId(10L);
-
-        ItemInventario itemInventario = new ItemInventario();
-        itemInventario.setCantidad(1);
-
-        Partida partida = new Partida();
-
-        RecompensaDTO recompensaDTO = new RecompensaDTO();
-        recompensaDTO.setIdCarta(10L);
-        when(servicioCalculoRecompensaMock.obtenerRecompensa(partida)).thenReturn(recompensaDTO);
-
-        when(repositorioCartaMock.buscarPorId(10L)).thenReturn(carta);
-        when(repositorioInventarioMock.buscarItemDeJugador(1L, 10L)).thenReturn(itemInventario);
-
-        servicioUsuario.aplicarRecompensa(usuario, partida);
-
-        assertEquals(2, itemInventario.getCantidad());
-    }
+    assertEquals(2, itemInventario.getCantidad());
+  }
 }

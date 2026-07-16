@@ -2,8 +2,8 @@ package com.tallerwebi.presentacion;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.mockito.Mockito.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.*;
 import java.util.ArrayList;
@@ -44,14 +44,15 @@ public class ControladorCombateTest {
 
     when(requestMock.getSession()).thenReturn(sessionMock);
 
-    controladorCombate = new ControladorCombate(
-            servicioCombateMock,
-            servicioPartidaMock,
-            servicioUsuarioMock,
-            servicioCalculoRecompensaMock,
-            servicioHistorialMock,
-            servicioCartaMock
-    );
+    controladorCombate =
+      new ControladorCombate(
+        servicioCombateMock,
+        servicioPartidaMock,
+        servicioUsuarioMock,
+        servicioCalculoRecompensaMock,
+        servicioHistorialMock,
+        servicioCartaMock
+      );
   }
 
   // ------------------------------------------------------------------
@@ -101,7 +102,7 @@ public class ControladorCombateTest {
     partidaSimulada.setManoJugador(new ArrayList<>());
     partidaSimulada.setMazoRestante(new ArrayList<>());
     when(servicioPartidaMock.iniciarPartida(any(Usuario.class), anyString()))
-            .thenReturn(partidaSimulada);
+      .thenReturn(partidaSimulada);
 
     ModelAndView modelAndView = controladorCombate.iniciarCombate("bosque", requestMock);
 
@@ -136,7 +137,7 @@ public class ControladorCombateTest {
     partidaSimulada.setMazoRestante(mazoRestanteQueDevuelveElServicio);
 
     when(servicioPartidaMock.iniciarPartida(any(Usuario.class), anyString()))
-            .thenReturn(partidaSimulada);
+      .thenReturn(partidaSimulada);
 
     ModelAndView mav = controladorCombate.iniciarCombate("bosque", requestMock);
 
@@ -174,7 +175,7 @@ public class ControladorCombateTest {
     Partida partidaExistente = new Partida();
     partidaExistente.setId(idPartidaActiva);
     when(servicioCombateMock.obtenerPartidaPorIdentificador(idPartidaActiva))
-            .thenReturn(partidaExistente);
+      .thenReturn(partidaExistente);
 
     ModelAndView mav = controladorCombate.iniciarCombate("bosque", requestMock);
 
@@ -220,15 +221,16 @@ public class ControladorCombateTest {
     partidaActualizada.setHpEnemigo(50); // Nadie llega a 0 HP
 
     when(servicioCombateMock.jugarTurno(idPartida, idCarta)).thenReturn(logEsperado);
-    when(servicioCombateMock.obtenerPartidaPorIdentificador(idPartida)).thenReturn(partidaActualizada);
+    when(servicioCombateMock.obtenerPartidaPorIdentificador(idPartida))
+      .thenReturn(partidaActualizada);
 
     // 5. Ejecución
     ModelAndView mav = controladorCombate.jugarCarta(
-            idCarta,
-            idPartida,
-            "bosque",
-            requestMock,
-            modelMock
+      idCarta,
+      idPartida,
+      "bosque",
+      requestMock,
+      modelMock
     );
 
     // 6. Validaciones
@@ -265,12 +267,18 @@ public class ControladorCombateTest {
     recompensaDTO.setExperiencia(50);
     when(servicioCalculoRecompensaMock.obtenerRecompensa(partidaGanada)).thenReturn(recompensaDTO);
 
-    ModelAndView mav = controladorCombate.jugarCarta(idCarta, idPartida, "bosque", requestMock, modelMock);
+    ModelAndView mav = controladorCombate.jugarCarta(
+      idCarta,
+      idPartida,
+      "bosque",
+      requestMock,
+      modelMock
+    );
 
     assertThat(mav.getViewName(), equalTo("recompensas"));
     assertThat(mav.getModel().get("recompensa"), is(recompensaDTO));
     verify(servicioHistorialMock, times(1))
-            .guardarHistorialPartidaServicio(any(HistorialPartida.class));
+      .guardarHistorialPartidaServicio(any(HistorialPartida.class));
   }
 
   @Test
@@ -304,19 +312,28 @@ public class ControladorCombateTest {
     when(sessionMock.getAttribute("idsMazoRobo")).thenReturn(idsMazoRoboSimulado);
 
     when(servicioCalculoRecompensaMock.obtenerRecompensa(partidaPerdida))
-            .thenReturn(new RecompensaDTO());
+      .thenReturn(new RecompensaDTO());
 
     Carta cartaJugada = new Carta();
     cartaJugada.setNombre("Golpe Débil");
     when(servicioCartaMock.buscarPorId(idCarta)).thenReturn(cartaJugada);
 
-    ModelAndView mav = controladorCombate.jugarCarta(idCarta, idPartida, "bosque", requestMock, modelMock);
+    ModelAndView mav = controladorCombate.jugarCarta(
+      idCarta,
+      idPartida,
+      "bosque",
+      requestMock,
+      modelMock
+    );
 
     assertThat(mav.getViewName(), equalTo("game-over"));
-    assertThat(mav.getModel().get("motivoDerrota"), equalTo("¡Tus puntos de vida llegaron a cero!"));
+    assertThat(
+      mav.getModel().get("motivoDerrota"),
+      equalTo("¡Tus puntos de vida llegaron a cero!")
+    );
     assertThat(mav.getModel().get("ultimaCartaJugada"), is(cartaJugada));
     verify(servicioHistorialMock, times(1))
-            .guardarHistorialPartidaServicio(any(HistorialPartida.class));
+      .guardarHistorialPartidaServicio(any(HistorialPartida.class));
   }
 
   @Test
@@ -345,15 +362,21 @@ public class ControladorCombateTest {
     when(sessionMock.getAttribute("idsMazoRobo")).thenReturn(new ArrayList<Long>());
 
     when(servicioCalculoRecompensaMock.obtenerRecompensa(partidaEnCurso))
-            .thenReturn(new RecompensaDTO());
+      .thenReturn(new RecompensaDTO());
     when(servicioCartaMock.buscarPorId(idCarta)).thenReturn(new Carta());
 
-    ModelAndView mav = controladorCombate.jugarCarta(idCarta, idPartida, "bosque", requestMock, modelMock);
+    ModelAndView mav = controladorCombate.jugarCarta(
+      idCarta,
+      idPartida,
+      "bosque",
+      requestMock,
+      modelMock
+    );
 
     assertThat(mav.getViewName(), equalTo("game-over"));
     assertThat(
-            mav.getModel().get("motivoDerrota"),
-            equalTo("¡Te quedaste sin cartas y el enemigo resistió!")
+      mav.getModel().get("motivoDerrota"),
+      equalTo("¡Te quedaste sin cartas y el enemigo resistió!")
     );
   }
 
@@ -384,7 +407,7 @@ public class ControladorCombateTest {
     when(sessionMock.getAttribute("idsMano")).thenReturn(null);
     when(sessionMock.getAttribute("idsMazoRobo")).thenReturn(null);
     when(servicioCalculoRecompensaMock.obtenerRecompensa(partidaGanada))
-            .thenReturn(new RecompensaDTO());
+      .thenReturn(new RecompensaDTO());
 
     controladorCombate.jugarCarta(idCarta, idPartida, "bosque", requestMock, modelMock);
 
